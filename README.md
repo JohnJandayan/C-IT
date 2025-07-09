@@ -1,6 +1,54 @@
-# C-It - Professional C Code Visualizer
+# C-It - C Code Visualizer
 
-A modern, professional-grade C code visualization tool that helps developers and students understand algorithms and data structures through interactive step-by-step execution.
+A modern, professional-grade C code visualization tool that helps developers and students understand algorithms and data structures through interactive, step-by-step execution.
+
+## 🚀 Live Demo
+
+[A live demo of the application will be available here once deployed.]
+
+## 📖 Documentation
+
+For detailed information about the project, please refer to the following documents:
+
+- **[Project Overview](docs/PROJECT_OVERVIEW.md)**: High-level information about the project, including features and technology stack.
+- **[Deployment Guide](docs/deployment-guide.md)**: Step-by-step instructions for deploying the application.
+- **[Architecture](docs/architecture.md)**: An in-depth look at the project's architecture.
+- **[Hosting Configuration](docs/hosting-configuration.md)**: Detailed hosting configuration for Render and Cloudflare Pages.
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/c-it.git
+cd c-it
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the application.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our **[Contributing Guidelines](CONTRIBUTING.md)**.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Developer
+
+**John Jandayan**
+- Portfolio: [https://portfolio-john-jandayan.vercel.app/](https://portfolio-john-jandayan.vercel.app/)
+- GitHub: [@johnjandayan](https://github.com/johnjandayan)
 
 ## 🚀 Features
 
@@ -33,12 +81,33 @@ A modern, professional-grade C code visualization tool that helps developers and
 - **Icons**: Lucide React
 - **Deployment**: Cloudflare Pages
 
-### Backend (Planned)
+### Backend
 - **Framework**: Django with Django REST Framework
 - **Language**: Python 3.11+
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL (via Render)
 - **Deployment**: Render
-- **Architecture**: Microservices
+
+## 🌟 Project Status
+
+### Phase 1: Initial Setup
+- [x] Scaffolding the Next.js frontend.
+- [x] Creating a modern UI with `shadcn/ui`.
+- [x] Implementing mock data for visualization.
+
+### Phase 2: Backend Development
+- [x] Setting up the Django backend with Django REST Framework.
+- [x] Implementing a C code execution engine with `gcc` and `gdb`.
+- [x] Creating an API endpoint to receive code and return an execution trace.
+
+### Phase 3: Frontend-Backend Integration
+- [x] Connecting the Next.js frontend to the Django backend.
+- [x] Replacing mock data with live data from the API.
+- [x] Displaying the execution trace in a user-friendly format.
+
+### Phase 4: Enhancements & Deployment (In Progress)
+- [x] Adding animations to the frontend visualization.
+- [ ] Implementing more advanced visualization features.
+- [x] Documenting the deployment process for Render and Cloudflare Pages.
 
 ## 🚀 Quick Start
 
@@ -109,49 +178,6 @@ The application includes templates for:
 - **Theme**: Toggle between light and dark modes
 - **Speed Control**: Adjust execution speed from 100ms to 1000ms
 - **Code Editing**: Modify existing templates or write custom algorithms
-
-## 🚀 Deployment
-
-### Frontend (Cloudflare Pages)
-1. Connect your GitHub repository to Cloudflare Pages
-2. Set build command: `npm run build`
-3. Set build output directory: `out`
-4. Deploy automatically on git push
-
-### Backend (Render) - Coming Soon
-1. Deploy Django backend to Render
-2. Configure PostgreSQL database
-3. Set up environment variables
-4. Enable CORS for frontend domain
-
-For detailed deployment instructions, see [Deployment Guide](docs/deployment-guide.md).
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow TypeScript best practices
-- Use Tailwind CSS for styling
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Developer
-
-**John Jandayan**
-- Portfolio: [https://portfolio-john-jandayan.vercel.app/](https://portfolio-john-jandayan.vercel.app/)
-- GitHub: [@johnjandayan](https://github.com/johnjandayan)
 
 ## 🙏 Acknowledgments
 
