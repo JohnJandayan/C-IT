@@ -12,9 +12,11 @@ from rest_framework.response import Response
 from celery.result import AsyncResult
 from .tasks import run_code_in_docker
 from .utils import create_gdb_script, parse_gdb_output_intelligently
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
+@csrf_exempt
 @api_view(['POST'])
 def execute_code(request):
     code = request.data.get('code', '')
