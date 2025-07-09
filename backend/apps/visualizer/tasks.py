@@ -3,7 +3,7 @@ import docker
 import tempfile
 from pathlib import Path
 
-from .views import create_gdb_script, parse_gdb_output_intelligently
+from .utils import create_gdb_script, parse_gdb_output_intelligently
 
 @shared_task
 def run_code_in_docker(code: str):

@@ -32,7 +32,7 @@ const useCodeExecution = () => {
     setExecutionResult(null);
 
     try {
-      const executeResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/execute/`, {
+      const executeResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
@@ -47,7 +47,7 @@ const useCodeExecution = () => {
 
       // Poll for result
       const poll = async (): Promise<ExecutionResult> => {
-        const resultResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/result/${task_id}/`);
+        const resultResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/result/${task_id}`);
         if (!resultResponse.ok) {
           throw new Error('Failed to fetch execution result');
         }
