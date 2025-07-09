@@ -15,6 +15,10 @@ from .utils import create_gdb_script, parse_gdb_output_intelligently
 
 # Create your views here.
 
+@api_view(['GET'])
+def index(request):
+    return Response({"message": "Welcome to the C-IT Visualizer API!"})
+
 @api_view(['POST'])
 def execute_code(request):
     code = request.data.get('code', '')
