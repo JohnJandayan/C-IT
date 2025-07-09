@@ -16,11 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from apps.visualizer import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include('visualizer.urls')),
-    path('api/execute/', views.execute_code, name='execute_code'),
-    path('api/result/<str:task_id>/', views.get_result, name='get_result'),
+    path('api/', include('visualizer.urls')),
 ]
