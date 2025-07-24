@@ -12,6 +12,9 @@ from rest_framework.response import Response
 from celery.result import AsyncResult
 from .tasks import run_code_in_docker
 from .utils import create_gdb_script, parse_gdb_output_intelligently
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -21,9 +24,14 @@ def index(request):
 
 @api_view(['POST'])
 def execute_code(request):
+    logger.info(f"Request data: {request.data}")
     code = request.data.get('code', '')
     if not code:
-        return Response({"error": "No code provided"}, status=400)
+        return Response({
+            "error": "No code provided",
+            "received_data": request.data,
+            "content_type": request.content_type,
+        }, status=400)
 
     task = run_code_in_docker.delay(code)
     return Response({"task_id": task.id})
