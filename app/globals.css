@@ -14,7 +14,7 @@
   }
   
   * {
-    @apply border-border;
+    @apply border-secondary-200;
   }
 }
 
