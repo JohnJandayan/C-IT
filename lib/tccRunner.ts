@@ -8,18 +8,31 @@ declare global {
   }
 }
 
+function loadTCCScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') return reject(new Error('TCC.js can only run in the browser'));
+    if (window.TCC) return resolve();
+    // Check if script is already loading
+    if (document.getElementById('tcc-js-script')) {
+      (document.getElementById('tcc-js-script') as HTMLScriptElement).onload = () => resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'tcc-js-script';
+    script.src = '/tcc.js';
+    script.onload = () => resolve();
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
 export async function runCCode(code: string, input: string, variables: string[] = []): Promise<{ output: string, steps: any[] }> {
-  // Instrument code for tracing
+  if (typeof window === 'undefined') {
+    throw new Error('TCC.js can only run in the browser');
+  }
+  await loadTCCScript();
   const instrumentedCode = instrumentCCode(code, variables);
 
-  // Dynamically import tcc.js (assumes tcc.js and tcc.wasm are in /public)
-  // @ts-ignore
-  const tccModule = await import('/tcc.js');
-
-  if (!window.TCC) {
-    // @ts-ignore
-    window.TCC = await tccModule.default();
-  }
   const tcc = window.TCC;
 
   let output = '';
@@ -31,7 +44,6 @@ export async function runCCode(code: string, input: string, variables: string[] 
   });
   tcc.setStdin(input);
 
-  // Compile and run the instrumented code
   try {
     tcc.compile(instrumentedCode);
     tcc.run();
@@ -39,12 +51,10 @@ export async function runCCode(code: string, input: string, variables: string[] 
     output += '\nError: ' + (err as Error).message;
   }
 
-  // Parse trace output into steps
   const steps: any[] = [];
   const lines = output.split('\n');
   for (const line of lines) {
     if (line.startsWith('TRACE:')) {
-      // Example: TRACE:7:a=1,b=2
       const [, lineNum, ...rest] = line.split(':');
       const vars = rest.join(':').split(',').map(s => s.trim());
       const state: Record<string, any> = { line: Number(lineNum) };
