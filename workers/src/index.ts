@@ -166,7 +166,7 @@ async function visualizeAlgorithm(request: Request, env: Env, corsHeaders: Recor
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as { algorithmId?: string; inputArray?: number[] };
     const { algorithmId, inputArray } = body;
 
     if (!algorithmId || !inputArray) {
@@ -213,7 +213,7 @@ async function saveVisualization(request: Request, env: Env, corsHeaders: Record
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as { name?: string; algorithmId?: string; inputArray?: number[]; steps?: any[] };
     const { name, algorithmId, inputArray, steps } = body;
 
     if (!name || !algorithmId || !inputArray || !steps) {
