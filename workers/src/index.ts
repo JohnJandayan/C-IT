@@ -338,6 +338,9 @@ async function serveStaticAsset(request: Request, env: Env, path: string): Promi
   }
 }
 
+
+// Visualization steps
+
 function generateVisualizationSteps(algorithmId: string, inputArray: number[]): any[] {
   // This is a simplified version - in a real implementation, you'd have more sophisticated logic
   const steps = [];
