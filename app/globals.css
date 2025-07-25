@@ -1,306 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  --font-inter: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
   }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+  
+  body {
+    @apply bg-secondary-50 text-secondary-900;
   }
-}
-
-@layer base {
+  
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
 }
 
-/* Custom scrollbar for code editor */
-.code-editor::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.code-editor::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
-}
-
-.code-editor::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-md;
-}
-
-.code-editor::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
-}
-
-/* Syntax highlighting for C code */
-.c-keyword {
-  @apply text-purple-600 dark:text-purple-400 font-semibold;
-}
-
-.c-string {
-  @apply text-green-600 dark:text-green-400;
-}
-
-.c-comment {
-  @apply text-gray-500 dark:text-gray-400 italic;
-}
-
-.c-number {
-  @apply text-blue-600 dark:text-blue-400;
-}
-
-/* Enhanced animations for array elements */
-.array-element {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-}
-
-.array-element:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Smooth slide-in animation for stack elements */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Pulse animation for highlighted elements */
-@keyframes gentlePulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
-
-.animate-gentle-pulse {
-  animation: gentlePulse 2s ease-in-out infinite;
-}
-
-/* Bounce animation for swapping elements */
-@keyframes smoothBounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  40% {
-    transform: translateY(-8px) scale(1.1);
-  }
-  60% {
-    transform: translateY(-4px) scale(1.05);
-  }
-}
-
-.animate-smooth-bounce {
-  animation: smoothBounce 1s ease-in-out;
-}
-
-/* Glow effect for active elements */
-.glow-effect {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-  border-color: rgb(59, 130, 246);
-}
-
-.dark .glow-effect {
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
-  border-color: rgb(96, 165, 250);
-}
-
-/* Professional loading animation */
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Smooth transitions for theme switching */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* Enhanced button hover effects */
-.btn-hover-effect {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-hover-effect:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Staggered animation for variable list */
-.variable-item {
-  animation: slideInLeft 0.5s ease-out forwards;
-  opacity: 0;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Tree node connection lines animation */
-.tree-connection {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: drawLine 1s ease-in-out forwards;
-}
-
-@keyframes drawLine {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Graph node hover effects */
-.graph-node {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.graph-node:hover {
-  transform: scale(1.2);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-}
-
-/* Code editor line highlight animation */
-.line-highlight {
-  animation: highlightFade 2s ease-in-out;
-}
-
-@keyframes highlightFade {
-  0% {
-    background-color: rgba(59, 130, 246, 0.3);
-    transform: scale(1.02);
-  }
-  50% {
-    background-color: rgba(59, 130, 246, 0.2);
-  }
-  100% {
-    background-color: rgba(59, 130, 246, 0.1);
-    transform: scale(1);
-  }
-}
-
-/* Responsive design enhancements */
-@media (max-width: 768px) {
-  .array-element {
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 0.75rem;
+@layer components {
+  .code-editor {
+    @apply font-mono text-sm leading-relaxed;
   }
   
-  .graph-node {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.75rem;
+  .visualization-container {
+    @apply bg-white rounded-lg shadow-lg border border-secondary-200;
+  }
+  
+  .algorithm-step {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .array-element {
+    @apply flex items-center justify-center w-12 h-12 rounded-lg border-2 font-mono font-semibold transition-all duration-300;
+  }
+  
+  .array-element.comparing {
+    @apply bg-yellow-100 border-yellow-400 text-yellow-800;
+  }
+  
+  .array-element.swapping {
+    @apply bg-red-100 border-red-400 text-red-800;
+  }
+  
+  .array-element.sorted {
+    @apply bg-green-100 border-green-400 text-green-800;
+  }
+  
+  .array-element.current {
+    @apply bg-blue-100 border-blue-400 text-blue-800;
+  }
+  
+  .array-element.pivot {
+    @apply bg-purple-100 border-purple-400 text-purple-800;
+  }
+  
+  .data-structure-node {
+    @apply flex items-center justify-center w-16 h-16 rounded-full border-2 font-mono font-semibold transition-all duration-300;
+  }
+  
+  .data-structure-node.active {
+    @apply bg-blue-100 border-blue-400 text-blue-800;
+  }
+  
+  .data-structure-node.visited {
+    @apply bg-green-100 border-green-400 text-green-800;
+  }
+  
+  .data-structure-node.path {
+    @apply bg-yellow-100 border-yellow-400 text-yellow-800;
+  }
+  
+  .button-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .button-secondary {
+    @apply bg-secondary-200 hover:bg-secondary-300 text-secondary-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
   }
 }
 
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  .array-element,
-  .btn-hover-effect,
-  .graph-node,
-  * {
-    animation: none !important;
-    transition: none !important;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
-}
-
-/* Focus indicators for keyboard navigation */
-.focus-visible:focus {
-  outline: 2px solid rgb(59, 130, 246);
-  outline-offset: 2px;
-}
+} 
