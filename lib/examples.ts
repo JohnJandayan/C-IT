@@ -18,14 +18,13 @@ export const cExamples: CExample[] = [
   },
   {
     name: 'Bubble Sort',
-    description: 'Sort an array using bubble sort.',
-    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {5, 1, 4, 2, 8};\n  int n = 5;\n  for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n  }\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  return 0;\n}`
+    description: 'Sort an array using bubble sort with animated visualization.',
+    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {5, 1, 4, 2, 8};\n  int n = 5;\n  printf("Original array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  \n  for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n    printf("After pass %d: ", i+1);\n    for (int k = 0; k < n; k++) printf("%d ", arr[k]);\n    printf("\\n");\n  }\n  \n  printf("Sorted array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  return 0;\n}`
   },
   {
     name: 'Linear Search',
-    description: 'Search for a value in an array.',
-    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {3, 7, 2, 9, 5};\n  int x;\n  scanf("%d", &x);\n  int found = 0;\n  for (int i = 0; i < 5; i++) {\n    if (arr[i] == x) found = 1;\n  }\n  printf(found ? "Found\\n" : "Not found\\n");\n  return 0;\n}`,
-    input: '7'
+    description: 'Search for a value in an array with animated visualization.',
+    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {3, 7, 2, 9, 5};\n  int target = 7;\n  int found = 0;\n  int foundIndex = -1;\n  \n  printf("Searching for: %d\\n", target);\n  printf("Array: ");\n  for (int i = 0; i < 5; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  \n  for (int i = 0; i < 5; i++) {\n    printf("Checking index %d: %d\\n", i, arr[i]);\n    if (arr[i] == target) {\n      found = 1;\n      foundIndex = i;\n      break;\n    }\n  }\n  \n  if (found) {\n    printf("Found %d at index %d\\n", target, foundIndex);\n  } else {\n    printf("Not found\\n");\n  }\n  return 0;\n}`
   },
   {
     name: 'Linked List Insert',

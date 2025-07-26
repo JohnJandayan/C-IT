@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import CodeEditor from '@/components/CodeEditor';
-import GraphicalVisualizer from '@/components/GraphicalVisualizer';
+import AlgorithmVisualizer from '@/components/AlgorithmVisualizer';
 import { runCCode } from '@/lib/tccRunner';
 import { cExamples, CExample } from '@/lib/examples';
 
@@ -108,31 +108,14 @@ export default function Home() {
               {executionSteps.length > 0 && (
                 <>
                   <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-4 mt-4 min-h-[80px] text-secondary-700 text-xs">
-                    <div className="flex items-center gap-2 mb-2">
-                      <button onClick={() => setCurrentStep(s => Math.max(0, s - 1))} disabled={currentStep === 0} className="px-2 py-1 bg-secondary-200 rounded disabled:opacity-50">Prev</button>
-                      <span>Step {currentStep + 1} / {executionSteps.length}</span>
-                      <button onClick={() => setCurrentStep(s => Math.min(executionSteps.length - 1, s + 1))} disabled={currentStep === executionSteps.length - 1} className="px-2 py-1 bg-secondary-200 rounded disabled:opacity-50">Next</button>
-                    </div>
-                    <table className="w-full text-xs mb-4">
-                      <thead>
-                        <tr>
-                          <th className="text-left">Line</th>
-                          {Object.keys(executionSteps[currentStep]).filter(k => k !== 'line').map(v => (
-                            <th key={v} className="text-left">{v}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>{executionSteps[currentStep].line}</td>
-                          {Object.keys(executionSteps[currentStep]).filter(k => k !== 'line').map(v => (
-                            <td key={v}>{executionSteps[currentStep][v]}</td>
-                          ))}
-                        </tr>
-                      </tbody>
-                    </table>
-                    {/* Graphical visualization for arrays/pointers */}
-                    <GraphicalVisualizer step={executionSteps[currentStep]} />
+
+                    {/* Animated algorithm visualization */}
+                    <AlgorithmVisualizer 
+                      step={executionSteps[currentStep]} 
+                      currentStep={currentStep}
+                      totalSteps={executionSteps.length}
+                      onStepChange={setCurrentStep}
+                    />
                   </div>
                 </>
               )}

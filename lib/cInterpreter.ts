@@ -40,7 +40,10 @@ class CInterpreter {
     const variables: Record<string, any> = {};
     this.variables.forEach((var_, name) => {
       if (var_.type === 'array') {
-        variables[name] = var_.value;
+        // Add array elements individually for better visualization
+        var_.value.forEach((val: any, index: number) => {
+          variables[`${name}[${index}]`] = val;
+        });
       } else {
         variables[name] = var_.value;
       }
