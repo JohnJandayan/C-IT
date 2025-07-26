@@ -49,9 +49,26 @@ class CInterpreter {
       }
     });
 
+    // Add step information for visualization
+    const stepData = { ...variables };
+    
+    // Add current line
+    stepData.line = line;
+    
+    // Add loop variables for visualization
+    if (this.variables.has('i')) stepData.i = this.variables.get('i')!.value;
+    if (this.variables.has('j')) stepData.j = this.variables.get('j')!.value;
+    
+    // Add target for search algorithms
+    if (this.variables.has('target')) stepData.target = this.variables.get('target')!.value;
+    if (this.variables.has('found')) stepData.found = this.variables.get('found')!.value;
+    
+    // Add current position for traversal
+    if (this.variables.has('current')) stepData.current = this.variables.get('current')!.value;
+
     this.steps.push({
       line,
-      variables: { ...variables },
+      variables: stepData,
       output: this.output,
       description
     });

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import CodeEditor from '@/components/CodeEditor';
-import AlgorithmVisualizer from '@/components/AlgorithmVisualizer';
+import DataStructureVisualizer from '@/components/DataStructureVisualizer';
 import { runCCode } from '@/lib/tccRunner';
 import { cExamples, CExample } from '@/lib/examples';
 
@@ -15,6 +15,8 @@ export default function Home() {
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedExample, setSelectedExample] = useState<CExample | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState('normal');
 
   const consoleRef = useRef<HTMLDivElement>(null);
 
@@ -109,12 +111,16 @@ export default function Home() {
                 <>
                   <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-4 mt-4 min-h-[80px] text-secondary-700 text-xs">
 
-                    {/* Animated algorithm visualization */}
-                    <AlgorithmVisualizer 
+                    {/* Data structure visualization */}
+                    <DataStructureVisualizer 
                       step={executionSteps[currentStep]} 
                       currentStep={currentStep}
                       totalSteps={executionSteps.length}
                       onStepChange={setCurrentStep}
+                      onSpeedChange={setSpeed}
+                      onPlayPause={() => setIsPlaying(!isPlaying)}
+                      isPlaying={isPlaying}
+                      speed={speed}
                     />
                   </div>
                 </>

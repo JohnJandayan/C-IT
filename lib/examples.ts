@@ -8,8 +8,8 @@ export interface CExample {
 export const cExamples: CExample[] = [
   {
     name: 'Array Sum',
-    description: 'Sum all elements of an array.',
-    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {1, 2, 3, 4, 5};\n  int sum = 0;\n  for (int i = 0; i < 5; i++) {\n    sum += arr[i];\n  }\n  printf("Sum: %d\\n", sum);\n  return 0;\n}`
+    description: 'Sum all elements of an array with visualization.',
+    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {1, 2, 3, 4, 5};\n  int sum = 0;\n  printf("Array: ");\n  for (int i = 0; i < 5; i++) {\n    printf("%d ", arr[i]);\n  }\n  printf("\\n");\n  \n  for (int i = 0; i < 5; i++) {\n    printf("Adding arr[%d] = %d to sum\\n", i, arr[i]);\n    sum += arr[i];\n    printf("Current sum: %d\\n", sum);\n  }\n  printf("Final sum: %d\\n", sum);\n  return 0;\n}`
   },
   {
     name: 'Pointer Demo',
