@@ -5,6 +5,7 @@ interface DataStructureVisualizerProps {
   step: Record<string, any>;
   currentStep: number;
   totalSteps: number;
+  executionSteps: Record<string, any>[];
   onStepChange: (step: number) => void;
   onSpeedChange: (speed: string) => void;
   onPlayPause: () => void;
@@ -24,6 +25,7 @@ export default function DataStructureVisualizer({
   step,
   currentStep,
   totalSteps,
+  executionSteps,
   onStepChange,
   onSpeedChange,
   onPlayPause,
@@ -51,6 +53,23 @@ export default function DataStructureVisualizer({
         arrays[arrName][idx] = step[key];
       }
     });
+
+    // If no arrays found in current step, try to find them in previous steps
+    if (Object.keys(arrays).length === 0 && executionSteps.length > 0) {
+      for (let i = executionSteps.length - 1; i >= 0; i--) {
+        const prevStep = executionSteps[i];
+        Object.keys(prevStep).forEach((key) => {
+          const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+          if (arrayMatch) {
+            const arrName = arrayMatch[1];
+            const idx = parseInt(arrayMatch[2], 10);
+            if (!arrays[arrName]) arrays[arrName] = [];
+            arrays[arrName][idx] = prevStep[key];
+          }
+        });
+        if (Object.keys(arrays).length > 0) break;
+      }
+    }
 
     // Extract linked list nodes
     Object.keys(step).forEach((key) => {
@@ -132,19 +151,24 @@ export default function DataStructureVisualizer({
 
     // Detect sorting operations
     if (dataStructureType === 'array') {
-      // Look for swapping operations
+      // Look for swapping operations by detecting changes in array values
       const swappingIndices: number[] = [];
-      Object.keys(step).forEach((key) => {
-        const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
-        if (arrayMatch) {
-          const idx = parseInt(arrayMatch[2], 10);
-          const element = newElements.find(el => el.index === idx);
-          if (element) {
-            element.value = step[key];
-            swappingIndices.push(idx);
+      const previousStep = currentStep > 0 ? executionSteps[currentStep - 1] : null;
+      
+      if (previousStep) {
+        Object.keys(step).forEach((key) => {
+          const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+          if (arrayMatch) {
+            const idx = parseInt(arrayMatch[2], 10);
+            const currentValue = step[key];
+            const previousValue = previousStep[key];
+            
+            if (currentValue !== previousValue) {
+              swappingIndices.push(idx);
+            }
           }
-        }
-      });
+        });
+      }
 
       // Look for comparison operations
       const comparingIndices: number[] = [];
@@ -168,6 +192,27 @@ export default function DataStructureVisualizer({
           element.state = 'normal';
         }
       });
+
+      // Update element values from current step
+      Object.keys(step).forEach((key) => {
+        const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+        if (arrayMatch) {
+          const idx = parseInt(arrayMatch[2], 10);
+          const element = newElements.find(el => el.index === idx);
+          if (element) {
+            element.value = step[key];
+          }
+        }
+      });
+
+      // Set default action if none detected
+      if (!action) {
+        if (step.line) {
+          action = `Executing line ${step.line}`;
+        } else {
+          action = `Step ${currentStep + 1} of ${totalSteps}`;
+        }
+      }
     }
 
     // Detect searching operations
@@ -341,7 +386,7 @@ export default function DataStructureVisualizer({
                   scale: 1, 
                   opacity: 1,
                   y: element.state === 'swapping' ? -10 : 0,
-                  rotate: element.state === 'swapping' ? 180 : 0
+                  rotate: 0
                 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ 

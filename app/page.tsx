@@ -15,7 +15,7 @@ export default function Home() {
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedExample, setSelectedExample] = useState<CExample | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [speed, setSpeed] = useState('normal');
 
   const consoleRef = useRef<HTMLDivElement>(null);
@@ -26,6 +26,22 @@ export default function Home() {
     }
   }, [executionOutput]);
 
+  // Auto-play functionality
+  useEffect(() => {
+    if (!isPlaying || executionSteps.length === 0) return;
+
+    const speedDelay = speed === 'slow' ? 2000 : speed === 'fast' ? 500 : 1000;
+    const timer = setTimeout(() => {
+      if (currentStep < executionSteps.length - 1) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        setIsPlaying(false);
+      }
+    }, speedDelay);
+
+    return () => clearTimeout(timer);
+  }, [isPlaying, currentStep, executionSteps.length, speed]);
+
   // Handler for running/visualizing code
   const handleRunCode = async (userCode: string, input: string) => {
     setCode(userCode);
@@ -34,6 +50,7 @@ export default function Home() {
     setExecutionOutput('');
     setExecutionSteps([]);
     setCurrentStep(0);
+    setIsPlaying(true);
 
     // For MVP, extract variable names from code (simple regex for int/float/char)
     const variableRegex = /\b(?:int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
@@ -116,6 +133,7 @@ export default function Home() {
                       step={executionSteps[currentStep]} 
                       currentStep={currentStep}
                       totalSteps={executionSteps.length}
+                      executionSteps={executionSteps}
                       onStepChange={setCurrentStep}
                       onSpeedChange={setSpeed}
                       onPlayPause={() => setIsPlaying(!isPlaying)}
