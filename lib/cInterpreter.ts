@@ -81,16 +81,24 @@ class CInterpreter {
   }
 
   private parseVariableDeclaration(line: string): { name: string; type: string; value?: any } | null {
-    // Match: int x = 5; or int arr[5] = {1,2,3,4,5};
+    // Match: int x = 5; or int arr[5] = {1,2,3,4,5}; or int arr[] = {1,2,3,4,5};
     const intMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
     if (intMatch) {
       return { name: intMatch[1], type: 'int', value: parseInt(intMatch[2]) };
     }
 
+    // Match array with size: int arr[5] = {1,2,3,4,5};
     const arrayMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[(\d+)\]\s*=\s*\{([^}]+)\};/);
     if (arrayMatch) {
       const values = arrayMatch[3].split(',').map(v => parseInt(v.trim()));
       return { name: arrayMatch[1], type: 'array', value: values };
+    }
+
+    // Match array without size: int arr[] = {1,2,3,4,5};
+    const arrayNoSizeMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\]\s*=\s*\{([^}]+)\};/);
+    if (arrayNoSizeMatch) {
+      const values = arrayNoSizeMatch[2].split(',').map(v => parseInt(v.trim()));
+      return { name: arrayNoSizeMatch[1], type: 'array', value: values };
     }
 
     const simpleDeclare = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*);/);
@@ -121,6 +129,30 @@ class CInterpreter {
 
   private evaluateExpression(expr: string): any {
     expr = expr.trim();
+    
+    // Handle sizeof operator
+    const sizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\/\s*sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*0\s*\]\s*\)/);
+    if (sizeofMatch) {
+      const arrayName = sizeofMatch[1];
+      const array = this.variables.get(arrayName);
+      if (array && array.type === 'array') {
+        return array.value.length;
+      }
+    }
+
+    // Handle simple sizeof
+    const simpleSizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/);
+    if (simpleSizeofMatch) {
+      const varName = simpleSizeofMatch[1];
+      const variable = this.variables.get(varName);
+      if (variable) {
+        if (variable.type === 'array') {
+          return variable.value.length * 4; // Assuming int is 4 bytes
+        } else {
+          return 4; // Assuming int is 4 bytes
+        }
+      }
+    }
     
     // Simple arithmetic
     if (expr.includes('+')) {
@@ -364,16 +396,28 @@ class CInterpreter {
     const assignment = this.parseAssignment(line);
     if (assignment) {
       if (assignment.name.includes('[')) {
-        const [arrayName, indexStr] = assignment.name.split('[');
-        const index = parseInt(indexStr.replace(']', ''));
-        const array = this.variables.get(arrayName);
-        if (array && array.type === 'array') {
-          array.value[index] = assignment.value;
+        // Handle array assignment
+        const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+        if (arrayMatch) {
+          const arrayName = arrayMatch[1];
+          const index = parseInt(arrayMatch[2]);
+          const array = this.variables.get(arrayName);
+          if (array && array.type === 'array') {
+            array.value[index] = assignment.value;
+          }
         }
       } else {
+        // Handle regular variable assignment
         const variable = this.variables.get(assignment.name);
         if (variable) {
           variable.value = assignment.value;
+        } else {
+          // Create new variable if it doesn't exist
+          this.variables.set(assignment.name, {
+            name: assignment.name,
+            value: assignment.value,
+            type: 'int'
+          });
         }
       }
       this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);

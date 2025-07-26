@@ -19,7 +19,7 @@ export const cExamples: CExample[] = [
   {
     name: 'Bubble Sort',
     description: 'Sort an array using bubble sort with animated visualization.',
-    code: `#include <stdio.h>\nint main() {\n  int arr[5] = {5, 1, 4, 2, 8};\n  int n = 5;\n  printf("Original array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  \n  for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n    printf("After pass %d: ", i+1);\n    for (int k = 0; k < n; k++) printf("%d ", arr[k]);\n    printf("\\n");\n  }\n  \n  printf("Sorted array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  return 0;\n}`
+    code: `#include <stdio.h>\nint main() {\n  int arr[] = {64, 34, 25, 12, 22, 11, 90};\n  int n = sizeof(arr) / sizeof(arr[0]);\n  printf("Original array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  \n  for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n    printf("After pass %d: ", i+1);\n    for (int k = 0; k < n; k++) printf("%d ", arr[k]);\n    printf("\\n");\n  }\n  \n  printf("Sorted array: ");\n  for (int i = 0; i < n; i++) printf("%d ", arr[i]);\n  printf("\\n");\n  return 0;\n}`
   },
   {
     name: 'Linear Search',
