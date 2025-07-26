@@ -255,7 +255,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **John Jandayan**
 - Portfolio: [https://portfolio-john-jandayan.vercel.app/](https://portfolio-john-jandayan.vercel.app/)
-- GitHub: [@your-username](https://github.com/your-username)
+- GitHub: [JohnJandayan](https://github.com/JohnJandayan)
 
 ## 🙏 Acknowledgments
 
@@ -268,7 +268,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have any questions or need help, please:
 
-1. Check the [Issues](https://github.com/your-username/c-it/issues) page
+1. Check the [Issues](https://github.com/JohnJandayan/C-IT/issues) page
 2. Create a new issue if your problem isn't already listed
 3. Contact the developer through the portfolio website
 

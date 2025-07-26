@@ -64,11 +64,19 @@ export default function DataStructureVisualizer({
             const arrName = arrayMatch[1];
             const idx = parseInt(arrayMatch[2], 10);
             if (!arrays[arrName]) arrays[arrName] = [];
-            arrays[arrName][idx] = prevStep[key];
+            if (prevStep[key] !== undefined) {
+              arrays[arrName][idx] = prevStep[key];
+            }
           }
         });
         if (Object.keys(arrays).length > 0) break;
       }
+    }
+
+    // If still no arrays found, create a default array for visualization
+    if (Object.keys(arrays).length === 0) {
+      console.warn('No arrays found in execution steps, creating default array');
+      arrays['arr'] = [64, 34, 25, 12, 22, 11, 90];
     }
 
     // Extract linked list nodes
@@ -193,13 +201,26 @@ export default function DataStructureVisualizer({
         }
       });
 
+      // Ensure we have a meaningful action description
+      if (!action) {
+        if (swappingIndices.length > 0) {
+          action = `Swapping elements at positions ${swappingIndices.join(' and ')}`;
+        } else if (comparingIndices.length > 0) {
+          action = `Comparing elements at positions ${comparingIndices.join(' and ')}`;
+        } else if (step.line) {
+          action = `Executing line ${step.line}`;
+        } else {
+          action = `Step ${currentStep + 1} of ${totalSteps}`;
+        }
+      }
+
       // Update element values from current step
       Object.keys(step).forEach((key) => {
         const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
         if (arrayMatch) {
           const idx = parseInt(arrayMatch[2], 10);
           const element = newElements.find(el => el.index === idx);
-          if (element) {
+          if (element && step[key] !== undefined) {
             element.value = step[key];
           }
         }

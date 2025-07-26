@@ -41,9 +41,11 @@ class CInterpreter {
     this.variables.forEach((var_, name) => {
       if (var_.type === 'array') {
         // Add array elements individually for better visualization
-        var_.value.forEach((val: any, index: number) => {
-          variables[`${name}[${index}]`] = val;
-        });
+        if (Array.isArray(var_.value)) {
+          var_.value.forEach((val: any, index: number) => {
+            variables[`${name}[${index}]`] = val;
+          });
+        }
       } else {
         variables[name] = var_.value;
       }
@@ -65,6 +67,9 @@ class CInterpreter {
     
     // Add current position for traversal
     if (this.variables.has('current')) stepData.current = this.variables.get('current')!.value;
+
+    // Debug logging
+    console.log(`Step ${line}: ${description}`, { variables: stepData });
 
     this.steps.push({
       line,
@@ -98,6 +103,7 @@ class CInterpreter {
     const arrayNoSizeMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\]\s*=\s*\{([^}]+)\};/);
     if (arrayNoSizeMatch) {
       const values = arrayNoSizeMatch[2].split(',').map(v => parseInt(v.trim()));
+      console.log(`Array declaration: ${arrayNoSizeMatch[1]} = [${values.join(', ')}]`);
       return { name: arrayNoSizeMatch[1], type: 'array', value: values };
     }
 
@@ -273,17 +279,30 @@ class CInterpreter {
       if (assignment) {
         if (assignment.name.includes('[')) {
           // Array assignment
-          const [arrayName, indexStr] = assignment.name.split('[');
-          const index = parseInt(indexStr.replace(']', ''));
-          const array = this.variables.get(arrayName);
-          if (array && array.type === 'array') {
-            array.value[index] = assignment.value;
+          const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+          if (arrayMatch) {
+            const arrayName = arrayMatch[1];
+            const index = parseInt(arrayMatch[2]);
+            const array = this.variables.get(arrayName);
+            if (array && array.type === 'array') {
+              console.log(`Array assignment: ${arrayName}[${index}] = ${assignment.value}`);
+              array.value[index] = assignment.value;
+            } else {
+              console.error(`Array not found: ${arrayName}`);
+            }
           }
         } else {
           // Simple assignment
           const variable = this.variables.get(assignment.name);
           if (variable) {
             variable.value = assignment.value;
+          } else {
+            // Create new variable if it doesn't exist
+            this.variables.set(assignment.name, {
+              name: assignment.name,
+              value: assignment.value,
+              type: 'int'
+            });
           }
         }
         this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);

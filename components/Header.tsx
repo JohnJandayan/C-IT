@@ -39,7 +39,7 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center space-x-4">
             <a
-              href="https://github.com/your-username/c-it"
+              href="https://github.com/JohnJandayan/C-IT"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg transition-colors"
