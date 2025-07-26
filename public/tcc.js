@@ -4,6 +4,35 @@ const text_decoder = new TextDecoder();
 let console_log_buffer = "";
 let term = null;
 
+// Term class for terminal functionality
+class Term {
+  constructor(options) {
+    this.cols = options.cols || 80;
+    this.rows = options.rows || 50;
+    this.scrollback = options.scrollback || 10000;
+    this.fontSize = options.fontSize || 15;
+    this.term_el = { style: {} };
+  }
+  
+  setKeyHandler(handler) {
+    this.keyHandler = handler;
+  }
+  
+  open(container, paste) {
+    this.container = container;
+    this.paste = paste;
+  }
+  
+  write(text) {
+    console_log_buffer += text;
+    console.log('Terminal:', text);
+  }
+  
+  resizePixel(w, h) {
+    return true;
+  }
+}
+
 // WebAssembly Helper Functions
 const wasm = {
   // WebAssembly Instance
@@ -37,7 +66,9 @@ const importObject = {
     // https://github.com/daneelsan/zig-wasm-logger/blob/master/script.js
     jsConsoleLogFlush: function() {
       // Print to the Terminal
-      term.write(console_log_buffer.split("\n").join("\r\n") + "\r\n");
+      if (term) {
+        term.write(console_log_buffer.split("\n").join("\r\n") + "\r\n");
+      }
 
       // Print to the JavaScript Console
       console.log(console_log_buffer);
@@ -55,8 +86,12 @@ function main() {
   const options_ptr = allocateString(JSON.stringify(options));
   
   // Allocate a String for passing the Program Code to Zig
-  const code = document.getElementById("code").value;
-  const code_ptr = allocateString(code);
+  const code = document.getElementById("code");
+  if (!code) {
+    console.log("main: no code element found, skipping compilation");
+    return;
+  }
+  const code_ptr = allocateString(code.value);
 
   // Call TCC to compile a program
   const ptr = wasm.instance.exports
@@ -121,7 +156,10 @@ function read_options() {
     if (option === "") { continue; }
     options.push(option);
   }
-  document.getElementById("options").innerText = "tcc " + options.join(" ");
+  const optionsEl = document.getElementById("options");
+  if (optionsEl) {
+    optionsEl.innerText = "tcc " + options.join(" ");
+  }
   return options;
 }
 
@@ -129,13 +167,20 @@ function read_options() {
 function start_terminal() {
   term = new Term({ cols: 80, rows: 50, scrollback: 10000, fontSize: 15 });
   term.setKeyHandler(term_handler);
-  term.open(
-    document.getElementById("term_container"),
-    document.getElementById("term_paste")
-  );
+  
+  // Only try to open terminal if elements exist
+  const container = document.getElementById("term_container");
+  const paste = document.getElementById("term_paste");
+  if (container && paste) {
+    term.open(container, paste);
+  }
+  
   const term_wrap_el = document.getElementById("term_wrap");
-  term_wrap_el.style.width = term.term_el.style.width;
-  term_wrap_el.onclick = term_wrap_onclick_handler;
+  if (term_wrap_el) {
+    term_wrap_el.style.width = term.term_el.style.width;
+    term_wrap_el.onclick = term_wrap_onclick_handler;
+  }
+  
   term.write("This is a barebones port of TCC 64-bit RISC-V Compiler to WebAssembly. \r\nOnly very simple C programs are supported. (Sorry, no `#include`) \r\nThe generated RISC-V ELF `a.out` will be auto-downloaded. \r\nhttps://github.com/lupyuen/tcc-riscv32-wasm\r\n");
 }
 
@@ -151,6 +196,8 @@ function term_handler(str) {
 function term_wrap_onclick_handler() {
   const term_wrap_el = document.getElementById("term_wrap");
   const term_bar_el = document.getElementById("term_bar");
+  if (!term_wrap_el || !term_bar_el) return;
+  
   const w = term_wrap_el.clientWidth;
   const h = term_wrap_el.clientHeight;
   const bar_h = term_bar_el.clientHeight;
@@ -189,8 +236,8 @@ async function bootstrap() {
   window.requestAnimationFrame(main);
 }        
 
-// Start the Terminal
-start_terminal();
-
-// Show the Compiler Options
-read_options();
+// Start the Terminal (only if we're in a browser environment)
+if (typeof window !== 'undefined') {
+  start_terminal();
+  read_options();
+}

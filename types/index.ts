@@ -8,20 +8,7 @@ export interface AlgorithmStep {
   dataStructure?: any;
 }
 
-export interface Algorithm {
-  id: string;
-  name: string;
-  category: 'sorting' | 'searching' | 'data-structures' | 'basic' | 'advanced';
-  description: string;
-  timeComplexity: {
-    best: string;
-    average: string;
-    worst: string;
-  };
-  spaceComplexity: string;
-  code: string;
-  example: number[];
-}
+
 
 export interface VisualizationState {
   currentStep: number;
@@ -30,7 +17,6 @@ export interface VisualizationState {
   speed: number;
   array: number[];
   steps: AlgorithmStep[];
-  algorithm: Algorithm | null;
 }
 
 export interface DataStructureNode {

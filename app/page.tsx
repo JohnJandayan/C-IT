@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import CodeEditor from '@/components/CodeEditor';
-import Visualization from '@/components/Visualization';
 import GraphicalVisualizer from '@/components/GraphicalVisualizer';
 import { runCCode } from '@/lib/tccRunner';
 import { cExamples, CExample } from '@/lib/examples';
@@ -43,7 +42,7 @@ export default function Home() {
     }
 
     try {
-      const result = await runCCode(userCode, input, variables);
+      const result = await runCCode(userCode, input);
       setExecutionOutput(result.output);
       setExecutionSteps(result.steps);
     } catch (err) {
