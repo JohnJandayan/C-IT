@@ -1,6 +1,6 @@
-// TCC Runner Utility for Browser-based C Code Execution
-// Uses lupyuen/tcc-riscv32-wasm which compiles C to ELF binary
-// https://github.com/lupyuen/tcc-riscv32-wasm
+// C Code Runner Utility for Browser-based Execution
+// Uses a custom C interpreter for visualization purposes
+import { runCCodeInterpreter } from './cInterpreter';
 
 declare global {
   interface Window {
@@ -148,80 +148,22 @@ function extractVariables(code: string): string[] {
 
 export async function runCCode(code: string, input: string = ''): Promise<TCCResult> {
   if (typeof window === 'undefined') {
-    throw new Error('TCC.js can only run in the browser');
+    throw new Error('C interpreter can only run in the browser');
   }
   
   try {
-    await loadTCCScript();
-    setupTerminal();
-    resetCapture();
+    console.log('Executing C code with interpreter...');
+    console.log('Code:', code);
     
-    // Extract variables for instrumentation
-    const variables = extractVariables(code);
-    const instrumentedCode = instrumentCCode(code, variables);
+    // Use the custom C interpreter
+    const result = runCCodeInterpreter(code);
     
-    console.log('Compiling C code with TCC...');
-    console.log('Instrumented code:', instrumentedCode);
-    
-    // Set up the code input for TCC
-    const codeElement = document.createElement('textarea');
-    codeElement.id = 'code';
-    codeElement.value = instrumentedCode;
-    codeElement.style.display = 'none';
-    document.body.appendChild(codeElement);
-    
-    // Call TCC's bootstrap function
-    if (typeof window.bootstrap === 'function') {
-      await window.bootstrap();
-    } else {
-      // Fallback: try to call the main function directly
-      if (typeof window.main === 'function') {
-        window.main();
-      } else {
-        throw new Error('TCC bootstrap function not found');
-      }
-    }
-    
-    // Wait a bit for compilation to complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Parse output for steps
-    const steps: any[] = [];
-    const lines = capturedOutput.split('\n');
-    
-    for (const line of lines) {
-      if (line.includes('TRACE:')) {
-        const traceMatch = line.match(/TRACE:(\d+):(.+)/);
-        if (traceMatch) {
-          const lineNum = parseInt(traceMatch[1]);
-          const varsStr = traceMatch[2];
-          const state: Record<string, any> = { line: lineNum };
-          
-          // Parse variable assignments
-          const varPairs = varsStr.split(',');
-          for (const pair of varPairs) {
-            const [name, value] = pair.split('=');
-            if (name && value !== undefined) {
-              state[name.trim()] = parseInt(value.trim()) || 0;
-            }
-          }
-          
-          steps.push(state);
-        }
-      }
-    }
-    
-    // Get ELF data from localStorage if available
-    const elfData = localStorage.getItem('elf_data') || undefined;
-    
-    // Clean up
-    document.body.removeChild(codeElement);
+    console.log('Execution result:', result);
     
     return {
-      output: capturedOutput,
-      steps,
-      compiled: true,
-      elfData
+      output: result.output,
+      steps: result.steps,
+      compiled: true
     };
     
   } catch (error) {
