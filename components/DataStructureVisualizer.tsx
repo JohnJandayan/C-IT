@@ -50,7 +50,10 @@ export default function DataStructureVisualizer({
         const arrName = arrayMatch[1];
         const idx = parseInt(arrayMatch[2], 10);
         if (!arrays[arrName]) arrays[arrName] = [];
-        arrays[arrName][idx] = step[key];
+        if (step[key] !== undefined) {
+          arrays[arrName][idx] = step[key];
+          console.log(`DEBUG: Found array element ${arrName}[${idx}] = ${step[key]}`);
+        }
       }
     });
 
@@ -110,6 +113,7 @@ export default function DataStructureVisualizer({
       setDataStructureType('array');
       Object.keys(arrays).forEach((arrName) => {
         const arr = arrays[arrName];
+        console.log(`DEBUG: Creating visualization for array ${arrName}: [${arr.join(', ')}]`);
         arr.forEach((value, index) => {
           newElements.push({
             value,

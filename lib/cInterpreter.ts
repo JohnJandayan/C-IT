@@ -190,7 +190,11 @@ class CInterpreter {
       const index = this.evaluateExpression(arrayMatch[2]);
       const array = this.variables.get(arrayName);
       if (array && array.type === 'array') {
-        return array.value[index] || 0;
+        const value = array.value[index];
+        console.log(`DEBUG: Array access ${arrayName}[${index}] = ${value}`);
+        return value !== undefined ? value : 0;
+      } else {
+        console.error(`DEBUG: Array not found: ${arrayName}`);
       }
     }
 
@@ -220,17 +224,24 @@ class CInterpreter {
       let format = printfMatch[1];
       const args = printfMatch[2] ? printfMatch[2].split(',').map(a => a.trim()) : [];
       
+      console.log(`DEBUG: printf format: "${format}", args: [${args.join(', ')}]`);
+      
       // Replace format specifiers with values
       let argIndex = 0;
       format = format.replace(/%d/g, () => {
         if (argIndex < args.length) {
           const value = this.evaluateExpression(args[argIndex]);
+          console.log(`DEBUG: printf arg ${argIndex}: ${args[argIndex]} = ${value}`);
           argIndex++;
           return value.toString();
         }
         return '%d';
       });
 
+      // Handle \n escape sequences
+      format = format.replace(/\\n/g, '\n');
+      
+      console.log(`DEBUG: printf result: "${format}"`);
       return format;
     }
     return null;
@@ -254,6 +265,7 @@ class CInterpreter {
       // Variable declaration
       const varDecl = this.parseVariableDeclaration(line);
       if (varDecl) {
+        console.log(`DEBUG: Variable declaration: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
         if (varDecl.type === 'array') {
           this.variables.set(varDecl.name, {
             name: varDecl.name,
@@ -261,6 +273,7 @@ class CInterpreter {
             type: 'array',
             address: this.allocateMemory(varDecl.value.length * 4)
           });
+          console.log(`DEBUG: Array ${varDecl.name} initialized with values: [${varDecl.value.join(', ')}]`);
         } else {
           this.variables.set(varDecl.name, {
             name: varDecl.name,
@@ -305,6 +318,7 @@ class CInterpreter {
             });
           }
         }
+        console.log(`DEBUG: Assignment: ${assignment.name} = ${assignment.value}`);
         this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);
         i++;
         continue;
@@ -351,7 +365,7 @@ class CInterpreter {
       // Printf
       const printfResult = this.parsePrintf(line);
       if (printfResult) {
-        this.output += printfResult + '\n';
+        this.output += printfResult;
         this.addStep(this.currentLine, `Printed: ${printfResult}`);
         i++;
         continue;
@@ -445,7 +459,7 @@ class CInterpreter {
 
     const printfResult = this.parsePrintf(line);
     if (printfResult) {
-      this.output += printfResult + '\n';
+      this.output += printfResult;
       this.addStep(this.currentLine, `Printed: ${printfResult}`);
       return;
     }

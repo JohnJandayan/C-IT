@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Array Test</title>
+</head>
+<body>
+    <h1>Testing Array Handling</h1>
+    <div id="output"></div>
+    
+    <script type="module">
+        import { runCCodeInterpreter } from './lib/cInterpreter.ts';
+        
+        const testCode = `
+#include <stdio.h>
+int main() {
+  int arr[] = {64, 34, 25, 12, 22, 11, 90};
+  int n = sizeof(arr) / sizeof(arr[0]);
+  printf("Original array: ");
+  for (int i = 0; i < n; i++) {
+    printf("%d ", arr[i]);
+  }
+  printf("\\n");
+  return 0;
+}`;
+
+        console.log('Testing array handling...');
+        const result = runCCodeInterpreter(testCode);
+        console.log('Result:', result);
+        
+        document.getElementById('output').innerHTML = `
+            <h2>Output:</h2>
+            <pre>${result.output}</pre>
+            <h2>Steps:</h2>
+            <pre>${JSON.stringify(result.steps, null, 2)}</pre>
+        `;
+    </script>
+</body>
+</html> 
