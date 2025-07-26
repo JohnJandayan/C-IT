@@ -86,10 +86,11 @@ class CInterpreter {
   }
 
   private parseVariableDeclaration(line: string): { name: string; type: string; value?: any } | null {
-    // Match: int x = 5; or int arr[5] = {1,2,3,4,5}; or int arr[] = {1,2,3,4,5};
+    // Match: int x = expr; or int arr[5] = {1,2,3,4,5}; or int arr[] = {1,2,3,4,5};
     const intMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
     if (intMatch) {
-      return { name: intMatch[1], type: 'int', value: parseInt(intMatch[2]) };
+      // Evaluate the right-hand side as an expression, not just parseInt
+      return { name: intMatch[1], type: 'int', value: this.evaluateExpression(intMatch[2]) };
     }
 
     // Match array with size: int arr[5] = {1,2,3,4,5};
