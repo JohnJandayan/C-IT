@@ -117,18 +117,19 @@ class CInterpreter {
   }
 
   private parseAssignment(line: string): { name: string; value: any } | null {
-    // Match: x = 5; or arr[i] = 10;
-    const simpleMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
-    if (simpleMatch) {
-      return { name: simpleMatch[1], value: this.evaluateExpression(simpleMatch[2]) };
-    }
-
+    // Match array assignment first: arr[i] = expr;
     const arrayMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\[([^\]]+)\]\s*=\s*([^;]+);/);
     if (arrayMatch) {
       const arrayName = arrayMatch[1];
       const index = this.evaluateExpression(arrayMatch[2]);
       const value = this.evaluateExpression(arrayMatch[3]);
       return { name: `${arrayName}[${index}]`, value };
+    }
+
+    // Match simple assignment: x = expr;
+    const simpleMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
+    if (simpleMatch) {
+      return { name: simpleMatch[1], value: this.evaluateExpression(simpleMatch[2]) };
     }
 
     return null;
