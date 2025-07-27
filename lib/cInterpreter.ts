@@ -162,45 +162,64 @@ class CInterpreter {
         }
       }
     }
-    
-    // Simple arithmetic
-    if (expr.includes('+')) {
-      const [left, right] = expr.split('+').map(e => e.trim());
-      const leftVal = this.evaluateExpression(left);
-      const rightVal = this.evaluateExpression(right);
-      console.log(`DEBUG: Arithmetic ${left} + ${right} = ${leftVal} + ${rightVal} = ${leftVal + rightVal}`);
-      return leftVal + rightVal;
+
+    // Handle comparison operators first
+    if (expr.includes('>')) {
+      const parts = this.splitOnOperator(expr, '>');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} > ${parts[1].trim()} = ${leftVal} > ${rightVal} = ${leftVal > rightVal}`);
+        return leftVal > rightVal;
+      }
     }
-    if (expr.includes('-')) {
-      const [left, right] = expr.split('-').map(e => e.trim());
-      const leftVal = this.evaluateExpression(left);
-      const rightVal = this.evaluateExpression(right);
-      console.log(`DEBUG: Arithmetic ${left} - ${right} = ${leftVal} - ${rightVal} = ${leftVal - rightVal}`);
-      return leftVal - rightVal;
+    if (expr.includes('<')) {
+      const parts = this.splitOnOperator(expr, '<');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} < ${parts[1].trim()} = ${leftVal} < ${rightVal} = ${leftVal < rightVal}`);
+        return leftVal < rightVal;
+      }
     }
-    if (expr.includes('*')) {
-      const [left, right] = expr.split('*').map(e => e.trim());
-      const leftVal = this.evaluateExpression(left);
-      const rightVal = this.evaluateExpression(right);
-      console.log(`DEBUG: Arithmetic ${left} * ${right} = ${leftVal} * ${rightVal} = ${leftVal * rightVal}`);
-      return leftVal * rightVal;
+    if (expr.includes('>=')) {
+      const parts = this.splitOnOperator(expr, '>=');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} >= ${parts[1].trim()} = ${leftVal} >= ${rightVal} = ${leftVal >= rightVal}`);
+        return leftVal >= rightVal;
+      }
     }
-    if (expr.includes('/')) {
-      const [left, right] = expr.split('/').map(e => e.trim());
-      const leftVal = this.evaluateExpression(left);
-      const rightVal = this.evaluateExpression(right);
-      console.log(`DEBUG: Arithmetic ${left} / ${right} = ${leftVal} / ${rightVal} = ${leftVal / rightVal}`);
-      return leftVal / rightVal;
+    if (expr.includes('<=')) {
+      const parts = this.splitOnOperator(expr, '<=');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} <= ${parts[1].trim()} = ${leftVal} <= ${rightVal} = ${leftVal <= rightVal}`);
+        return leftVal <= rightVal;
+      }
+    }
+    if (expr.includes('==')) {
+      const parts = this.splitOnOperator(expr, '==');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} == ${parts[1].trim()} = ${leftVal} == ${rightVal} = ${leftVal === rightVal}`);
+        return leftVal === rightVal;
+      }
+    }
+    if (expr.includes('!=')) {
+      const parts = this.splitOnOperator(expr, '!=');
+      if (parts.length === 2) {
+        const leftVal = this.evaluateExpression(parts[0].trim());
+        const rightVal = this.evaluateExpression(parts[1].trim());
+        console.log(`DEBUG: Comparison ${parts[0].trim()} != ${parts[1].trim()} = ${leftVal} != ${rightVal} = ${leftVal !== rightVal}`);
+        return leftVal !== rightVal;
+      }
     }
 
-    // Variable lookup
-    if (this.variables.has(expr)) {
-      const value = this.variables.get(expr)!.value;
-      console.log(`DEBUG: Variable lookup ${expr} = ${value}`);
-      return value;
-    }
-
-    // Array access
+    // Array access - handle this after comparison operators
     const arrayMatch = expr.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\[([^\]]+)\]/);
     if (arrayMatch) {
       const arrayName = arrayMatch[1];
@@ -213,7 +232,66 @@ class CInterpreter {
         return value !== undefined ? value : 0;
       } else {
         console.error(`DEBUG: Array not found: ${arrayName}`);
+        return 0;
       }
+    }
+
+    // Arithmetic operations - handle with better precedence
+    if (expr.includes('+')) {
+      // Split on + but be careful not to split within parentheses or brackets
+      const parts = this.splitOnOperator(expr, '+');
+      if (parts.length > 1) {
+        let result = this.evaluateExpression(parts[0]);
+        for (let i = 1; i < parts.length; i++) {
+          const rightVal = this.evaluateExpression(parts[i]);
+          console.log(`DEBUG: Arithmetic ${result} + ${rightVal} = ${result + rightVal}`);
+          result += rightVal;
+        }
+        return result;
+      }
+    }
+    if (expr.includes('-')) {
+      const parts = this.splitOnOperator(expr, '-');
+      if (parts.length > 1) {
+        let result = this.evaluateExpression(parts[0]);
+        for (let i = 1; i < parts.length; i++) {
+          const rightVal = this.evaluateExpression(parts[i]);
+          console.log(`DEBUG: Arithmetic ${result} - ${rightVal} = ${result - rightVal}`);
+          result -= rightVal;
+        }
+        return result;
+      }
+    }
+    if (expr.includes('*')) {
+      const parts = this.splitOnOperator(expr, '*');
+      if (parts.length > 1) {
+        let result = this.evaluateExpression(parts[0]);
+        for (let i = 1; i < parts.length; i++) {
+          const rightVal = this.evaluateExpression(parts[i]);
+          console.log(`DEBUG: Arithmetic ${result} * ${rightVal} = ${result * rightVal}`);
+          result *= rightVal;
+        }
+        return result;
+      }
+    }
+    if (expr.includes('/')) {
+      const parts = this.splitOnOperator(expr, '/');
+      if (parts.length > 1) {
+        let result = this.evaluateExpression(parts[0]);
+        for (let i = 1; i < parts.length; i++) {
+          const rightVal = this.evaluateExpression(parts[i]);
+          console.log(`DEBUG: Arithmetic ${result} / ${rightVal} = ${result / rightVal}`);
+          result /= rightVal;
+        }
+        return result;
+      }
+    }
+
+    // Variable lookup
+    if (this.variables.has(expr)) {
+      const value = this.variables.get(expr)!.value;
+      console.log(`DEBUG: Variable lookup ${expr} = ${value}`);
+      return value;
     }
 
     // Literal values
@@ -224,6 +302,48 @@ class CInterpreter {
 
     console.log(`DEBUG: Expression "${expr}" not recognized, returning 0`);
     return 0;
+  }
+
+  private splitOnOperator(expr: string, operator: string): string[] {
+    const parts: string[] = [];
+    let current = '';
+    let parenCount = 0;
+    let bracketCount = 0;
+    
+    for (let i = 0; i < expr.length; i++) {
+      const char = expr[i];
+      
+      if (char === '(') parenCount++;
+      else if (char === ')') parenCount--;
+      else if (char === '[') bracketCount++;
+      else if (char === ']') bracketCount--;
+      else if (parenCount === 0 && bracketCount === 0) {
+        // Check for multi-character operators first
+        if (operator.length === 2 && i < expr.length - 1) {
+          const twoCharOp = expr.substring(i, i + 2);
+          if (twoCharOp === operator) {
+            parts.push(current.trim());
+            current = '';
+            i++; // Skip the next character
+            continue;
+          }
+        }
+        // Check for single-character operators
+        else if (char === operator) {
+          parts.push(current.trim());
+          current = '';
+          continue;
+        }
+      }
+      
+      current += char;
+    }
+    
+    if (current.trim()) {
+      parts.push(current.trim());
+    }
+    
+    return parts;
   }
 
   private parseForLoop(line: string): { init: string; condition: string; increment: string } | null {
@@ -311,7 +431,7 @@ class CInterpreter {
       const assignment = this.parseAssignment(line);
       if (assignment) {
         if (assignment.name.includes('[')) {
-          // Array assignment
+          // Array assignment - the index is already evaluated in parseAssignment
           const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
           if (arrayMatch) {
             const arrayName = arrayMatch[1];
@@ -449,7 +569,7 @@ class CInterpreter {
     const assignment = this.parseAssignment(line);
     if (assignment) {
       if (assignment.name.includes('[')) {
-        // Handle array assignment
+        // Handle array assignment - the index is already evaluated in parseAssignment
         const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
         if (arrayMatch) {
           const arrayName = arrayMatch[1];
