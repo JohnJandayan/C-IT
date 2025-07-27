@@ -406,69 +406,7 @@ class CInterpreter {
         continue;
       }
 
-      // Variable declaration
-      const varDecl = this.parseVariableDeclaration(line);
-      if (varDecl) {
-        console.log(`DEBUG: Variable declaration: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
-        if (varDecl.type === 'array') {
-          this.variables.set(varDecl.name, {
-            name: varDecl.name,
-            value: varDecl.value,
-            type: 'array',
-            address: this.allocateMemory(varDecl.value.length * 4)
-          });
-          console.log(`DEBUG: Array ${varDecl.name} initialized with values: [${varDecl.value.join(', ')}]`);
-        } else {
-          this.variables.set(varDecl.name, {
-            name: varDecl.name,
-            value: varDecl.value || 0,
-            type: 'int',
-            address: this.allocateMemory(4)
-          });
-        }
-        this.addStep(this.currentLine, `Declared ${varDecl.type} ${varDecl.name}`);
-        i++;
-        continue;
-      }
-
-      // Assignment
-      const assignment = this.parseAssignment(line);
-      if (assignment) {
-        if (assignment.name.includes('[')) {
-          // Array assignment - the index is already evaluated in parseAssignment
-          const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
-          if (arrayMatch) {
-            const arrayName = arrayMatch[1];
-            const index = parseInt(arrayMatch[2]);
-            const array = this.variables.get(arrayName);
-            if (array && array.type === 'array') {
-              console.log(`Array assignment: ${arrayName}[${index}] = ${assignment.value}`);
-              array.value[index] = assignment.value;
-            } else {
-              console.error(`Array not found: ${arrayName}`);
-            }
-          }
-        } else {
-          // Simple assignment
-          const variable = this.variables.get(assignment.name);
-          if (variable) {
-            variable.value = assignment.value;
-          } else {
-            // Create new variable if it doesn't exist
-            this.variables.set(assignment.name, {
-              name: assignment.name,
-              value: assignment.value,
-              type: 'int'
-            });
-          }
-        }
-        console.log(`DEBUG: Assignment: ${assignment.name} = ${assignment.value}`);
-        this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);
-        i++;
-        continue;
-      }
-
-      // For loop
+      // For loop - check BEFORE variable declarations to avoid conflicts
       const forLoop = this.parseForLoop(line);
       if (forLoop) {
         console.log(`DEBUG: For loop detected: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
@@ -637,6 +575,68 @@ class CInterpreter {
         }
         
         i = loopEnd + 1;
+        continue;
+      }
+
+      // Variable declaration
+      const varDecl = this.parseVariableDeclaration(line);
+      if (varDecl) {
+        console.log(`DEBUG: Variable declaration: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
+        if (varDecl.type === 'array') {
+          this.variables.set(varDecl.name, {
+            name: varDecl.name,
+            value: varDecl.value,
+            type: 'array',
+            address: this.allocateMemory(varDecl.value.length * 4)
+          });
+          console.log(`DEBUG: Array ${varDecl.name} initialized with values: [${varDecl.value.join(', ')}]`);
+        } else {
+          this.variables.set(varDecl.name, {
+            name: varDecl.name,
+            value: varDecl.value || 0,
+            type: 'int',
+            address: this.allocateMemory(4)
+          });
+        }
+        this.addStep(this.currentLine, `Declared ${varDecl.type} ${varDecl.name}`);
+        i++;
+        continue;
+      }
+
+      // Assignment
+      const assignment = this.parseAssignment(line);
+      if (assignment) {
+        if (assignment.name.includes('[')) {
+          // Array assignment - the index is already evaluated in parseAssignment
+          const arrayMatch = assignment.name.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
+          if (arrayMatch) {
+            const arrayName = arrayMatch[1];
+            const index = parseInt(arrayMatch[2]);
+            const array = this.variables.get(arrayName);
+            if (array && array.type === 'array') {
+              console.log(`Array assignment: ${arrayName}[${index}] = ${assignment.value}`);
+              array.value[index] = assignment.value;
+            } else {
+              console.error(`Array not found: ${arrayName}`);
+            }
+          }
+        } else {
+          // Simple assignment
+          const variable = this.variables.get(assignment.name);
+          if (variable) {
+            variable.value = assignment.value;
+          } else {
+            // Create new variable if it doesn't exist
+            this.variables.set(assignment.name, {
+              name: assignment.name,
+              value: assignment.value,
+              type: 'int'
+            });
+          }
+        }
+        console.log(`DEBUG: Assignment: ${assignment.name} = ${assignment.value}`);
+        this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);
+        i++;
         continue;
       }
 
