@@ -420,58 +420,22 @@ class CInterpreter {
         // Execute initialization
         this.executeLine(forLoop.init);
         
-        // Find the loop body by looking for the opening brace
-        let braceCount = 0;
-        let loopStart = -1;
-        let loopEnd = -1;
-        
-        // Find the opening brace
-        for (let j = i + 1; j < lines.length; j++) {
-          if (lines[j].includes('{')) {
-            loopStart = j + 1;
-            braceCount = 1;
-            break;
-          }
-        }
-        
-        if (loopStart === -1) {
-          console.error('No opening brace found for for loop');
-          i++;
-          continue;
-        }
-        
-        // Find the matching closing brace
-        for (let j = loopStart; j < lines.length; j++) {
-          if (lines[j].includes('{')) braceCount++;
-          if (lines[j].includes('}')) {
-            braceCount--;
-            if (braceCount === 0) {
-              loopEnd = j;
-              break;
-            }
-          }
-        }
-        
-        if (loopEnd === -1) {
-          console.error('No closing brace found for for loop');
-          i = loopStart;
-          continue;
-        }
-
-        console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
-        
-        // Execute loop with proper nested loop handling
+        // Simple loop execution - no complex body detection
         let iterationCount = 0;
-        const maxIterations = 100; // Reduced to prevent infinite loops
+        const maxIterations = 1000; // Reasonable limit for algorithms
+        let bodyLineCount = 0; // Track how many body lines we execute
         
         console.log(`DEBUG: Starting loop execution with condition: ${forLoop.condition}`);
         
         while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
           console.log(`DEBUG: For loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
           
-          // Execute the loop body line by line
-          for (let j = loopStart; j < loopEnd; j++) {
-            this.currentLine = j + 1;
+          // Execute the next few lines as the loop body
+          // This is much simpler and more efficient
+          bodyLineCount = 0;
+          const maxBodyLines = 10; // Limit body lines to prevent infinite loops
+          
+          for (let j = i + 1; j < lines.length && bodyLineCount < maxBodyLines; j++) {
             const bodyLine = lines[j];
             
             // Skip empty lines and comments
@@ -479,92 +443,14 @@ class CInterpreter {
               continue;
             }
             
-            console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
-            
-            // Handle nested for loops within the loop body
-            const nestedForLoop = this.parseForLoop(bodyLine);
-            if (nestedForLoop) {
-              console.log(`DEBUG: Nested for loop detected: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
-              
-              // Execute nested loop initialization
-              this.executeLine(nestedForLoop.init);
-              
-              // Find the nested loop body
-              let nestedBraceCount = 0;
-              let nestedStart = -1;
-              let nestedEnd = -1;
-              
-              // Find the opening brace for nested loop
-              for (let k = j + 1; k < loopEnd; k++) {
-                if (lines[k].includes('{')) {
-                  nestedStart = k + 1;
-                  nestedBraceCount = 1;
-                  break;
-                }
-              }
-              
-              if (nestedStart === -1) {
-                console.error('No opening brace found for nested for loop');
-                continue;
-              }
-              
-              // Find the matching closing brace for nested loop
-              for (let k = nestedStart; k < loopEnd; k++) {
-                if (lines[k].includes('{')) nestedBraceCount++;
-                if (lines[k].includes('}')) {
-                  nestedBraceCount--;
-                  if (nestedBraceCount === 0) {
-                    nestedEnd = k;
-                    break;
-                  }
-                }
-              }
-              
-              if (nestedEnd === -1) {
-                console.error('No closing brace found for nested for loop');
-                continue;
-              }
-
-              console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
-              
-              // Execute nested loop
-              let nestedIterationCount = 0;
-              const maxNestedIterations = 100; // Reduced to prevent infinite loops
-              
-              console.log(`DEBUG: Starting nested loop execution with condition: ${nestedForLoop.condition}`);
-              
-              while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
-                console.log(`DEBUG: Nested for loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
-                
-                // Execute the nested loop body
-                for (let k = nestedStart; k < nestedEnd; k++) {
-                  this.currentLine = k + 1;
-                  const nestedBodyLine = lines[k];
-                  
-                  if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
-                    continue;
-                  }
-                  
-                  console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
-                  this.executeLine(nestedBodyLine);
-                }
-                
-                // Execute nested increment
-                console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
-                this.executeLine(nestedForLoop.increment);
-                
-                nestedIterationCount++;
-              }
-              
-              console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
-              
-              // Skip the nested loop body since we've already executed it
-              j = nestedEnd;
-              continue;
+            // Stop if we hit another for loop or closing brace
+            if (bodyLine.includes('for') || bodyLine.includes('}')) {
+              break;
             }
             
-            // Handle other statements in the loop body
+            console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
             this.executeLine(bodyLine);
+            bodyLineCount++;
           }
           
           // Execute increment
@@ -580,7 +466,8 @@ class CInterpreter {
           console.warn('For loop reached maximum iterations, stopping');
         }
         
-        i = loopEnd + 1;
+        // Skip the loop body lines we already executed
+        i += bodyLineCount + 1;
         continue;
       }
 
