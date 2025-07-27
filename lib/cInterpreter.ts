@@ -347,13 +347,17 @@ class CInterpreter {
   }
 
   private parseForLoop(line: string): { init: string; condition: string; increment: string } | null {
+    console.log(`DEBUG: parseForLoop checking line: "${line}"`);
     const forMatch = line.match(/for\s*\(\s*([^;]+);\s*([^;]+);\s*([^)]+)\s*\)/);
     if (forMatch) {
+      console.log(`DEBUG: parseForLoop MATCH: init=${forMatch[1].trim()}, condition=${forMatch[2].trim()}, increment=${forMatch[3].trim()}`);
       return {
         init: forMatch[1].trim(),
         condition: forMatch[2].trim(),
         increment: forMatch[3].trim()
       };
+    } else {
+      console.log(`DEBUG: parseForLoop NO MATCH for line: "${line}"`);
     }
     return null;
   }
