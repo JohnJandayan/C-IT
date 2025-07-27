@@ -696,6 +696,34 @@ class CInterpreter {
       return;
     }
     
+    // Handle increment expressions like j++ or i++
+    const incrementMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\+\+/);
+    if (incrementMatch) {
+      const varName = incrementMatch[1];
+      const variable = this.variables.get(varName);
+      if (variable) {
+        const oldValue = variable.value;
+        variable.value = oldValue + 1;
+        console.log(`DEBUG: Increment ${varName}++: ${oldValue} -> ${variable.value}`);
+        this.addStep(this.currentLine, `Incremented ${varName}++: ${oldValue} -> ${variable.value}`);
+        return;
+      }
+    }
+    
+    // Handle decrement expressions like j-- or i--
+    const decrementMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\-\-/);
+    if (decrementMatch) {
+      const varName = decrementMatch[1];
+      const variable = this.variables.get(varName);
+      if (variable) {
+        const oldValue = variable.value;
+        variable.value = oldValue - 1;
+        console.log(`DEBUG: Decrement ${varName}--: ${oldValue} -> ${variable.value}`);
+        this.addStep(this.currentLine, `Decremented ${varName}--: ${oldValue} -> ${variable.value}`);
+        return;
+      }
+    }
+    
     // Handle if statements within loops
     if (line.startsWith('if')) {
       const conditionMatch = line.match(/if\s*\(\s*([^)]+)\s*\)/);
