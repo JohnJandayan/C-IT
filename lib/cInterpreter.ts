@@ -137,6 +137,7 @@ class CInterpreter {
 
   private evaluateExpression(expr: string): any {
     expr = expr.trim();
+    console.log(`DEBUG: Evaluating expression: "${expr}"`);
     
     // Handle sizeof operator
     const sizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\/\s*sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*0\s*\]\s*\)/);
@@ -165,35 +166,50 @@ class CInterpreter {
     // Simple arithmetic
     if (expr.includes('+')) {
       const [left, right] = expr.split('+').map(e => e.trim());
-      return this.evaluateExpression(left) + this.evaluateExpression(right);
+      const leftVal = this.evaluateExpression(left);
+      const rightVal = this.evaluateExpression(right);
+      console.log(`DEBUG: Arithmetic ${left} + ${right} = ${leftVal} + ${rightVal} = ${leftVal + rightVal}`);
+      return leftVal + rightVal;
     }
     if (expr.includes('-')) {
       const [left, right] = expr.split('-').map(e => e.trim());
-      return this.evaluateExpression(left) - this.evaluateExpression(right);
+      const leftVal = this.evaluateExpression(left);
+      const rightVal = this.evaluateExpression(right);
+      console.log(`DEBUG: Arithmetic ${left} - ${right} = ${leftVal} - ${rightVal} = ${leftVal - rightVal}`);
+      return leftVal - rightVal;
     }
     if (expr.includes('*')) {
       const [left, right] = expr.split('*').map(e => e.trim());
-      return this.evaluateExpression(left) * this.evaluateExpression(right);
+      const leftVal = this.evaluateExpression(left);
+      const rightVal = this.evaluateExpression(right);
+      console.log(`DEBUG: Arithmetic ${left} * ${right} = ${leftVal} * ${rightVal} = ${leftVal * rightVal}`);
+      return leftVal * rightVal;
     }
     if (expr.includes('/')) {
       const [left, right] = expr.split('/').map(e => e.trim());
-      return this.evaluateExpression(left) / this.evaluateExpression(right);
+      const leftVal = this.evaluateExpression(left);
+      const rightVal = this.evaluateExpression(right);
+      console.log(`DEBUG: Arithmetic ${left} / ${right} = ${leftVal} / ${rightVal} = ${leftVal / rightVal}`);
+      return leftVal / rightVal;
     }
 
     // Variable lookup
     if (this.variables.has(expr)) {
-      return this.variables.get(expr)!.value;
+      const value = this.variables.get(expr)!.value;
+      console.log(`DEBUG: Variable lookup ${expr} = ${value}`);
+      return value;
     }
 
     // Array access
     const arrayMatch = expr.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\[([^\]]+)\]/);
     if (arrayMatch) {
       const arrayName = arrayMatch[1];
-      const index = this.evaluateExpression(arrayMatch[2]);
+      const indexExpr = arrayMatch[2];
+      const index = this.evaluateExpression(indexExpr);
       const array = this.variables.get(arrayName);
       if (array && array.type === 'array') {
         const value = array.value[index];
-        console.log(`DEBUG: Array access ${arrayName}[${index}] = ${value}`);
+        console.log(`DEBUG: Array access ${arrayName}[${indexExpr}] = ${arrayName}[${index}] = ${value}`);
         return value !== undefined ? value : 0;
       } else {
         console.error(`DEBUG: Array not found: ${arrayName}`);
@@ -202,9 +218,11 @@ class CInterpreter {
 
     // Literal values
     if (!isNaN(Number(expr))) {
+      console.log(`DEBUG: Literal value ${expr} = ${Number(expr)}`);
       return Number(expr);
     }
 
+    console.log(`DEBUG: Expression "${expr}" not recognized, returning 0`);
     return 0;
   }
 
