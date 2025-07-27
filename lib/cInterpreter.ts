@@ -472,7 +472,7 @@ class CInterpreter {
         // Execute initialization
         this.executeLine(forLoop.init);
         
-        // Find the loop body
+        // Find the loop body by looking for the opening brace
         let braceCount = 0;
         let loopStart = -1;
         let loopEnd = -1;
@@ -515,6 +515,8 @@ class CInterpreter {
         // Execute loop with proper nested loop handling
         let iterationCount = 0;
         const maxIterations = 1000; // Prevent infinite loops
+        
+        console.log(`DEBUG: Starting loop execution with condition: ${forLoop.condition}`);
         
         while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
           console.log(`DEBUG: For loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
@@ -581,6 +583,8 @@ class CInterpreter {
               let nestedIterationCount = 0;
               const maxNestedIterations = 1000;
               
+              console.log(`DEBUG: Starting nested loop execution with condition: ${nestedForLoop.condition}`);
+              
               while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
                 console.log(`DEBUG: Nested for loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
                 
@@ -604,6 +608,8 @@ class CInterpreter {
                 nestedIterationCount++;
               }
               
+              console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
+              
               // Skip the nested loop body since we've already executed it
               j = nestedEnd;
               continue;
@@ -619,6 +625,8 @@ class CInterpreter {
           
           iterationCount++;
         }
+        
+        console.log(`DEBUG: Loop completed after ${iterationCount} iterations`);
         
         if (iterationCount >= maxIterations) {
           console.warn('For loop reached maximum iterations, stopping');
