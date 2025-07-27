@@ -227,12 +227,18 @@ class CInterpreter {
       const index = this.evaluateExpression(indexExpr);
       const array = this.variables.get(arrayName);
       if (array && array.type === 'array') {
-        const value = array.value[index];
-        console.log(`DEBUG: Array access ${arrayName}[${indexExpr}] = ${arrayName}[${index}] = ${value}`);
-        return value !== undefined ? value : 0;
+        // Check bounds before accessing
+        if (index >= 0 && index < array.value.length) {
+          const value = array.value[index];
+          console.log(`DEBUG: Array access ${arrayName}[${indexExpr}] = ${arrayName}[${index}] = ${value}`);
+          return value;
+        } else {
+          console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}] (array size: ${array.value.length})`);
+          return undefined;
+        }
       } else {
         console.error(`DEBUG: Array not found: ${arrayName}`);
-        return 0;
+        return undefined;
       }
     }
 
@@ -420,22 +426,58 @@ class CInterpreter {
         // Execute initialization
         this.executeLine(forLoop.init);
         
-        // Simple loop execution - no complex body detection
+        // Find the loop body by looking for the opening brace
+        let braceCount = 0;
+        let loopStart = -1;
+        let loopEnd = -1;
+        
+        // Find the opening brace
+        for (let j = i + 1; j < lines.length; j++) {
+          if (lines[j].includes('{')) {
+            loopStart = j + 1;
+            braceCount = 1;
+            break;
+          }
+        }
+        
+        if (loopStart === -1) {
+          console.error('No opening brace found for for loop');
+          i++;
+          continue;
+        }
+        
+        // Find the matching closing brace
+        for (let j = loopStart; j < lines.length; j++) {
+          if (lines[j].includes('{')) braceCount++;
+          if (lines[j].includes('}')) {
+            braceCount--;
+            if (braceCount === 0) {
+              loopEnd = j;
+              break;
+            }
+          }
+        }
+        
+        if (loopEnd === -1) {
+          console.error('No closing brace found for for loop');
+          i = loopStart;
+          continue;
+        }
+
+        console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
+        
+        // Execute loop with proper iteration control
         let iterationCount = 0;
-        const maxIterations = 1000; // Reasonable limit for algorithms
-        let bodyLineCount = 0; // Track how many body lines we execute
+        const maxIterations = 100; // Reasonable limit for algorithms
         
         console.log(`DEBUG: Starting loop execution with condition: ${forLoop.condition}`);
         
         while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
           console.log(`DEBUG: For loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
           
-          // Execute the next few lines as the loop body
-          // This is much simpler and more efficient
-          bodyLineCount = 0;
-          const maxBodyLines = 10; // Limit body lines to prevent infinite loops
-          
-          for (let j = i + 1; j < lines.length && bodyLineCount < maxBodyLines; j++) {
+          // Execute the loop body line by line
+          for (let j = loopStart; j < loopEnd; j++) {
+            this.currentLine = j + 1;
             const bodyLine = lines[j];
             
             // Skip empty lines and comments
@@ -443,14 +485,8 @@ class CInterpreter {
               continue;
             }
             
-            // Stop if we hit another for loop or closing brace
-            if (bodyLine.includes('for') || bodyLine.includes('}')) {
-              break;
-            }
-            
             console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
             this.executeLine(bodyLine);
-            bodyLineCount++;
           }
           
           // Execute increment
@@ -466,8 +502,7 @@ class CInterpreter {
           console.warn('For loop reached maximum iterations, stopping');
         }
         
-        // Skip the loop body lines we already executed
-        i += bodyLineCount + 1;
+        i = loopEnd + 1;
         continue;
       }
 
@@ -507,8 +542,13 @@ class CInterpreter {
             const index = parseInt(arrayMatch[2]);
             const array = this.variables.get(arrayName);
             if (array && array.type === 'array') {
-              console.log(`Array assignment: ${arrayName}[${index}] = ${assignment.value}`);
-              array.value[index] = assignment.value;
+              // Only allow assignment within the original array bounds
+              if (index >= 0 && index < array.value.length) {
+                console.log(`Array assignment: ${arrayName}[${index}] = ${assignment.value}`);
+                array.value[index] = assignment.value;
+              } else {
+                console.warn(`Array index out of bounds: ${arrayName}[${index}] (array size: ${array.value.length})`);
+              }
             } else {
               console.error(`Array not found: ${arrayName}`);
             }
