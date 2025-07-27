@@ -396,9 +396,15 @@ class CInterpreter {
     const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
     let i = 0;
-    while (i < lines.length) {
+    let safetyCounter = 0;
+    const maxSafetyIterations = 10000; // Prevent infinite loops
+    
+    while (i < lines.length && safetyCounter < maxSafetyIterations) {
+      safetyCounter++;
       const line = lines[i];
       this.currentLine = i + 1;
+
+      console.log(`DEBUG: Processing line ${i + 1}: "${line}"`);
 
       // Skip comments and empty lines
       if (line.startsWith('//') || line.startsWith('/*') || line.length === 0) {
@@ -456,7 +462,7 @@ class CInterpreter {
         
         // Execute loop with proper nested loop handling
         let iterationCount = 0;
-        const maxIterations = 1000; // Prevent infinite loops
+        const maxIterations = 100; // Reduced to prevent infinite loops
         
         console.log(`DEBUG: Starting loop execution with condition: ${forLoop.condition}`);
         
@@ -523,7 +529,7 @@ class CInterpreter {
               
               // Execute nested loop
               let nestedIterationCount = 0;
-              const maxNestedIterations = 1000;
+              const maxNestedIterations = 100; // Reduced to prevent infinite loops
               
               console.log(`DEBUG: Starting nested loop execution with condition: ${nestedForLoop.condition}`);
               
@@ -691,7 +697,13 @@ class CInterpreter {
         break;
       }
 
+      // If we reach here, we couldn't parse the line
+      console.warn(`Could not parse line: "${line}"`);
       i++;
+    }
+
+    if (safetyCounter >= maxSafetyIterations) {
+      console.error('Execution stopped due to safety limit - possible infinite loop detected');
     }
 
     return {
