@@ -467,15 +467,33 @@ class CInterpreter {
       // For loop
       const forLoop = this.parseForLoop(line);
       if (forLoop) {
+        console.log(`DEBUG: For loop detected: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
+        
         // Execute initialization
         this.executeLine(forLoop.init);
         
-        // Find the loop body
+        // Find the loop body by looking for the opening brace
         let braceCount = 0;
-        let loopStart = i + 1;
-        let loopEnd = i + 1;
+        let loopStart = -1;
+        let loopEnd = -1;
         
+        // Find the opening brace
         for (let j = i + 1; j < lines.length; j++) {
+          if (lines[j].includes('{')) {
+            loopStart = j + 1;
+            braceCount = 1;
+            break;
+          }
+        }
+        
+        if (loopStart === -1) {
+          console.error('No opening brace found for for loop');
+          i++;
+          continue;
+        }
+        
+        // Find the matching closing brace
+        for (let j = loopStart; j < lines.length; j++) {
           if (lines[j].includes('{')) braceCount++;
           if (lines[j].includes('}')) {
             braceCount--;
@@ -485,17 +503,45 @@ class CInterpreter {
             }
           }
         }
+        
+        if (loopEnd === -1) {
+          console.error('No closing brace found for for loop');
+          i = loopStart;
+          continue;
+        }
 
+        console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
+        
         // Execute loop
-        while (this.evaluateExpression(forLoop.condition)) {
+        let iterationCount = 0;
+        const maxIterations = 1000; // Prevent infinite loops
+        
+        while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
+          console.log(`DEBUG: For loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
+          
           // Execute loop body
           for (let j = loopStart; j < loopEnd; j++) {
             this.currentLine = j + 1;
-            this.executeLine(lines[j]);
+            const bodyLine = lines[j];
+            
+            // Skip empty lines and comments
+            if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
+              continue;
+            }
+            
+            console.log(`DEBUG: Executing loop body line: ${bodyLine}`);
+            this.executeLine(bodyLine);
           }
           
           // Execute increment
+          console.log(`DEBUG: Executing increment: ${forLoop.increment}`);
           this.executeLine(forLoop.increment);
+          
+          iterationCount++;
+        }
+        
+        if (iterationCount >= maxIterations) {
+          console.warn('For loop reached maximum iterations, stopping');
         }
         
         i = loopEnd + 1;
@@ -566,6 +612,31 @@ class CInterpreter {
     // Execute a single line (helper for loops and conditionals)
     this.currentLine++;
     
+    console.log(`DEBUG: executeLine: "${line}"`);
+    
+    // Handle variable declarations within loops
+    const varDecl = this.parseVariableDeclaration(line);
+    if (varDecl) {
+      console.log(`DEBUG: Variable declaration in loop: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
+      if (varDecl.type === 'array') {
+        this.variables.set(varDecl.name, {
+          name: varDecl.name,
+          value: varDecl.value,
+          type: 'array',
+          address: this.allocateMemory(varDecl.value.length * 4)
+        });
+      } else {
+        this.variables.set(varDecl.name, {
+          name: varDecl.name,
+          value: varDecl.value || 0,
+          type: 'int',
+          address: this.allocateMemory(4)
+        });
+      }
+      this.addStep(this.currentLine, `Declared ${varDecl.type} ${varDecl.name}`);
+      return;
+    }
+    
     const assignment = this.parseAssignment(line);
     if (assignment) {
       if (assignment.name.includes('[')) {
@@ -576,6 +647,7 @@ class CInterpreter {
           const index = parseInt(arrayMatch[2]);
           const array = this.variables.get(arrayName);
           if (array && array.type === 'array') {
+            console.log(`DEBUG: Array assignment in loop: ${arrayName}[${index}] = ${assignment.value}`);
             array.value[index] = assignment.value;
           }
         }
@@ -602,6 +674,17 @@ class CInterpreter {
       this.output += printfResult;
       this.addStep(this.currentLine, `Printed: ${printfResult}`);
       return;
+    }
+    
+    // Handle if statements within loops
+    if (line.startsWith('if')) {
+      const conditionMatch = line.match(/if\s*\(\s*([^)]+)\s*\)/);
+      if (conditionMatch) {
+        const condition = this.evaluateExpression(conditionMatch[1]);
+        this.addStep(this.currentLine, `If condition: ${conditionMatch[1]} = ${condition}`);
+        console.log(`DEBUG: If condition in loop: ${conditionMatch[1]} = ${condition}`);
+        return;
+      }
     }
   }
 }
