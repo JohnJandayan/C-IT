@@ -511,98 +511,118 @@ class CInterpreter {
         
         while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
           console.log(`DEBUG: Loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
+          console.log(`DEBUG: Current variables:`, {
+            i: this.variables.get('i')?.value,
+            j: this.variables.get('j')?.value,
+            n: this.variables.get('n')?.value,
+            arr: this.variables.get('arr')?.value
+          });
           
-          // Execute loop body
+          // Check if there's a nested for loop in the loop body BEFORE executing
+          let hasNestedLoop = false;
+          let nestedForLoop = null;
+          let nestedStart = -1;
+          let nestedEnd = -1;
+          
           for (let j = loopStart; j < loopEnd; j++) {
             const bodyLine = lines[j];
-            this.currentLine = j + 1;
-            
-            if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
-              continue;
-            }
-            
-            console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
-            
-            // Handle nested for loops
-            const nestedForLoop = this.parseForLoop(bodyLine);
-            if (nestedForLoop) {
-              console.log(`DEBUG: Nested for loop: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
-              
-              // Execute nested initialization
-              this.executeLine(nestedForLoop.init);
-              
-              // Find nested loop body
-              let nestedBraceCount = 0;
-              let nestedStart = -1;
-              let nestedEnd = -1;
-              
-              for (let k = j + 1; k < loopEnd; k++) {
-                if (lines[k].includes('{')) {
-                  nestedStart = k + 1;
-                  nestedBraceCount = 1;
-                  break;
-                }
-              }
-              
-              if (nestedStart === -1) {
-                console.error('No opening brace found for nested for loop');
-                continue;
-              }
-              
-              for (let k = nestedStart; k < loopEnd; k++) {
-                if (lines[k].includes('{')) nestedBraceCount++;
-                if (lines[k].includes('}')) {
-                  nestedBraceCount--;
-                  if (nestedBraceCount === 0) {
-                    nestedEnd = k;
+            if (bodyLine.length > 0 && !bodyLine.startsWith('//')) {
+              const nestedLoop = this.parseForLoop(bodyLine);
+              if (nestedLoop) {
+                hasNestedLoop = true;
+                nestedForLoop = nestedLoop;
+                
+                // Find the nested loop body
+                let nestedBraceCount = 0;
+                
+                for (let k = j + 1; k < loopEnd; k++) {
+                  if (lines[k].includes('{')) {
+                    nestedStart = k + 1;
+                    nestedBraceCount = 1;
                     break;
                   }
                 }
-              }
-              
-              if (nestedEnd === -1) {
-                console.error('No closing brace found for nested for loop');
-                continue;
-              }
-
-              console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
-              
-              // Execute nested loop
-              let nestedIterationCount = 0;
-              const maxNestedIterations = 1000;
-              
-              while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
-                console.log(`DEBUG: Nested loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
                 
-                // Execute nested loop body
-                for (let k = nestedStart; k < nestedEnd; k++) {
-                  const nestedBodyLine = lines[k];
-                  this.currentLine = k + 1;
-                  
-                  if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
-                    continue;
-                  }
-                  
-                  console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
-                  this.executeLine(nestedBodyLine);
+                if (nestedStart === -1) {
+                  console.error('No opening brace found for nested for loop');
+                  break;
                 }
                 
-                // Execute nested increment
-                console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
-                this.executeLine(nestedForLoop.increment);
+                for (let k = nestedStart; k < loopEnd; k++) {
+                  if (lines[k].includes('{')) nestedBraceCount++;
+                  if (lines[k].includes('}')) {
+                    nestedBraceCount--;
+                    if (nestedBraceCount === 0) {
+                      nestedEnd = k;
+                      break;
+                    }
+                  }
+                }
                 
-                nestedIterationCount++;
+                if (nestedEnd === -1) {
+                  console.error('No closing brace found for nested for loop');
+                  break;
+                }
+                
+                console.log(`DEBUG: Found nested loop: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
+                console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
+                console.log(`DEBUG: Nested loop body lines:`, lines.slice(nestedStart, nestedEnd));
+                break;
+              }
+            }
+          }
+          
+          if (hasNestedLoop && nestedForLoop) {
+            // Execute nested loop initialization
+            this.executeLine(nestedForLoop.init);
+            
+            // Execute nested loop
+            let nestedIterationCount = 0;
+            const maxNestedIterations = 1000;
+            
+            while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
+              console.log(`DEBUG: Nested loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
+              console.log(`DEBUG: Current variables:`, {
+                i: this.variables.get('i')?.value,
+                j: this.variables.get('j')?.value,
+                n: this.variables.get('n')?.value,
+                arr: this.variables.get('arr')?.value
+              });
+              
+              // Execute nested loop body
+              for (let k = nestedStart; k < nestedEnd; k++) {
+                const nestedBodyLine = lines[k];
+                this.currentLine = k + 1;
+                
+                if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
+                  continue;
+                }
+                
+                console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
+                this.executeLine(nestedBodyLine);
               }
               
-              console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
+              // Execute nested increment
+              console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
+              this.executeLine(nestedForLoop.increment);
               
-              // Skip the nested loop body since we've already executed it
-              j = nestedEnd;
-              continue;
+              nestedIterationCount++;
             }
             
-            // Handle other statements in loop body
-            this.executeLine(bodyLine);
+            console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
+          } else {
+            // Execute loop body normally (no nested loops)
+            for (let j = loopStart; j < loopEnd; j++) {
+              const bodyLine = lines[j];
+              this.currentLine = j + 1;
+              
+              if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
+                continue;
+              }
+              
+              console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
+              this.executeLine(bodyLine);
+            }
           }
           
           // Execute increment
@@ -710,6 +730,8 @@ class CInterpreter {
         console.log(`DEBUG: Increment ${varName}++: ${oldValue} -> ${variable.value}`);
         this.addStep(this.currentLine, `Incremented ${varName}++: ${oldValue} -> ${variable.value}`);
         return;
+      } else {
+        console.error(`DEBUG: Variable ${varName} not found for increment`);
       }
     }
     
@@ -724,6 +746,8 @@ class CInterpreter {
         console.log(`DEBUG: Decrement ${varName}--: ${oldValue} -> ${variable.value}`);
         this.addStep(this.currentLine, `Decremented ${varName}--: ${oldValue} -> ${variable.value}`);
         return;
+      } else {
+        console.error(`DEBUG: Variable ${varName} not found for decrement`);
       }
     }
     
