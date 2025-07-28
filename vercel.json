@@ -2,22 +2,31 @@
   "version": 2,
   "builds": [
     {
-      "src": "c_it_project/wsgi.py",
-      "use": "@vercel/python"
+      "src": "c_it_project/wsgi_vercel.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "c_it_project/wsgi.py"
+      "dest": "c_it_project/wsgi_vercel.py"
     }
   ],
   "env": {
     "DJANGO_SETTINGS_MODULE": "c_it_project.settings"
   },
   "functions": {
-    "c_it_project/wsgi.py": {
+    "c_it_project/wsgi_vercel.py": {
       "runtime": "python3.9"
     }
-  }
+  },
+  "buildCommand": "pip install -r requirements-vercel.txt && python manage.py collectstatic --noinput",
+  "outputDirectory": "staticfiles"
 } 
