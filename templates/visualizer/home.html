@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}C-It - Interactive C Algorithm Visualizer{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gradient-bg text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                Visualize C Algorithms
+                <span class="block text-blue-200">Like Never Before</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+                Interactive algorithm visualizer for C programming. Learn sorting, searching, data structures, and more through beautiful animations.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'visualizer:visualize' %}" class="btn-primary text-white px-8 py-4 rounded-lg text-lg font-semibold inline-flex items-center">
+                    <i class="fas fa-play mr-2"></i>
+                    Start Visualizing
+                </a>
+                <a href="#features" class="btn-secondary text-white px-8 py-4 rounded-lg text-lg font-semibold inline-flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose C-It?</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Experience algorithms like never before with our interactive visualization platform
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Sorting Algorithms -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-sort text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Sorting Algorithms</h3>
+                <p class="text-gray-600 mb-6">
+                    Visualize bubble sort, quick sort, merge sort, insertion sort, and selection sort with step-by-step animations.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Bubble Sort</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Quick Sort</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Merge Sort</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Insertion Sort</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Selection Sort</li>
+                </ul>
+            </div>
+            
+            <!-- Searching Algorithms -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-search text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Searching Algorithms</h3>
+                <p class="text-gray-600 mb-6">
+                    Understand binary search and linear search with interactive visualizations showing the search process.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Binary Search</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Linear Search</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Step-by-step tracking</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Performance comparison</li>
+                </ul>
+            </div>
+            
+            <!-- Data Structures -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-project-diagram text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Data Structures</h3>
+                <p class="text-gray-600 mb-6">
+                    Explore linked lists, stacks, queues, trees, and hash maps with dynamic visualizations.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Linked Lists</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Stacks & Queues</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Binary Trees</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Hash Maps</li>
+                </ul>
+            </div>
+            
+            <!-- Complexity Analysis -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Complexity Analysis</h3>
+                <p class="text-gray-600 mb-6">
+                    Understand time and space complexity with detailed analysis and performance metrics.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Time Complexity</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Space Complexity</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Big O Notation</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Performance Charts</li>
+                </ul>
+            </div>
+            
+            <!-- Interactive Learning -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Interactive Learning</h3>
+                <p class="text-gray-600 mb-6">
+                    Learn at your own pace with step-by-step animations and detailed explanations.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Step-by-step animations</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Detailed explanations</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Code highlighting</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Variable tracking</li>
+                </ul>
+            </div>
+            
+            <!-- Modern UI/UX -->
+            <div class="card-hover bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-green-600 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-palette text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Modern Design</h3>
+                <p class="text-gray-600 mb-6">
+                    Beautiful, responsive design that works perfectly on all devices and screen sizes.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Responsive design</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Dark mode support</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Mobile friendly</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Accessible UI</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Three simple steps to start visualizing your C algorithms
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-white text-2xl font-bold">1</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Write Your Code</h3>
+                <p class="text-gray-600">
+                    Input your C code in our syntax-highlighted editor. Support for all standard C syntax and data structures.
+                </p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-white text-2xl font-bold">2</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Watch It Animate</h3>
+                <p class="text-gray-600">
+                    See your algorithm come to life with beautiful animations showing each step of execution.
+                </p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-white text-2xl font-bold">3</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Learn & Understand</h3>
+                <p class="text-gray-600">
+                    Gain deep insights into algorithm behavior, complexity, and optimization techniques.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 gradient-bg text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-bold mb-6">Ready to Start Learning?</h2>
+        <p class="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+            Join thousands of students and developers who are already using C-It to master algorithms and data structures.
+        </p>
+        <a href="{% url 'visualizer:visualize' %}" class="btn-primary text-white px-8 py-4 rounded-lg text-lg font-semibold inline-flex items-center">
+            <i class="fas fa-rocket mr-2"></i>
+            Start Visualizing Now
+        </a>
+    </div>
+</section>
+{% endblock %} 

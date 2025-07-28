@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "c_it_project/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "c_it_project/wsgi.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "c_it_project.settings"
+  },
+  "functions": {
+    "c_it_project/wsgi.py": {
+      "runtime": "python3.9"
+    }
+  }
+} 

@@ -1,277 +1,356 @@
-# C-It: C Algorithm Visualizer
+# C-It: Interactive C Algorithm Visualizer
 
-An interactive visualization tool for C programming algorithms, built with Next.js and CloudFlare Workers. Learn sorting, searching, and data structure algorithms with step-by-step animations.
+A modern, elegant web application for visualizing C programming algorithms and data structures with beautiful animations and step-by-step explanations.
 
-![C-It Logo](https://img.shields.io/badge/C--It-Algorithm%20Visualizer-blue?style=for-the-badge&logo=typescript)
+## 🌟 Features
 
-## 🚀 Features
+### 🎯 Core Functionality
+- **Interactive Algorithm Visualization**: Watch algorithms execute step-by-step with beautiful animations
+- **Comprehensive Algorithm Library**: Support for sorting, searching, and data structure algorithms
+- **Real-time Code Analysis**: Parse and analyze C code to generate visualizations
+- **Complexity Analysis**: Detailed time and space complexity information
+- **Step-by-step Execution**: Control animation speed and step through algorithms manually
 
-- **Interactive Algorithm Visualization**: Step-by-step visual representation of how algorithms work
-- **Multiple Algorithm Support**: Sorting, searching, and data structure algorithms
-- **Modern UI/UX**: Clean, responsive design that works on all devices
-- **Code Editor**: Syntax-highlighted C code editor with copy/download features
-- **Animation Controls**: Play, pause, step forward/backward, and speed control
-- **Educational Focus**: Designed for students, educators, and developers
-- **CloudFlare Integration**: Fast, global deployment with serverless backend
+### 📊 Supported Algorithms
 
-## 🛠️ Tech Stack
+#### Sorting Algorithms
+- **Bubble Sort**: Simple comparison-based sorting
+- **Quick Sort**: Efficient divide-and-conquer sorting
+- **Merge Sort**: Stable sorting with O(n log n) complexity
+- **Insertion Sort**: Simple adaptive sorting
+- **Selection Sort**: Simple in-place sorting
 
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **Lucide React** - Icon library
-- **React Syntax Highlighter** - Code highlighting
+#### Searching Algorithms
+- **Binary Search**: Fast search in sorted arrays
+- **Linear Search**: Simple sequential search
+
+#### Data Structures
+- **Linked Lists**: Dynamic data structure with nodes
+- **Stacks**: LIFO (Last In, First Out) data structure
+- **Queues**: FIFO (First In, First Out) data structure
+- **Binary Trees**: Hierarchical data structure
+- **Hash Maps**: Key-value pair data structure
+
+### 🎨 User Experience
+- **Modern, Responsive Design**: Works perfectly on all devices
+- **Interactive Code Editor**: Syntax-highlighted C code editor
+- **Beautiful Animations**: Smooth, engaging visualizations
+- **User-friendly Interface**: Intuitive design for all skill levels
+- **Mobile Optimized**: Full functionality on mobile devices
+
+## 🛠️ Technology Stack
 
 ### Backend
-- **CloudFlare Workers** - Serverless edge computing
-- **CloudFlare KV** - Key-value storage
-- **CloudFlare R2** - Object storage
-- **TypeScript** - Type-safe backend development
+- **Python 3.9**: Core programming language
+- **Django 4.2.7**: Web framework
+- **Django CORS Headers**: Cross-origin resource sharing
+- **WhiteNoise**: Static file serving
+- **Gunicorn**: WSGI HTTP Server
 
-## 📋 Prerequisites
+### Frontend
+- **HTML5 & CSS3**: Modern web standards
+- **JavaScript (ES6+)**: Interactive functionality
+- **Tailwind CSS**: Utility-first CSS framework
+- **Font Awesome**: Icon library
+- **Chart.js**: Data visualization
 
-- Node.js 18+ 
-- npm or yarn
-- CloudFlare account
-- Git
+### Deployment
+- **Vercel**: Cloud platform for deployment
+- **Python 3.9**: Runtime environment
+- **Static File Optimization**: Compressed and optimized assets
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Prerequisites
+- Python 3.9 or higher
+- pip (Python package installer)
+- Git
 
-```bash
-git clone https://github.com/your-username/c-it.git
-cd c-it
+### Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/c-it.git
+   cd c-it
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+5. **Run migrations**
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Collect static files**
+   ```bash
+   python manage.py collectstatic --noinput
+   ```
+
+7. **Start development server**
+   ```bash
+   python manage.py runserver
+   ```
+
+8. **Open your browser**
+   Navigate to `http://localhost:8000`
+
+### Production Deployment
+
+#### Vercel Deployment
+
+1. **Install Vercel CLI**
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Login to Vercel**
+   ```bash
+   vercel login
+   ```
+
+3. **Deploy to Vercel**
+   ```bash
+   vercel --prod
+   ```
+
+#### Environment Variables for Production
+
+Set these environment variables in your Vercel dashboard:
+
+```env
+DEBUG=False
+SECRET_KEY=your-secret-key-here
+DJANGO_SETTINGS_MODULE=c_it_project.settings
 ```
 
-### 2. Install Dependencies
-
-```bash
-# Install frontend dependencies
-npm install
-
-# Install backend dependencies
-cd workers
-npm install
-cd ..
-```
-
-### 3. Environment Setup
-
-Create environment files for both frontend and backend:
-
-```bash
-# Frontend (.env.local)
-NEXT_PUBLIC_API_URL=https://your-workers-domain.workers.dev
-NEXT_PUBLIC_ENVIRONMENT=development
-
-# Backend (workers/.env)
-CLOUDFLARE_ACCOUNT_ID=your-account-id
-CLOUDFLARE_API_TOKEN=your-api-token
-```
-
-### 4. Development
-
-```bash
-# Start frontend development server
-npm run dev
-
-# Start backend development server (in workers directory)
-cd workers
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`
-
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
 c-it/
-├── app/                    # Next.js app directory
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Main page
-├── components/            # React components
-│   ├── AlgorithmSelector.tsx
-│   ├── CodeEditor.tsx
-│   ├── Header.tsx
-│   └── Visualization.tsx
-├── lib/                   # Utility libraries
-│   ├── algorithms.ts      # Algorithm definitions
-│   └── visualizer.ts      # Visualization engine
-├── types/                 # TypeScript type definitions
-│   └── index.ts
-├── workers/               # CloudFlare Workers backend
-│   ├── src/
-│   │   └── index.ts       # Main worker file
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── wrangler.toml
-├── package.json
-├── tailwind.config.js
-├── tsconfig.json
-└── README.md
+├── c_it_project/          # Django project settings
+│   ├── __init__.py
+│   ├── settings.py        # Django settings
+│   ├── urls.py           # Main URL configuration
+│   ├── wsgi.py           # WSGI application
+│   └── asgi.py           # ASGI application
+├── visualizer/            # Main Django app
+│   ├── __init__.py
+│   ├── apps.py           # App configuration
+│   ├── views.py          # View functions
+│   ├── urls.py           # App URL patterns
+│   ├── algorithm_parser.py    # C code parser
+│   └── visualization_engine.py # Animation generator
+├── templates/             # HTML templates
+│   ├── base.html         # Base template
+│   └── visualizer/       # App templates
+│       ├── home.html     # Home page
+│       ├── visualize.html # Main visualizer
+│       └── about.html    # About page
+├── static/               # Static files (CSS, JS, images)
+├── requirements.txt      # Python dependencies
+├── vercel.json          # Vercel configuration
+├── runtime.txt          # Python runtime specification
+├── build_files.sh       # Build script
+├── .gitignore          # Git ignore file
+└── README.md           # This file
 ```
 
-## 🚀 Deployment
+## 🎯 Usage
 
-### Frontend Deployment (CloudFlare Pages)
+### Basic Usage
 
-1. **Build the Application**
+1. **Navigate to the Visualizer**
+   - Go to the main visualizer page
+   - You'll see a code editor and visualization canvas
 
-```bash
-npm run build
-```
+2. **Input Your C Code**
+   - Write or paste your C algorithm in the code editor
+   - Supported algorithms include sorting, searching, and data structures
 
-2. **Deploy to CloudFlare Pages**
+3. **Generate Visualization**
+   - Click "Visualize Algorithm" button
+   - The system will parse your code and generate animations
 
-```bash
-# Install Wrangler CLI
-npm install -g wrangler
+4. **Control Animation**
+   - Use play/pause controls
+   - Step through animation manually
+   - Adjust animation speed
+   - View step-by-step descriptions
 
-# Login to CloudFlare
-wrangler login
+### Example Algorithms
 
-# Deploy to Pages
-wrangler pages deploy out --project-name c-it
-```
+#### Bubble Sort
+```c
+#include <stdio.h>
 
-### Backend Deployment (CloudFlare Workers)
+void bubbleSort(int arr[], int n) {
+    int i, j, temp;
+    for (i = 0; i < n-1; i++) {
+        for (j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
 
-1. **Configure CloudFlare Resources**
-
-```bash
-# Create KV namespace
-wrangler kv:namespace create "C_IT_KV"
-
-# Create R2 bucket
-wrangler r2 bucket create c-it-assets
-```
-
-2. **Update Configuration**
-
-Update `workers/wrangler.toml` with your resource IDs:
-
-```toml
-[[kv_namespaces]]
-binding = "C_IT_KV"
-id = "your-kv-namespace-id"
-
-[[r2_buckets]]
-binding = "C_IT_BUCKET"
-bucket_name = "c-it-assets"
-```
-
-3. **Deploy Workers**
-
-```bash
-cd workers
-wrangler deploy
-```
-
-### Environment Variables
-
-Set up the following environment variables in CloudFlare:
-
-- `ENVIRONMENT`: production/staging
-- `CLOUDFLARE_ACCOUNT_ID`: Your CloudFlare account ID
-- `CLOUDFLARE_API_TOKEN`: Your CloudFlare API token
-
-## 📚 Supported Algorithms
-
-### Sorting Algorithms
-- **Bubble Sort** - O(n²) time complexity
-- **Quick Sort** - O(n log n) average time complexity
-- **Merge Sort** - O(n log n) time complexity
-- **Insertion Sort** - O(n²) time complexity
-- **Selection Sort** - O(n²) time complexity
-
-### Searching Algorithms
-- **Linear Search** - O(n) time complexity
-- **Binary Search** - O(log n) time complexity
-
-### Data Structures
-- **Linked Lists** - Linear data structure
-- **Stacks** - LIFO data structure
-- **Queues** - FIFO data structure
-- **Binary Trees** - Hierarchical data structure
-
-## 🎨 Customization
-
-### Adding New Algorithms
-
-1. **Define the Algorithm**
-
-Add to `lib/algorithms.ts`:
-
-```typescript
-{
-  id: 'your-algorithm',
-  name: 'Your Algorithm',
-  category: 'sorting',
-  description: 'Algorithm description',
-  timeComplexity: {
-    best: 'O(n)',
-    average: 'O(n log n)',
-    worst: 'O(n²)'
-  },
-  spaceComplexity: 'O(1)',
-  code: `// Your C code here`,
-  example: [1, 2, 3, 4, 5]
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    bubbleSort(arr, n);
+    return 0;
 }
 ```
 
-2. **Implement Visualization**
+#### Binary Search
+```c
+#include <stdio.h>
 
-Add to `lib/visualizer.ts`:
+int binarySearch(int arr[], int l, int r, int x) {
+    while (l <= r) {
+        int m = l + (r - l) / 2;
+        
+        if (arr[m] == x)
+            return m;
+        
+        if (arr[m] < x)
+            l = m + 1;
+        else
+            r = m - 1;
+    }
+    return -1;
+}
 
-```typescript
-case 'your-algorithm':
-  return this.generateYourAlgorithmSteps();
+int main() {
+    int arr[] = {2, 3, 4, 10, 40};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int x = 10;
+    int result = binarySearch(arr, 0, n-1, x);
+    return 0;
+}
 ```
 
-### Styling
+## 🔧 Configuration
 
-The application uses Tailwind CSS. Customize colors and styles in:
+### Development Settings
 
-- `tailwind.config.js` - Theme configuration
-- `app/globals.css` - Custom CSS classes
+Create a `.env` file in the root directory:
+
+```env
+DEBUG=True
+SECRET_KEY=your-development-secret-key
+DJANGO_SETTINGS_MODULE=c_it_project.settings
+```
+
+### Production Settings
+
+For production deployment, ensure these settings:
+
+```env
+DEBUG=False
+SECRET_KEY=your-production-secret-key
+DJANGO_SETTINGS_MODULE=c_it_project.settings
+```
+
+## 🧪 Testing
+
+Run tests to ensure everything works correctly:
+
+```bash
+python manage.py test
+```
+
+## 📈 Performance
+
+### Optimization Features
+- **Static File Compression**: CSS and JS files are minified
+- **Image Optimization**: Optimized image delivery
+- **Caching**: Efficient caching strategies
+- **CDN Ready**: Configured for CDN deployment
+
+### Monitoring
+- **Error Logging**: Comprehensive error tracking
+- **Performance Metrics**: Built-in performance monitoring
+- **User Analytics**: Track user interactions
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add amazing feature'
+   ```
+4. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
+
+### Development Guidelines
+- Follow PEP 8 Python style guide
+- Write comprehensive tests
+- Update documentation
+- Ensure mobile responsiveness
+- Test across different browsers
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Developer
-
-**John Jandayan**
-- Portfolio: [https://portfolio-john-jandayan.vercel.app/](https://portfolio-john-jandayan.vercel.app/)
-- GitHub: [JohnJandayan](https://github.com/JohnJandayan)
-
 ## 🙏 Acknowledgments
 
-- [Next.js](https://nextjs.org/) for the amazing React framework
-- [CloudFlare](https://cloudflare.com/) for serverless infrastructure
-- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
-- [Framer Motion](https://www.framer.com/motion/) for smooth animations
+- **Django Community**: For the excellent web framework
+- **Tailwind CSS**: For the beautiful styling system
+- **Font Awesome**: For the comprehensive icon library
+- **Vercel**: For the seamless deployment platform
 
 ## 📞 Support
 
-If you have any questions or need help, please:
+- **Website**: [C-It Live Demo](https://c-it.vercel.app)
+- **Portfolio**: [John Jandayan Portfolio](https://portfolio-john-jandayan.vercel.app)
+- **Email**: Contact through portfolio
+- **Issues**: [GitHub Issues](https://github.com/yourusername/c-it/issues)
 
-1. Check the [Issues](https://github.com/JohnJandayan/C-IT/issues) page
-2. Create a new issue if your problem isn't already listed
-3. Contact the developer through the portfolio website
+## 🚀 Roadmap
+
+### Upcoming Features
+- [ ] More algorithm types (graph algorithms, dynamic programming)
+- [ ] Code execution simulation
+- [ ] Performance comparison tools
+- [ ] User accounts and saved algorithms
+- [ ] Collaborative features
+- [ ] Mobile app version
+
+### Version History
+- **v1.0.0**: Initial release with core visualization features
+- **v1.1.0**: Added more algorithms and improved UI
+- **v1.2.0**: Enhanced performance and mobile optimization
 
 ---
 
-Made with ❤️ by [John Jandayan](https://portfolio-john-jandayan.vercel.app/) 
+**Built with ❤️ by John Jandayan**
+
+*C-It: Making algorithm learning beautiful and interactive* 

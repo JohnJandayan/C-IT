@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About - C-It{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">About C-It</h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+                Interactive C algorithm visualizer designed to make learning algorithms and data structures engaging and intuitive.
+            </p>
+        </div>
+    </section>
+
+    <!-- About the Project -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">About the Project</h2>
+                    <p class="text-lg text-gray-600 mb-6">
+                        C-It is an innovative web application that brings C programming algorithms to life through interactive visualizations. 
+                        Our mission is to make learning algorithms and data structures accessible to everyone, from beginners to advanced programmers.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-6">
+                        Built with modern web technologies including Django, JavaScript, and Tailwind CSS, C-It provides a comprehensive 
+                        platform for understanding complex algorithms through step-by-step animations and detailed explanations.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">10+</div>
+                            <div class="text-gray-600">Algorithms Supported</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600 mb-2">5+</div>
+                            <div class="text-gray-600">Data Structures</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-purple-600 mb-2">100%</div>
+                            <div class="text-gray-600">Interactive</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-orange-600 mb-2">24/7</div>
+                            <div class="text-gray-600">Available</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
+                        <h3 class="text-2xl font-bold mb-4">Key Features</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Real-time algorithm visualization
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Step-by-step execution tracking
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Complexity analysis and performance metrics
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Interactive code editor with syntax highlighting
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Responsive design for all devices
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle mr-3"></i>
+                                Comprehensive algorithm library
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About the Developer -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">About the Developer</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Meet the passionate developer behind C-It
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="text-center lg:text-left">
+                    <div class="w-48 h-48 mx-auto lg:mx-0 mb-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-user text-white text-6xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">John Jandayan</h3>
+                    <p class="text-lg text-gray-600 mb-6">
+                        A passionate full-stack developer with 20 years of experience in software engineering, 
+                        specializing in web development, algorithm design, and educational technology.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-8">
+                        With expertise in Django, Python, JavaScript, and modern web technologies, 
+                        John has dedicated his career to creating innovative solutions that make complex 
+                        concepts accessible to learners of all levels.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" class="btn-primary text-white px-6 py-3 rounded-lg font-medium inline-flex items-center justify-center">
+                            <i class="fas fa-globe mr-2"></i>
+                            View Portfolio
+                        </a>
+                        <a href="{% url 'visualizer:visualize' %}" class="btn-secondary text-white px-6 py-3 rounded-lg font-medium inline-flex items-center justify-center">
+                            <i class="fas fa-code mr-2"></i>
+                            Try C-It
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <h4 class="text-2xl font-bold text-gray-900 mb-6">Skills & Expertise</h4>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-3">Backend Development</h5>
+                            <ul class="space-y-2 text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Python & Django
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    RESTful APIs
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Database Design
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Algorithm Design
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-3">Frontend Development</h5>
+                            <ul class="space-y-2 text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    JavaScript & React
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    HTML5 & CSS3
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Tailwind CSS
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Responsive Design
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-3">DevOps & Deployment</h5>
+                            <ul class="space-y-2 text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Vercel Deployment
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Git & GitHub
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    CI/CD Pipelines
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Performance Optimization
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-3">Specializations</h5>
+                            <ul class="space-y-2 text-gray-600">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Algorithm Visualization
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Educational Technology
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Full-Stack Development
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    Software Architecture
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Technology Stack</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Built with modern technologies for optimal performance and user experience
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-python text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Python</h3>
+                    <p class="text-gray-600">Backend logic and algorithm processing</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-js-square text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">JavaScript</h3>
+                    <p class="text-gray-600">Frontend interactivity and animations</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-server text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Django</h3>
+                    <p class="text-gray-600">Web framework and API endpoints</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-teal-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-css3-alt text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Tailwind CSS</h3>
+                    <p class="text-gray-600">Modern styling and responsive design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Have questions about C-It or want to collaborate? Feel free to reach out!
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" class="btn-primary text-white px-8 py-4 rounded-lg text-lg font-semibold inline-flex items-center">
+                    <i class="fas fa-globe mr-2"></i>
+                    Visit Portfolio
+                </a>
+                <a href="{% url 'visualizer:visualize' %}" class="btn-secondary text-white px-8 py-4 rounded-lg text-lg font-semibold inline-flex items-center">
+                    <i class="fas fa-code mr-2"></i>
+                    Try C-It Now
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %} 
