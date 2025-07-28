@@ -19,18 +19,14 @@ try:
     django.setup()
 
     from django.core.wsgi import get_wsgi_application
-    from django.contrib.staticfiles.handlers import StaticFilesHandler
 
     # Create the WSGI application
     application = get_wsgi_application()
 
-    # Wrap with StaticFilesHandler for Vercel
-    app = StaticFilesHandler(application)
-
     # Vercel expects a handler function
     def handler(request, context):
         try:
-            return app(request, context)
+            return application(request, context)
         except Exception as e:
             print(f"Error in handler: {e}")
             # Return a simple error response
