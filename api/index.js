@@ -15,7 +15,20 @@ module.exports = (req, res) => {
     return;
   }
   
-  // Return the main HTML page for all other routes
+  // Route handling
+  if (path === '/visualize' || path === '/visualizer') {
+    return serveVisualizerPage(res);
+  } else if (path === '/about') {
+    return serveAboutPage(res);
+  } else if (path === '/') {
+    return serveHomePage(res);
+  }
+  
+  // Default to home page
+  return serveHomePage(res);
+};
+
+function serveHomePage(res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.status(200).send(`
 <!DOCTYPE html>
@@ -45,7 +58,7 @@ module.exports = (req, res) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="#" class="flex items-center space-x-2">
+                    <a href="/" class="flex items-center space-x-2">
                         <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                             <i class="fas fa-code text-white text-sm"></i>
                         </div>
@@ -55,9 +68,9 @@ module.exports = (req, res) => {
                 
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Visualizer</a>
-                        <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="/visualize" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Visualizer</a>
+                        <a href="/about" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
                         <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-user mr-2"></i>Portfolio
                         </a>
@@ -81,10 +94,10 @@ module.exports = (req, res) => {
                         data structures, and programming concepts with beautiful animations.
                     </p>
                     <div class="flex justify-center space-x-4">
-                        <a href="#" class="btn-primary text-white px-8 py-3 rounded-lg text-lg font-semibold">
+                        <a href="/visualize" class="btn-primary text-white px-8 py-3 rounded-lg text-lg font-semibold">
                             <i class="fas fa-play mr-2"></i>Start Visualizing
                         </a>
-                        <a href="#" class="btn-secondary text-white px-8 py-3 rounded-lg text-lg font-semibold">
+                        <a href="/about" class="btn-secondary text-white px-8 py-3 rounded-lg text-lg font-semibold">
                             <i class="fas fa-info-circle mr-2"></i>Learn More
                         </a>
                     </div>
@@ -125,21 +138,6 @@ module.exports = (req, res) => {
                 </div>
             </div>
 
-            <!-- Success Message -->
-            <div class="container mx-auto px-4 py-16">
-                <div class="bg-white rounded-lg p-8 shadow-lg max-w-2xl mx-auto text-center">
-                    <div class="text-6xl mb-4">🎉</div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Deployment Successful!</h2>
-                    <p class="text-lg text-gray-600 mb-6">
-                        Your C-It application is now live on Vercel! The algorithm visualizer is ready to help you learn C programming concepts.
-                    </p>
-                    <div class="bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-lg">
-                        <p class="font-semibold">🚀 C-It is Running!</p>
-                        <p class="text-sm opacity-90">Your application is successfully deployed and ready to use.</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Call to Action -->
             <div class="container mx-auto px-4 py-16">
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-center text-white">
@@ -147,7 +145,7 @@ module.exports = (req, res) => {
                     <p class="text-xl mb-6 opacity-90">
                         Join thousands of students and developers learning algorithms through interactive visualizations.
                     </p>
-                    <a href="#" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+                    <a href="/visualize" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
                         <i class="fas fa-rocket mr-2"></i>Get Started Now
                     </a>
                 </div>
@@ -191,4 +189,517 @@ module.exports = (req, res) => {
 </body>
 </html>
   `);
-}; 
+}
+
+function serveVisualizerPage(res) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-It - Algorithm Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .code-editor { background: #1e293b; border-radius: 8px; font-family: 'Fira Code', 'Monaco', 'Consolas', monospace; }
+        .visualization-canvas { background: #f8fafc; border-radius: 8px; min-height: 400px; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); }
+        .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transition: all 0.3s ease; }
+        .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
+        .animation-step { transition: all 0.5s ease; }
+        .highlight { background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%); padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-code text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">C-It</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="/visualize" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Visualizer</a>
+                        <a href="/about" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-user mr-2"></i>Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Algorithm Visualizer</h1>
+                <p class="text-lg text-gray-600">Write your C code and watch it come to life with interactive visualizations</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Code Input Section -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-900">
+                            <i class="fas fa-code mr-2 text-blue-600"></i>Code Input
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Algorithm Type</label>
+                                <select id="algorithmType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="bubble-sort">Bubble Sort</option>
+                                    <option value="quick-sort">Quick Sort</option>
+                                    <option value="merge-sort">Merge Sort</option>
+                                    <option value="insertion-sort">Insertion Sort</option>
+                                    <option value="selection-sort">Selection Sort</option>
+                                    <option value="binary-search">Binary Search</option>
+                                    <option value="linear-search">Linear Search</option>
+                                    <option value="linked-list">Linked List</option>
+                                    <option value="stack">Stack</option>
+                                    <option value="queue">Queue</option>
+                                    <option value="binary-tree">Binary Tree</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Input Data</label>
+                                <input type="text" id="inputData" placeholder="Enter numbers separated by commas (e.g., 64,34,25,12,22,11,90)" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">C Code</label>
+                                <textarea id="codeInput" rows="15" 
+                                          class="code-editor w-full p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="// Your C code will appear here based on the algorithm type">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap elements
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    
+    printf("Original array: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    
+    bubbleSort(arr, n);
+    
+    printf("\\nSorted array: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    
+    return 0;
+}</textarea>
+                            </div>
+                            <div class="flex space-x-4">
+                                <button onclick="visualizeAlgorithm()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex-1">
+                                    <i class="fas fa-play mr-2"></i>Visualize
+                                </button>
+                                <button onclick="resetVisualization()" class="btn-secondary text-white px-6 py-3 rounded-lg font-semibold">
+                                    <i class="fas fa-redo mr-2"></i>Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Section -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-900">
+                            <i class="fas fa-chart-line mr-2 text-green-600"></i>Visualization
+                        </h2>
+                        <div class="visualization-canvas p-6" id="visualizationCanvas">
+                            <div class="text-center text-gray-500">
+                                <i class="fas fa-play-circle text-4xl mb-4"></i>
+                                <p>Click "Visualize" to see the algorithm in action</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-700">Animation Speed</span>
+                                <span id="speedValue" class="text-sm text-gray-500">Normal</span>
+                            </div>
+                            <input type="range" id="speedSlider" min="1" max="5" value="3" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Algorithm Information -->
+            <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-900">
+                    <i class="fas fa-info-circle mr-2 text-purple-600"></i>Algorithm Information
+                </h2>
+                <div id="algorithmInfo" class="text-gray-600">
+                    <p>Select an algorithm type to see detailed information about its complexity and implementation.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Algorithm information
+        const algorithmInfo = {
+            'bubble-sort': {
+                name: 'Bubble Sort',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                description: 'A simple sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.'
+            },
+            'quick-sort': {
+                name: 'Quick Sort',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(log n)',
+                description: 'A highly efficient, comparison-based sorting algorithm that uses a divide-and-conquer strategy.'
+            },
+            'merge-sort': {
+                name: 'Merge Sort',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(n)',
+                description: 'A stable, divide-and-conquer sorting algorithm that produces a sorted array by merging sorted subarrays.'
+            },
+            'insertion-sort': {
+                name: 'Insertion Sort',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                description: 'A simple sorting algorithm that builds the final sorted array one item at a time.'
+            },
+            'selection-sort': {
+                name: 'Selection Sort',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                description: 'A simple sorting algorithm that divides the input into a sorted and unsorted region.'
+            },
+            'binary-search': {
+                name: 'Binary Search',
+                timeComplexity: 'O(log n)',
+                spaceComplexity: 'O(1)',
+                description: 'An efficient search algorithm that finds the position of a target value within a sorted array.'
+            },
+            'linear-search': {
+                name: 'Linear Search',
+                timeComplexity: 'O(n)',
+                spaceComplexity: 'O(1)',
+                description: 'A simple search algorithm that checks each element in the list until the target is found.'
+            }
+        };
+
+        // Update algorithm info when type changes
+        document.getElementById('algorithmType').addEventListener('change', function() {
+            updateAlgorithmInfo();
+        });
+
+        function updateAlgorithmInfo() {
+            const type = document.getElementById('algorithmType').value;
+            const info = algorithmInfo[type] || {};
+            
+            document.getElementById('algorithmInfo').innerHTML = \`
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900">\${info.name || 'Algorithm'}</h3>
+                        <p class="text-sm">\${info.description || 'Select an algorithm to see details.'}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Time Complexity</h4>
+                        <p class="text-sm text-blue-600">\${info.timeComplexity || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Space Complexity</h4>
+                        <p class="text-sm text-green-600">\${info.spaceComplexity || 'N/A'}</p>
+                    </div>
+                </div>
+            \`;
+        }
+
+        function visualizeAlgorithm() {
+            const canvas = document.getElementById('visualizationCanvas');
+            const type = document.getElementById('algorithmType').value;
+            const input = document.getElementById('inputData').value;
+            
+            if (!input.trim()) {
+                alert('Please enter input data');
+                return;
+            }
+
+            // Parse input data
+            const data = input.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+            
+            if (data.length === 0) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            // Show loading
+            canvas.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i><p class="mt-2">Visualizing...</p></div>';
+
+            // Simulate visualization
+            setTimeout(() => {
+                showVisualization(data, type);
+            }, 1000);
+        }
+
+        function showVisualization(data, type) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            if (type.includes('sort')) {
+                showSortingVisualization(data, type);
+            } else if (type.includes('search')) {
+                showSearchVisualization(data, type);
+            } else {
+                showDataStructureVisualization(data, type);
+            }
+        }
+
+        function showSortingVisualization(data, type) {
+            const canvas = document.getElementById('visualizationCanvas');
+            const steps = generateSortingSteps(data, type);
+            
+            let currentStep = 0;
+            
+            function animateStep() {
+                if (currentStep >= steps.length) return;
+                
+                const step = steps[currentStep];
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Step \${currentStep + 1}</h3>
+                        <p class="text-sm text-gray-600">\${step.description}</p>
+                    </div>
+                    <div class="flex justify-center space-x-2">
+                        \${step.array.map((val, idx) => \`
+                            <div class="w-12 h-12 bg-\${step.highlighted.includes(idx) ? 'blue' : 'gray'}-500 text-white rounded-lg flex items-center justify-center font-semibold">
+                                \${val}
+                            </div>
+                        \`).join('')}
+                    </div>
+                \`;
+                
+                currentStep++;
+                setTimeout(animateStep, 1000);
+            }
+            
+            animateStep();
+        }
+
+        function generateSortingSteps(data, type) {
+            const steps = [];
+            const array = [...data];
+            
+            if (type === 'bubble-sort') {
+                for (let i = 0; i < array.length - 1; i++) {
+                    for (let j = 0; j < array.length - i - 1; j++) {
+                        steps.push({
+                            array: [...array],
+                            description: \`Comparing \${array[j]} and \${array[j+1]}\`,
+                            highlighted: [j, j+1]
+                        });
+                        
+                        if (array[j] > array[j+1]) {
+                            [array[j], array[j+1]] = [array[j+1], array[j]];
+                            steps.push({
+                                array: [...array],
+                                description: \`Swapped \${array[j]} and \${array[j+1]}\`,
+                                highlighted: [j, j+1]
+                            });
+                        }
+                    }
+                }
+            }
+            
+            return steps;
+        }
+
+        function resetVisualization() {
+            document.getElementById('visualizationCanvas').innerHTML = \`
+                <div class="text-center text-gray-500">
+                    <i class="fas fa-play-circle text-4xl mb-4"></i>
+                    <p>Click "Visualize" to see the algorithm in action</p>
+                </div>
+            \`;
+        }
+
+        // Initialize
+        updateAlgorithmInfo();
+    </script>
+</body>
+</html>
+  `);
+}
+
+function serveAboutPage(res) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-It - About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass-effect { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-code text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">C-It</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="/visualize" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Visualizer</a>
+                        <a href="/about" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-user mr-2"></i>Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">About C-It</h1>
+                <p class="text-xl text-gray-600">Interactive C Algorithm Visualizer</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">What is C-It?</h2>
+                <p class="text-gray-600 mb-4">
+                    C-It is an interactive algorithm visualizer designed to help students and developers understand 
+                    C programming concepts through beautiful animations and step-by-step visualizations.
+                </p>
+                <p class="text-gray-600 mb-4">
+                    Whether you're learning algorithms for the first time or brushing up on your skills, 
+                    C-It provides an intuitive way to see how algorithms work in real-time.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-graduation-cap text-blue-600 mr-2"></i>Educational
+                    </h3>
+                    <p class="text-gray-600">
+                        Perfect for students learning computer science, algorithms, and data structures. 
+                        Visual learning makes complex concepts easier to understand.
+                    </p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-code text-green-600 mr-2"></i>Interactive
+                    </h3>
+                    <p class="text-gray-600">
+                        Write your own C code or use our pre-built examples. Watch algorithms execute 
+                        step-by-step with detailed explanations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">About the Developer</h2>
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">John Jandayan</h3>
+                        <p class="text-gray-600">Full Stack Developer & Software Engineer</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">
+                    With 20 years of experience in full-stack development, John specializes in creating 
+                    educational tools and interactive applications that make learning programming accessible to everyone.
+                </p>
+                <p class="text-gray-600 mb-4">
+                    C-It was created to help bridge the gap between theoretical algorithm knowledge and 
+                    practical understanding through visual learning.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="https://portfolio-john-jandayan.vercel.app/" target="_blank" 
+                       class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-globe mr-2"></i>View Portfolio
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Technology Stack</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <i class="fas fa-code text-4xl text-blue-600 mb-2"></i>
+                        <h3 class="font-semibold text-gray-900">C Programming</h3>
+                        <p class="text-sm text-gray-600">Core algorithm implementation</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fab fa-js text-4xl text-yellow-600 mb-2"></i>
+                        <h3 class="font-semibold text-gray-900">JavaScript</h3>
+                        <p class="text-sm text-gray-600">Interactive visualizations</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fab fa-css3 text-4xl text-blue-500 mb-2"></i>
+                        <h3 class="font-semibold text-gray-900">Tailwind CSS</h3>
+                        <p class="text-sm text-gray-600">Modern UI design</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p>&copy; 2024 C-It. Built with ❤️ by John Jandayan</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+  `);
+} 
