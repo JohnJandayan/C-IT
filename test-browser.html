@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>C Interpreter Test</title>
+</head>
+<body>
+    <h1>C Interpreter Test</h1>
+    <div id="output"></div>
+    
+    <script type="module">
+        // Import the C interpreter
+        import { runCCodeInterpreter } from './lib/cInterpreter.ts';
+        
+        const output = document.getElementById('output');
+        
+        // Test simple code
+        const testCode = `
+int arr[] = {64, 34, 25, 12, 22, 11, 90};
+int n = sizeof(arr) / sizeof(arr[0]);
+printf("Array size: %d\\n", n);
+printf("First element: %d\\n", arr[0]);
+`;
+        
+        try {
+            console.log('Testing C interpreter...');
+            const result = runCCodeInterpreter(testCode);
+            
+            console.log('Result:', result);
+            output.innerHTML = `
+                <h3>Output:</h3>
+                <pre>${result.output}</pre>
+                <h3>Steps: ${result.steps.length}</h3>
+            `;
+        } catch (error) {
+            console.error('Error:', error);
+            output.innerHTML = `
+                <h3>Error:</h3>
+                <pre>${error.message}</pre>
+                <pre>${error.stack}</pre>
+            `;
+        }
+    </script>
+</body>
+</html> 

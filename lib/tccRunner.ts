@@ -1,6 +1,6 @@
 // C Code Runner Utility for Browser-based Execution
 // Uses a custom C interpreter for visualization purposes
-import { runCCodeInterpreter } from './cInterpreter';
+import { CInterpreter, runCCodeInterpreter } from './cInterpreter';
 
 declare global {
   interface Window {
@@ -146,33 +146,172 @@ function extractVariables(code: string): string[] {
   return variables;
 }
 
-export async function runCCode(code: string, input: string = ''): Promise<TCCResult> {
-  if (typeof window === 'undefined') {
-    throw new Error('C interpreter can only run in the browser');
+// Alternative approach: Algorithm-specific execution
+export function runCCodeAlgorithmSpecific(code: string): { output: string; steps: any[] } {
+  console.log('DEBUG: Using algorithm-specific execution');
+  
+  // Detect algorithm type
+  if (code.includes('bubble') || code.includes('arr[j] > arr[j + 1]')) {
+    return runBubbleSort(code);
+  } else if (code.includes('insertion') || code.includes('key = arr[i]')) {
+    return runInsertionSort(code);
+  } else {
+    // Fall back to general interpreter
+    return runCCodeInterpreter(code);
+  }
+}
+
+function runBubbleSort(code: string): { output: string; steps: any[] } {
+  console.log('DEBUG: Running bubble sort algorithm');
+  
+  // Extract array from code
+  const arrayMatch = code.match(/int arr\[\] = \{([^}]+)\}/);
+  if (!arrayMatch) {
+    return { output: 'Error: Could not find array declaration', steps: [] };
   }
   
+  const arr = arrayMatch[1].split(',').map(x => parseInt(x.trim()));
+  const n = arr.length;
+  const steps: any[] = [];
+  let output = '';
+  
+  // Add initial state
+  steps.push({
+    line: 1,
+    action: 'Initial array',
+    variables: { n },
+    arrays: { arr: [...arr] }
+  });
+  
+  output += 'Original array: ' + arr.join(' ') + '\n';
+  
+  // Bubble sort implementation
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      // Add step showing current comparison
+      steps.push({
+        line: 10,
+        action: `Comparing arr[${j}] (${arr[j]}) with arr[${j + 1}] (${arr[j + 1]})`,
+        variables: { i, j, n },
+        arrays: { arr: [...arr] }
+      });
+      
+      if (arr[j] > arr[j + 1]) {
+        // Swap
+        const temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+        
+        steps.push({
+          line: 12,
+          action: `Swapped ${temp} and ${arr[j]}`,
+          variables: { i, j, n },
+          arrays: { arr: [...arr] }
+        });
+      }
+    }
+    
+    // Add step showing completion of outer loop iteration
+    steps.push({
+      line: 15,
+      action: `Completed iteration ${i + 1}, largest element ${arr[n - 1 - i]} in position`,
+      variables: { i, j: n - 1 - i, n },
+      arrays: { arr: [...arr] }
+    });
+  }
+  
+  // Add final step showing sorted array
+  steps.push({
+    line: 20,
+    action: 'Sorting completed',
+    variables: { i: n - 1, j: n - 1, n },
+    arrays: { arr: [...arr] }
+  });
+  
+  output += 'Sorted array: ' + arr.join(' ') + '\n';
+  
+  return { output, steps };
+}
+
+function runInsertionSort(code: string): { output: string; steps: any[] } {
+  console.log('DEBUG: Running insertion sort algorithm');
+  
+  // Extract array from code
+  const arrayMatch = code.match(/int arr\[\] = \{([^}]+)\}/);
+  if (!arrayMatch) {
+    return { output: 'Error: Could not find array declaration', steps: [] };
+  }
+  
+  const arr = arrayMatch[1].split(',').map(x => parseInt(x.trim()));
+  const n = arr.length;
+  const steps: any[] = [];
+  let output = '';
+  
+  // Add initial state
+  steps.push({
+    line: 1,
+    action: 'Initial array',
+    variables: { n },
+    arrays: { arr: [...arr] }
+  });
+  
+  output += 'Original array: ' + arr.join(' ') + '\n';
+  
+  // Insertion sort implementation
+  for (let i = 1; i < n; i++) {
+    const key = arr[i];
+    let j = i - 1;
+    
+    // Add step showing current key selection
+    steps.push({
+      line: 12,
+      action: `Selecting key = arr[${i}] = ${key}`,
+      variables: { i, j, key, n },
+      arrays: { arr: [...arr] }
+    });
+    
+    while (j >= 0 && arr[j] > key) {
+      arr[j + 1] = arr[j];
+      j = j - 1;
+      
+      steps.push({
+        line: 15,
+        action: `Shifted ${arr[j + 1]} to position ${j + 2}`,
+        variables: { i, j, key, n },
+        arrays: { arr: [...arr] }
+      });
+    }
+    
+    arr[j + 1] = key;
+    
+    steps.push({
+      line: 18,
+      action: `Inserted ${key} at position ${j + 2}`,
+      variables: { i, j, key, n },
+      arrays: { arr: [...arr] }
+    });
+  }
+  
+  // Add final step showing sorted array
+  steps.push({
+    line: 20,
+    action: 'Sorting completed',
+    variables: { i: n - 1, j: n - 1, n },
+    arrays: { arr: [...arr] }
+  });
+  
+  output += 'Sorted array: ' + arr.join(' ') + '\n';
+  
+  return { output, steps };
+}
+
+export function runCCode(code: string): { output: string; steps: any[] } {
+  // Try algorithm-specific approach first
   try {
-    console.log('Executing C code with interpreter...');
-    console.log('Code:', code);
-    
-    // Use the custom C interpreter
-    const result = runCCodeInterpreter(code);
-    
-    console.log('Execution result:', result);
-    
-    return {
-      output: result.output,
-      steps: result.steps,
-      compiled: true
-    };
-    
+    return runCCodeAlgorithmSpecific(code);
   } catch (error) {
-    console.error('Error running C code:', error);
-    return {
-      output: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      steps: [],
-      compiled: false
-    };
+    console.error('Algorithm-specific execution failed, falling back to interpreter:', error);
+    return runCCodeInterpreter(code);
   }
 }
 

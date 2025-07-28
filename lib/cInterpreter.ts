@@ -1,88 +1,161 @@
 // Simple C Interpreter for Browser-based Execution
 // Handles basic C constructs for visualization purposes
 
-interface Variable {
-  name: string;
-  value: any;
-  type: 'int' | 'float' | 'char' | 'array' | 'pointer';
-  address?: number;
-}
-
-interface ExecutionStep {
-  line: number;
-  variables: Record<string, any>;
-  output: string;
-  description: string;
-}
-
-class CInterpreter {
-  private variables: Map<string, Variable> = new Map();
+export class CInterpreter {
+  private variables: Map<string, { name: string; value: any; type: string; address: number }> = new Map();
+  private arrays: Map<string, number[]> = new Map();
   private output: string = '';
-  private steps: ExecutionStep[] = [];
+  private steps: Array<{ line: number; action: string; variables: Record<string, any>; arrays: Record<string, number[]> }> = [];
   private currentLine: number = 0;
-  private memory: Map<number, any> = new Map();
-  private nextAddress: number = 1000;
+  private memoryAddress: number = 1000;
 
   constructor() {
-    this.reset();
-  }
-
-  reset() {
-    this.variables.clear();
-    this.output = '';
-    this.steps = [];
-    this.currentLine = 0;
-    this.memory.clear();
-    this.nextAddress = 1000;
-  }
-
-  private addStep(line: number, description: string) {
-    const variables: Record<string, any> = {};
-    this.variables.forEach((var_, name) => {
-      if (var_.type === 'array') {
-        // Add array elements individually for better visualization
-        if (Array.isArray(var_.value)) {
-          var_.value.forEach((val: any, index: number) => {
-            variables[`${name}[${index}]`] = val;
-          });
-        }
-      } else {
-        variables[name] = var_.value;
-      }
-    });
-
-    // Add step information for visualization
-    const stepData = { ...variables };
-    
-    // Add current line
-    stepData.line = line;
-    
-    // Add loop variables for visualization
-    if (this.variables.has('i')) stepData.i = this.variables.get('i')!.value;
-    if (this.variables.has('j')) stepData.j = this.variables.get('j')!.value;
-    
-    // Add target for search algorithms
-    if (this.variables.has('target')) stepData.target = this.variables.get('target')!.value;
-    if (this.variables.has('found')) stepData.found = this.variables.get('found')!.value;
-    
-    // Add current position for traversal
-    if (this.variables.has('current')) stepData.current = this.variables.get('current')!.value;
-
-    // Debug logging
-    console.log(`Step ${line}: ${description}`, { variables: stepData });
-
-    this.steps.push({
-      line,
-      variables: stepData,
-      output: this.output,
-      description
-    });
+    console.log('DEBUG: CInterpreter initialized');
   }
 
   private allocateMemory(size: number): number {
-    const address = this.nextAddress;
-    this.nextAddress += size;
+    const address = this.memoryAddress;
+    this.memoryAddress += size;
     return address;
+  }
+
+  private addStep(line: number, action: string) {
+    const step = {
+      line,
+      action,
+      variables: Object.fromEntries(this.variables),
+      arrays: Object.fromEntries(this.arrays)
+    };
+    this.steps.push(step);
+    console.log(`DEBUG: Step ${this.steps.length} - Line ${line}: ${action}`);
+  }
+
+  // Simplified expression evaluation - only handle basic cases
+  private evaluateExpression(expr: string): number {
+    expr = expr.trim();
+    console.log(`DEBUG: Evaluating expression: "${expr}"`);
+
+    // Handle array access: arr[index]
+    const arrayMatch = expr.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\[([^\]]+)\]$/);
+    if (arrayMatch) {
+      const arrayName = arrayMatch[1];
+      const indexExpr = arrayMatch[2];
+      const index = this.evaluateExpression(indexExpr);
+      
+      if (this.arrays.has(arrayName)) {
+        const array = this.arrays.get(arrayName)!;
+        if (index >= 0 && index < array.length) {
+          console.log(`DEBUG: Array access ${arrayName}[${index}] = ${array[index]}`);
+          return array[index];
+        } else {
+          console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}]`);
+          return 0;
+        }
+      } else {
+        console.warn(`DEBUG: Array not found: ${arrayName}`);
+        return 0;
+      }
+    }
+
+    // Handle simple arithmetic: a + b, a - b, a * b, a / b
+    if (expr.includes('+')) {
+      const parts = expr.split('+').map(p => p.trim());
+      if (parts.length === 2) {
+        const left = this.evaluateExpression(parts[0]);
+        const right = this.evaluateExpression(parts[1]);
+        console.log(`DEBUG: Arithmetic ${left} + ${right} = ${left + right}`);
+        return left + right;
+      }
+    }
+    if (expr.includes('-')) {
+      const parts = expr.split('-').map(p => p.trim());
+      if (parts.length === 2) {
+        const left = this.evaluateExpression(parts[0]);
+        const right = this.evaluateExpression(parts[1]);
+        console.log(`DEBUG: Arithmetic ${left} - ${right} = ${left - right}`);
+        return left - right;
+      }
+    }
+    if (expr.includes('*')) {
+      const parts = expr.split('*').map(p => p.trim());
+      if (parts.length === 2) {
+        const left = this.evaluateExpression(parts[0]);
+        const right = this.evaluateExpression(parts[1]);
+        console.log(`DEBUG: Arithmetic ${left} * ${right} = ${left * right}`);
+        return left * right;
+      }
+    }
+    if (expr.includes('/')) {
+      const parts = expr.split('/').map(p => p.trim());
+      if (parts.length === 2) {
+        const left = this.evaluateExpression(parts[0]);
+        const right = this.evaluateExpression(parts[1]);
+        console.log(`DEBUG: Arithmetic ${left} / ${right} = ${left / right}`);
+        return left / right;
+      }
+    }
+
+    // Handle sizeof
+    const sizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\/\s*sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*0\s*\]\s*\)/);
+    if (sizeofMatch) {
+      const arrayName = sizeofMatch[1];
+      if (this.arrays.has(arrayName)) {
+        const length = this.arrays.get(arrayName)!.length;
+        console.log(`DEBUG: sizeof(${arrayName})/sizeof(${arrayName}[0]) = ${length}`);
+        return length;
+      }
+    }
+
+    // Variable lookup
+    if (this.variables.has(expr)) {
+      const value = this.variables.get(expr)!.value;
+      console.log(`DEBUG: Variable lookup ${expr} = ${value}`);
+      return value;
+    }
+
+    // Literal values
+    if (!isNaN(Number(expr))) {
+      console.log(`DEBUG: Literal value ${expr} = ${Number(expr)}`);
+      return Number(expr);
+    }
+
+    console.log(`DEBUG: Expression "${expr}" not recognized, returning 0`);
+    return 0;
+  }
+
+  // Simplified comparison evaluation
+  private evaluateCondition(condition: string): boolean {
+    console.log(`DEBUG: Evaluating condition: "${condition}"`);
+    
+    // Handle simple comparisons: a > b, a < b, a >= b, a <= b, a == b, a != b
+    const operators = ['>=', '<=', '==', '!=', '>', '<'];
+    for (const op of operators) {
+      if (condition.includes(op)) {
+        const parts = condition.split(op).map(p => p.trim());
+        if (parts.length === 2) {
+          const left = this.evaluateExpression(parts[0]);
+          const right = this.evaluateExpression(parts[1]);
+          let result = false;
+          
+          switch (op) {
+            case '>': result = left > right; break;
+            case '<': result = left < right; break;
+            case '>=': result = left >= right; break;
+            case '<=': result = left <= right; break;
+            case '==': result = left === right; break;
+            case '!=': result = left !== right; break;
+          }
+          
+          console.log(`DEBUG: Condition ${left} ${op} ${right} = ${result}`);
+          return result;
+        }
+      }
+    }
+    
+    // If no comparison operator found, evaluate as boolean
+    const value = this.evaluateExpression(condition);
+    console.log(`DEBUG: Boolean condition "${condition}" = ${value !== 0}`);
+    return value !== 0;
   }
 
   private parseVariableDeclaration(line: string): { name: string; type: string; value?: any } | null {
@@ -91,6 +164,31 @@ class CInterpreter {
     if (intMatch) {
       // Evaluate the right-hand side as an expression, not just parseInt
       return { name: intMatch[1], type: 'int', value: this.evaluateExpression(intMatch[2]) };
+    }
+
+    // Match: int a =3, b =5; (multiple declarations on one line)
+    const multiDeclMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^,]+),\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
+    if (multiDeclMatch) {
+      // Handle the first declaration
+      const firstValue = this.evaluateExpression(multiDeclMatch[2]);
+      this.variables.set(multiDeclMatch[1], {
+        name: multiDeclMatch[1],
+        value: firstValue,
+        type: 'int',
+        address: this.allocateMemory(4)
+      });
+      
+      // Handle the second declaration
+      const secondValue = this.evaluateExpression(multiDeclMatch[4]);
+      this.variables.set(multiDeclMatch[3], {
+        name: multiDeclMatch[3],
+        value: secondValue,
+        type: 'int',
+        address: this.allocateMemory(4)
+      });
+      
+      this.addStep(this.currentLine, `Declared int ${multiDeclMatch[1]} = ${firstValue}, ${multiDeclMatch[3]} = ${secondValue}`);
+      return { name: multiDeclMatch[1], type: 'int', value: firstValue };
     }
 
     // Match array with size: int arr[5] = {1,2,3,4,5};
@@ -104,13 +202,7 @@ class CInterpreter {
     const arrayNoSizeMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\]\s*=\s*\{([^}]+)\};/);
     if (arrayNoSizeMatch) {
       const values = arrayNoSizeMatch[2].split(',').map(v => parseInt(v.trim()));
-      console.log(`Array declaration: ${arrayNoSizeMatch[1]} = [${values.join(', ')}]`);
       return { name: arrayNoSizeMatch[1], type: 'array', value: values };
-    }
-
-    const simpleDeclare = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*);/);
-    if (simpleDeclare) {
-      return { name: simpleDeclare[1], type: 'int', value: 0 };
     }
 
     return null;
@@ -133,223 +225,6 @@ class CInterpreter {
     }
 
     return null;
-  }
-
-  private evaluateExpression(expr: string): any {
-    expr = expr.trim();
-    console.log(`DEBUG: Evaluating expression: "${expr}"`);
-    
-    // Handle sizeof operator
-    const sizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\/\s*sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*0\s*\]\s*\)/);
-    if (sizeofMatch) {
-      const arrayName = sizeofMatch[1];
-      const array = this.variables.get(arrayName);
-      if (array && array.type === 'array') {
-        return array.value.length;
-      }
-    }
-
-    // Handle simple sizeof
-    const simpleSizeofMatch = expr.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/);
-    if (simpleSizeofMatch) {
-      const varName = simpleSizeofMatch[1];
-      const variable = this.variables.get(varName);
-      if (variable) {
-        if (variable.type === 'array') {
-          return variable.value.length * 4; // Assuming int is 4 bytes
-        } else {
-          return 4; // Assuming int is 4 bytes
-        }
-      }
-    }
-
-    // Handle comparison operators first
-    if (expr.includes('>')) {
-      const parts = this.splitOnOperator(expr, '>');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} > ${parts[1].trim()} = ${leftVal} > ${rightVal} = ${leftVal > rightVal}`);
-        return leftVal > rightVal;
-      }
-    }
-    if (expr.includes('<')) {
-      const parts = this.splitOnOperator(expr, '<');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} < ${parts[1].trim()} = ${leftVal} < ${rightVal} = ${leftVal < rightVal}`);
-        return leftVal < rightVal;
-      }
-    }
-    if (expr.includes('>=')) {
-      const parts = this.splitOnOperator(expr, '>=');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} >= ${parts[1].trim()} = ${leftVal} >= ${rightVal} = ${leftVal >= rightVal}`);
-        return leftVal >= rightVal;
-      }
-    }
-    if (expr.includes('<=')) {
-      const parts = this.splitOnOperator(expr, '<=');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} <= ${parts[1].trim()} = ${leftVal} <= ${rightVal} = ${leftVal <= rightVal}`);
-        return leftVal <= rightVal;
-      }
-    }
-    if (expr.includes('==')) {
-      const parts = this.splitOnOperator(expr, '==');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} == ${parts[1].trim()} = ${leftVal} == ${rightVal} = ${leftVal === rightVal}`);
-        return leftVal === rightVal;
-      }
-    }
-    if (expr.includes('!=')) {
-      const parts = this.splitOnOperator(expr, '!=');
-      if (parts.length === 2) {
-        const leftVal = this.evaluateExpression(parts[0].trim());
-        const rightVal = this.evaluateExpression(parts[1].trim());
-        console.log(`DEBUG: Comparison ${parts[0].trim()} != ${parts[1].trim()} = ${leftVal} != ${rightVal} = ${leftVal !== rightVal}`);
-        return leftVal !== rightVal;
-      }
-    }
-
-    // Array access - handle this after comparison operators
-    const arrayMatch = expr.match(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\[([^\]]+)\]/);
-    if (arrayMatch) {
-      const arrayName = arrayMatch[1];
-      const indexExpr = arrayMatch[2];
-      const index = this.evaluateExpression(indexExpr);
-      const array = this.variables.get(arrayName);
-      if (array && array.type === 'array') {
-        // Check bounds before accessing
-        if (index >= 0 && index < array.value.length) {
-          const value = array.value[index];
-          console.log(`DEBUG: Array access ${arrayName}[${indexExpr}] = ${arrayName}[${index}] = ${value}`);
-          return value;
-        } else {
-          console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}] (array size: ${array.value.length})`);
-          return undefined;
-        }
-      } else {
-        console.error(`DEBUG: Array not found: ${arrayName}`);
-        return undefined;
-      }
-    }
-
-    // Arithmetic operations - handle with better precedence
-    if (expr.includes('+')) {
-      // Split on + but be careful not to split within parentheses or brackets
-      const parts = this.splitOnOperator(expr, '+');
-      if (parts.length > 1) {
-        let result = this.evaluateExpression(parts[0]);
-        for (let i = 1; i < parts.length; i++) {
-          const rightVal = this.evaluateExpression(parts[i]);
-          console.log(`DEBUG: Arithmetic ${result} + ${rightVal} = ${result + rightVal}`);
-          result += rightVal;
-        }
-        return result;
-      }
-    }
-    if (expr.includes('-')) {
-      const parts = this.splitOnOperator(expr, '-');
-      if (parts.length > 1) {
-        let result = this.evaluateExpression(parts[0]);
-        for (let i = 1; i < parts.length; i++) {
-          const rightVal = this.evaluateExpression(parts[i]);
-          console.log(`DEBUG: Arithmetic ${result} - ${rightVal} = ${result - rightVal}`);
-          result -= rightVal;
-        }
-        return result;
-      }
-    }
-    if (expr.includes('*')) {
-      const parts = this.splitOnOperator(expr, '*');
-      if (parts.length > 1) {
-        let result = this.evaluateExpression(parts[0]);
-        for (let i = 1; i < parts.length; i++) {
-          const rightVal = this.evaluateExpression(parts[i]);
-          console.log(`DEBUG: Arithmetic ${result} * ${rightVal} = ${result * rightVal}`);
-          result *= rightVal;
-        }
-        return result;
-      }
-    }
-    if (expr.includes('/')) {
-      const parts = this.splitOnOperator(expr, '/');
-      if (parts.length > 1) {
-        let result = this.evaluateExpression(parts[0]);
-        for (let i = 1; i < parts.length; i++) {
-          const rightVal = this.evaluateExpression(parts[i]);
-          console.log(`DEBUG: Arithmetic ${result} / ${rightVal} = ${result / rightVal}`);
-          result /= rightVal;
-        }
-        return result;
-      }
-    }
-
-    // Variable lookup
-    if (this.variables.has(expr)) {
-      const value = this.variables.get(expr)!.value;
-      console.log(`DEBUG: Variable lookup ${expr} = ${value}`);
-      return value;
-    }
-
-    // Literal values
-    if (!isNaN(Number(expr))) {
-      console.log(`DEBUG: Literal value ${expr} = ${Number(expr)}`);
-      return Number(expr);
-    }
-
-    console.log(`DEBUG: Expression "${expr}" not recognized, returning 0`);
-    return 0;
-  }
-
-  private splitOnOperator(expr: string, operator: string): string[] {
-    const parts: string[] = [];
-    let current = '';
-    let parenCount = 0;
-    let bracketCount = 0;
-    
-    for (let i = 0; i < expr.length; i++) {
-      const char = expr[i];
-      
-      if (char === '(') parenCount++;
-      else if (char === ')') parenCount--;
-      else if (char === '[') bracketCount++;
-      else if (char === ']') bracketCount--;
-      else if (parenCount === 0 && bracketCount === 0) {
-        // Check for multi-character operators first
-        if (operator.length === 2 && i < expr.length - 1) {
-          const twoCharOp = expr.substring(i, i + 2);
-          if (twoCharOp === operator) {
-            parts.push(current.trim());
-            current = '';
-            i++; // Skip the next character
-            continue;
-          }
-        }
-        // Check for single-character operators
-        else if (char === operator) {
-          parts.push(current.trim());
-          current = '';
-          continue;
-        }
-      }
-      
-      current += char;
-    }
-    
-    if (current.trim()) {
-      parts.push(current.trim());
-    }
-    
-    return parts;
   }
 
   private parseForLoop(line: string): { init: string; condition: string; increment: string } | null {
@@ -397,292 +272,198 @@ class CInterpreter {
     return null;
   }
 
-  execute(code: string): { output: string; steps: ExecutionStep[] } {
+  execute(code: string): { output: string; steps: Array<{ line: number; action: string; variables: Record<string, any>; arrays: Record<string, number[]> }> } {
     this.reset();
+    
+    console.log('DEBUG: Starting execution of C code');
+    console.log('DEBUG: Input code:', code);
+    
     const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    let totalLinesProcessed = 0;
+    const maxTotalLines = 10000;
     
-    console.log('DEBUG: Starting execution with versatile approach');
-    
-    // Step 1: Process all variable declarations and initializations
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      this.currentLine = i + 1;
-      
-      // Skip comments and empty lines
-      if (line.startsWith('//') || line.startsWith('/*') || line.length === 0) {
-        continue;
-      }
-      
-      // Handle variable declarations
-      const varDecl = this.parseVariableDeclaration(line);
-      if (varDecl) {
-        console.log(`DEBUG: Variable declaration: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
-        if (varDecl.type === 'array') {
-          this.variables.set(varDecl.name, {
-            name: varDecl.name,
-            value: varDecl.value,
-            type: 'array',
-            address: this.allocateMemory(varDecl.value.length * 4)
-          });
-        } else {
-          this.variables.set(varDecl.name, {
-            name: varDecl.name,
-            value: varDecl.value || 0,
-            type: 'int',
-            address: this.allocateMemory(4)
-          });
-        }
-        this.addStep(this.currentLine, `Declared ${varDecl.type} ${varDecl.name}`);
-        continue;
-      }
-      
-      // Handle printf statements
-      const printfResult = this.parsePrintf(line);
-      if (printfResult) {
-        this.output += printfResult;
-        this.addStep(this.currentLine, `Printed: ${printfResult}`);
-        continue;
-      }
-      
-      // Handle sizeof expressions
-      const sizeofMatch = line.match(/sizeof\s*\(\s*([^)]+)\s*\)/);
-      if (sizeofMatch) {
-        const arrayName = sizeofMatch[1];
-        const array = this.variables.get(arrayName);
-        if (array && array.type === 'array') {
-          const size = array.value.length;
-          console.log(`DEBUG: sizeof(${arrayName}) = ${size}`);
-          this.addStep(this.currentLine, `sizeof(${arrayName}) = ${size}`);
-        }
-        continue;
-      }
-      
-      // Handle for loops - improved approach
-      const forLoop = this.parseForLoop(line);
-      if (forLoop) {
-        console.log(`DEBUG: For loop detected: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
+    try {
+      for (let i = 0; i < lines.length && totalLinesProcessed < maxTotalLines; i++) {
+        totalLinesProcessed++;
+        const line = lines[i];
+        this.currentLine = i + 1;
         
-        // Execute initialization
-        this.executeLine(forLoop.init);
+        console.log(`DEBUG: Processing line ${this.currentLine}: "${line}"`);
         
-        // Find the loop body
-        let braceCount = 0;
-        let loopStart = -1;
-        let loopEnd = -1;
-        
-        // Find opening brace
-        for (let j = i + 1; j < lines.length; j++) {
-          if (lines[j].includes('{')) {
-            loopStart = j + 1;
-            braceCount = 1;
-            break;
-          }
-        }
-        
-        if (loopStart === -1) {
-          console.error('No opening brace found for for loop');
-          i++;
+        if (line.length === 0 || line.startsWith('//') || line.startsWith('#include')) {
           continue;
         }
         
-        // Find closing brace
-        for (let j = loopStart; j < lines.length; j++) {
-          if (lines[j].includes('{')) braceCount++;
-          if (lines[j].includes('}')) {
-            braceCount--;
-            if (braceCount === 0) {
-              loopEnd = j;
-              break;
-            }
+        // Handle variable declarations first
+        const varDecl = this.parseVariableDeclaration(line);
+        if (varDecl) {
+          console.log(`DEBUG: Variable declaration: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
+          if (varDecl.type === 'array') {
+            this.arrays.set(varDecl.name, varDecl.value);
+            this.addStep(this.currentLine, `Declared array ${varDecl.name} = [${varDecl.value.join(', ')}]`);
+          } else {
+            this.variables.set(varDecl.name, {
+              name: varDecl.name,
+              value: varDecl.value,
+              type: 'int',
+              address: this.allocateMemory(4)
+            });
+            this.addStep(this.currentLine, `Declared int ${varDecl.name} = ${varDecl.value}`);
           }
-        }
-        
-        if (loopEnd === -1) {
-          console.error('No closing brace found for for loop');
-          i = loopStart;
           continue;
         }
-
-        console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
         
-        // Execute the loop with improved approach
-        let iterationCount = 0;
-        const maxIterations = 1000;
+        // Handle printf statements
+        const printfResult = this.parsePrintf(line);
+        if (printfResult) {
+          this.output += printfResult;
+          this.addStep(this.currentLine, `Printed: ${printfResult}`);
+          continue;
+        }
         
-        while (this.evaluateExpression(forLoop.condition) && iterationCount < maxIterations) {
-          console.log(`DEBUG: Loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
-          console.log(`DEBUG: Current variables:`, {
-            i: this.variables.get('i')?.value,
-            j: this.variables.get('j')?.value,
-            n: this.variables.get('n')?.value,
-            arr: this.variables.get('arr')?.value
+        // Handle scanf statements
+        const scanfMatch = line.match(/scanf\s*\(\s*"([^"]*)"\s*(?:,\s*([^)]*))?\s*\);/);
+        if (scanfMatch) {
+          const format = scanfMatch[1];
+          const args = scanfMatch[2] ? scanfMatch[2].split(',').map(a => a.trim()) : [];
+          
+          console.log(`DEBUG: scanf format: "${format}", args: [${args.join(', ')}]`);
+          
+          // For now, we'll simulate scanf by setting default values
+          // In a real implementation, this would read from user input
+          args.forEach((arg, index) => {
+            if (arg.startsWith('&')) {
+              const varName = arg.substring(1);
+              const variable = this.variables.get(varName);
+              if (variable) {
+                // Simulate user input (for demo purposes)
+                const simulatedInput = [10, 20, 30, 40, 50][index] || 0;
+                variable.value = simulatedInput;
+                console.log(`DEBUG: scanf set ${varName} = ${simulatedInput}`);
+                this.addStep(this.currentLine, `scanf: ${varName} = ${simulatedInput}`);
+              }
+            }
           });
-          
-          // Execute loop body line by line
-          for (let j = loopStart; j < loopEnd; j++) {
-            const bodyLine = lines[j];
-            this.currentLine = j + 1;
+          continue;
+        }
+        
+        // Handle sizeof
+        const sizeofMatch = line.match(/sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\/\s*sizeof\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\s*0\s*\]\s*\)/);
+        if (sizeofMatch) {
+          const arrayName = sizeofMatch[1];
+          const array = this.arrays.get(arrayName);
+          if (array) {
+            const size = array.length;
+            console.log(`DEBUG: sizeof(${arrayName}) = ${size}`);
+            this.addStep(this.currentLine, `sizeof(${arrayName}) = ${size}`);
             
-            if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
-              continue;
-            }
-            
-            console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
-            
-            // Handle nested for loops directly
-            const nestedForLoop = this.parseForLoop(bodyLine);
-            if (nestedForLoop) {
-              console.log(`DEBUG: Nested for loop: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
-              
-              // Execute nested initialization
-              this.executeLine(nestedForLoop.init);
-              
-              // Find nested loop body
-              let nestedBraceCount = 0;
-              let nestedStart = -1;
-              let nestedEnd = -1;
-              
-              for (let k = j + 1; k < loopEnd; k++) {
-                if (lines[k].includes('{')) {
-                  nestedStart = k + 1;
-                  nestedBraceCount = 1;
-                  break;
-                }
-              }
-              
-              if (nestedStart === -1) {
-                console.error('No opening brace found for nested for loop');
-                continue;
-              }
-              
-              for (let k = nestedStart; k < loopEnd; k++) {
-                if (lines[k].includes('{')) nestedBraceCount++;
-                if (lines[k].includes('}')) {
-                  nestedBraceCount--;
-                  if (nestedBraceCount === 0) {
-                    nestedEnd = k;
-                    break;
-                  }
-                }
-              }
-              
-              if (nestedEnd === -1) {
-                console.error('No closing brace found for nested for loop');
-                continue;
-              }
-
-              console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
-              
-              // Execute nested loop completely
-              let nestedIterationCount = 0;
-              const maxNestedIterations = 1000;
-              
-              while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
-                console.log(`DEBUG: Nested loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
-                console.log(`DEBUG: Current variables:`, {
-                  i: this.variables.get('i')?.value,
-                  j: this.variables.get('j')?.value,
-                  n: this.variables.get('n')?.value,
-                  arr: this.variables.get('arr')?.value
-                });
-                
-                // Execute nested loop body
-                for (let k = nestedStart; k < nestedEnd; k++) {
-                  const nestedBodyLine = lines[k];
-                  this.currentLine = k + 1;
-                  
-                  if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
-                    continue;
-                  }
-                  
-                  console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
-                  this.executeLine(nestedBodyLine);
-                }
-                
-                // Execute nested increment
-                console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
-                this.executeLine(nestedForLoop.increment);
-                
-                nestedIterationCount++;
-              }
-              
-              console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
-              
-              // Skip the nested loop body since we've already executed it
-              j = nestedEnd;
-              continue;
-            }
-            
-            // Handle other statements in loop body
-            this.executeLine(bodyLine);
+            // Store the result in a variable (usually 'n')
+            const resultVar = 'n';
+            this.variables.set(resultVar, {
+              name: resultVar,
+              value: size,
+              type: 'int',
+              address: this.allocateMemory(4)
+            });
+            this.addStep(this.currentLine, `Calculated array size: ${resultVar} = ${size}`);
           }
-          
-          // Execute increment
-          console.log(`DEBUG: Executing increment: ${forLoop.increment}`);
-          this.executeLine(forLoop.increment);
-          
-          iterationCount++;
+          continue;
         }
         
-        console.log(`DEBUG: Loop completed after ${iterationCount} iterations`);
-        
-        if (iterationCount >= maxIterations) {
-          console.warn('Loop reached maximum iterations, stopping');
-        }
-        
-        i = loopEnd + 1;
-        continue;
-      }
-      
-      // Handle if statements
-      if (line.startsWith('if')) {
-        const conditionMatch = line.match(/if\s*\(\s*([^)]+)\s*\)/);
-        if (conditionMatch) {
-          const condition = this.evaluateExpression(conditionMatch[1]);
-          this.addStep(this.currentLine, `If condition: ${conditionMatch[1]} = ${condition}`);
+        // Handle for loops with simplified execution
+        const forLoop = this.parseForLoop(line);
+        if (forLoop) {
+          console.log(`DEBUG: For loop: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
           
-          // Find the if body
+          // Execute initialization
+          this.executeLine(forLoop.init);
+          
+          // Find loop body
+          let loopStart = -1;
+          let loopEnd = -1;
           let braceCount = 0;
-          let ifStart = i + 1;
-          let ifEnd = i + 1;
           
           for (let j = i + 1; j < lines.length; j++) {
-            if (lines[j].includes('{')) braceCount++;
+            if (lines[j].includes('{')) {
+              if (braceCount === 0) loopStart = j + 1;
+              braceCount++;
+            }
             if (lines[j].includes('}')) {
               braceCount--;
               if (braceCount === 0) {
-                ifEnd = j;
+                loopEnd = j;
                 break;
               }
             }
           }
-
-          if (condition) {
-            // Execute if body
-            for (let j = ifStart; j < ifEnd; j++) {
-              this.currentLine = j + 1;
-              this.executeLine(lines[j]);
-            }
+          
+          if (loopStart === -1 || loopEnd === -1) {
+            console.error('Could not find loop body');
+            continue;
           }
           
-          i = ifEnd + 1;
+          console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
+          
+          // Execute loop with simplified logic
+          let iterationCount = 0;
+          const maxIterations = 100; // Reduced for safety
+          
+          while (this.evaluateCondition(forLoop.condition) && iterationCount < maxIterations) {
+            console.log(`DEBUG: Loop iteration ${iterationCount + 1}, condition: ${forLoop.condition}`);
+            console.log(`DEBUG: Current variables:`, {
+              i: this.variables.get('i')?.value,
+              j: this.variables.get('j')?.value,
+              n: this.variables.get('n')?.value,
+              arr: this.arrays.get('arr')
+            });
+            console.log(`DEBUG: Condition evaluation: ${forLoop.condition} = ${this.evaluateCondition(forLoop.condition)}`);
+            
+            // Execute loop body line by line with safety check
+            for (let j = loopStart; j < loopEnd && totalLinesProcessed < maxTotalLines; j++) {
+              totalLinesProcessed++;
+              const bodyLine = lines[j];
+              this.currentLine = j + 1;
+              
+              if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
+                continue;
+              }
+              
+              console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
+              this.executeLine(bodyLine);
+            }
+            
+            // Execute increment
+            console.log(`DEBUG: Executing increment: ${forLoop.increment}`);
+            this.executeLine(forLoop.increment);
+            
+            iterationCount++;
+          }
+          
+          console.log(`DEBUG: Loop completed after ${iterationCount} iterations`);
+          
+          // Skip the loop body since we've already executed it
+          i = loopEnd;
           continue;
         }
+        
+        // Handle other statements
+        this.executeLine(line);
       }
       
-      // Handle return statement
-      if (line.startsWith('return')) {
-        this.addStep(this.currentLine, 'Return statement');
-        break;
-      }
+      console.log(`DEBUG: Execution completed. Total lines processed: ${totalLinesProcessed}`);
+      console.log(`DEBUG: Final output: ${this.output}`);
+      console.log(`DEBUG: Final variables:`, Object.fromEntries(this.variables));
+      console.log(`DEBUG: Final arrays:`, Object.fromEntries(this.arrays));
       
-      // Handle other statements
-      this.executeLine(line);
-      i++;
+    } catch (error) {
+      console.error('DEBUG: Error during execution:', error);
+      this.addStep(this.currentLine, `Error: ${error}`);
     }
     
-    console.log('DEBUG: Execution completed');
-    return { output: this.output, steps: this.steps };
+    return {
+      output: this.output,
+      steps: this.steps
+    };
   }
 
   private executeLine(line: string) {
@@ -704,12 +485,7 @@ class CInterpreter {
     if (varDecl) {
       console.log(`DEBUG: Variable declaration in loop: ${varDecl.type} ${varDecl.name} = ${JSON.stringify(varDecl.value)}`);
       if (varDecl.type === 'array') {
-        this.variables.set(varDecl.name, {
-          name: varDecl.name,
-          value: varDecl.value,
-          type: 'array',
-          address: this.allocateMemory(varDecl.value.length * 4)
-        });
+        this.arrays.set(varDecl.name, varDecl.value);
       } else {
         this.variables.set(varDecl.name, {
           name: varDecl.name,
@@ -730,14 +506,14 @@ class CInterpreter {
         if (arrayMatch) {
           const arrayName = arrayMatch[1];
           const index = parseInt(arrayMatch[2]);
-          const array = this.variables.get(arrayName);
-          if (array && array.type === 'array') {
+          const array = this.arrays.get(arrayName);
+          if (array) {
             // Only allow assignment within the original array bounds
-            if (index >= 0 && index < array.value.length) {
+            if (index >= 0 && index < array.length) {
               console.log(`DEBUG: Array assignment in loop: ${arrayName}[${index}] = ${assignment.value}`);
-              array.value[index] = assignment.value;
+              array[index] = assignment.value;
             } else {
-              console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}] (array size: ${array.value.length})`);
+              console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}] (array size: ${array.length})`);
             }
           } else {
             console.error(`DEBUG: Array not found: ${arrayName}`);
@@ -753,7 +529,8 @@ class CInterpreter {
           this.variables.set(assignment.name, {
             name: assignment.name,
             value: assignment.value,
-            type: 'int'
+            type: 'int',
+            address: this.allocateMemory(4)
           });
         }
       }
@@ -798,7 +575,7 @@ class CInterpreter {
     if (line.startsWith('if')) {
       const conditionMatch = line.match(/if\s*\(\s*([^)]+)\s*\)/);
       if (conditionMatch) {
-        const condition = this.evaluateExpression(conditionMatch[1]);
+        const condition = this.evaluateCondition(conditionMatch[1]);
         this.addStep(this.currentLine, `If condition: ${conditionMatch[1]} = ${condition}`);
         console.log(`DEBUG: If condition in loop: ${conditionMatch[1]} = ${condition}`);
         return;
@@ -813,16 +590,27 @@ class CInterpreter {
     // If we reach here, we couldn't parse the line
     console.warn(`DEBUG: Could not parse line: "${line}"`);
   }
+
+  reset() {
+    this.variables.clear();
+    this.arrays.clear();
+    this.output = '';
+    this.steps = [];
+    this.currentLine = 0;
+    this.memoryAddress = 1000;
+  }
 }
 
-export function runCCodeInterpreter(code: string): { output: string; steps: any[] } {
+export function runCCodeInterpreter(code: string): { output: string; steps: Array<{ line: number; action: string; variables: Record<string, any>; arrays: Record<string, number[]> }> } {
   const interpreter = new CInterpreter();
   const result = interpreter.execute(code);
   
   // Convert steps to the format expected by the UI
   const steps = result.steps.map(step => ({
     line: step.line,
-    ...step.variables
+    action: step.action,
+    variables: step.variables,
+    arrays: step.arrays
   }));
   
   return {

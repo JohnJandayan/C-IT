@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Settings, Play, Copy, Download } from 'lucide-react';
 
 interface CodeEditorProps {
@@ -139,27 +137,15 @@ export default function CodeEditor({ code: initialCode = '', onRun, className = 
         <textarea
           value={code}
           onChange={handleCodeChange}
-          className="w-full h-96 p-4 font-mono text-sm leading-relaxed bg-transparent text-transparent caret-black resize-none focus:outline-none"
-          style={{ fontSize: `${fontSize}px` }}
+          className="w-full h-96 p-4 font-mono text-sm leading-relaxed bg-white border-0 resize-none focus:outline-none focus:ring-0"
+          style={{ 
+            fontSize: `${fontSize}px`,
+            color: theme === 'dark' ? '#e5e5e5' : '#1f2937',
+            backgroundColor: theme === 'dark' ? '#1e1e1e' : '#ffffff'
+          }}
           spellCheck={false}
+          placeholder="Enter your C code here..."
         />
-        <div className="absolute inset-0 pointer-events-none">
-          <SyntaxHighlighter
-            language="c"
-            style={theme === 'dark' ? tomorrow : undefined}
-            customStyle={{
-              margin: 0,
-              padding: '1rem',
-              fontSize: `${fontSize}px`,
-              background: theme === 'light' ? '#ffffff' : undefined,
-              height: '100%'
-            }}
-            showLineNumbers={true}
-            wrapLines={true}
-          >
-            {code}
-          </SyntaxHighlighter>
-        </div>
       </div>
 
       {/* User Input Panel */}

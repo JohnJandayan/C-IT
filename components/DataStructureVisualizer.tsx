@@ -43,7 +43,18 @@ export default function DataStructureVisualizer({
     const linkedListNodes: Record<string, { value: number; next?: string }> = {};
     const treeNodes: Record<string, { value: number; left?: string; right?: string }> = {};
 
-    // Extract arrays
+    // First, check if step has arrays in the new format (from algorithm-specific execution)
+    if (step.arrays && typeof step.arrays === 'object') {
+      Object.keys(step.arrays).forEach((arrName) => {
+        const arr = step.arrays[arrName];
+        if (Array.isArray(arr)) {
+          arrays[arrName] = arr;
+          console.log(`DEBUG: Found array in new format: ${arrName} = [${arr.join(', ')}]`);
+        }
+      });
+    }
+
+    // Extract arrays in the old format (from interpreter)
     Object.keys(step).forEach((key) => {
       const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
       if (arrayMatch) {
@@ -61,6 +72,19 @@ export default function DataStructureVisualizer({
     if (Object.keys(arrays).length === 0 && executionSteps.length > 0) {
       for (let i = executionSteps.length - 1; i >= 0; i--) {
         const prevStep = executionSteps[i];
+        
+        // Check new format first
+        if (prevStep.arrays && typeof prevStep.arrays === 'object') {
+          Object.keys(prevStep.arrays).forEach((arrName) => {
+            const arr = prevStep.arrays[arrName];
+            if (Array.isArray(arr)) {
+              arrays[arrName] = arr;
+              console.log(`DEBUG: Found array in previous step (new format): ${arrName} = [${arr.join(', ')}]`);
+            }
+          });
+        }
+        
+        // Check old format
         Object.keys(prevStep).forEach((key) => {
           const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
           if (arrayMatch) {
@@ -76,10 +100,20 @@ export default function DataStructureVisualizer({
       }
     }
 
-    // If still no arrays found, create a default array for visualization
+    // If still no arrays found, show variables instead
     if (Object.keys(arrays).length === 0) {
-      console.warn('No arrays found in execution steps, creating default array');
-      arrays['arr'] = [64, 34, 25, 12, 22, 11, 90];
+      console.log('DEBUG: No arrays found in execution steps, showing variable visualization instead');
+      // Don't create mock data - show actual variables from the step
+      Object.keys(step).forEach((key) => {
+        if (typeof step[key] === 'number' && !key.includes('[') && !key.includes('_') && key !== 'line' && key !== 'action') {
+          newElements.push({
+            value: step[key],
+            index: newElements.length,
+            state: 'normal',
+            dataStructure: 'array'
+          });
+        }
+      });
     }
 
     // Extract linked list nodes
@@ -165,9 +199,38 @@ export default function DataStructureVisualizer({
     if (dataStructureType === 'array') {
       // Look for swapping operations by detecting changes in array values
       const swappingIndices: number[] = [];
+      const comparingIndices: number[] = [];
       const previousStep = currentStep > 0 ? executionSteps[currentStep - 1] : null;
       
+      // Check for comparison operations from variables
+      if (step.variables) {
+        if (step.variables.i !== undefined) comparingIndices.push(step.variables.i);
+        if (step.variables.j !== undefined) comparingIndices.push(step.variables.j);
+      }
+      
+      // Check for comparison operations from direct step properties
+      if (step.i !== undefined) comparingIndices.push(step.i);
+      if (step.j !== undefined) comparingIndices.push(step.j);
+
+      // Look for swapping operations by comparing with previous step
       if (previousStep) {
+        // Check new format arrays
+        if (step.arrays && previousStep.arrays) {
+          Object.keys(step.arrays).forEach((arrName) => {
+            const currentArr = step.arrays[arrName];
+            const previousArr = previousStep.arrays[arrName];
+            
+            if (Array.isArray(currentArr) && Array.isArray(previousArr)) {
+              for (let i = 0; i < currentArr.length; i++) {
+                if (currentArr[i] !== previousArr[i]) {
+                  swappingIndices.push(i);
+                }
+              }
+            }
+          });
+        }
+        
+        // Check old format arrays
         Object.keys(step).forEach((key) => {
           const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
           if (arrayMatch) {
@@ -181,11 +244,6 @@ export default function DataStructureVisualizer({
           }
         });
       }
-
-      // Look for comparison operations
-      const comparingIndices: number[] = [];
-      if (step.i !== undefined) comparingIndices.push(step.i);
-      if (step.j !== undefined) comparingIndices.push(step.j);
 
       // Set states based on operations
       newElements.forEach((element) => {
@@ -205,20 +263,22 @@ export default function DataStructureVisualizer({
         }
       });
 
-      // Ensure we have a meaningful action description
-      if (!action) {
-        if (swappingIndices.length > 0) {
-          action = `Swapping elements at positions ${swappingIndices.join(' and ')}`;
-        } else if (comparingIndices.length > 0) {
-          action = `Comparing elements at positions ${comparingIndices.join(' and ')}`;
-        } else if (step.line) {
-          action = `Executing line ${step.line}`;
-        } else {
-          action = `Step ${currentStep + 1} of ${totalSteps}`;
-        }
+      // Update element values from current step arrays
+      if (step.arrays) {
+        Object.keys(step.arrays).forEach((arrName) => {
+          const arr = step.arrays[arrName];
+          if (Array.isArray(arr)) {
+            arr.forEach((value, index) => {
+              const element = newElements.find(el => el.index === index);
+              if (element) {
+                element.value = value;
+              }
+            });
+          }
+        });
       }
 
-      // Update element values from current step
+      // Update element values from old format
       Object.keys(step).forEach((key) => {
         const arrayMatch = key.match(/([a-zA-Z_][a-zA-Z0-9_]*)\[(\d+)\]/);
         if (arrayMatch) {
@@ -232,7 +292,9 @@ export default function DataStructureVisualizer({
 
       // Set default action if none detected
       if (!action) {
-        if (step.line) {
+        if (step.action) {
+          action = step.action;
+        } else if (step.line) {
           action = `Executing line ${step.line}`;
         } else {
           action = `Step ${currentStep + 1} of ${totalSteps}`;
