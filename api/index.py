@@ -1,20 +1,26 @@
 """
-Vercel API handler for Django application
+Vercel API handler for C-It application
 """
 
-import os
-import sys
-from pathlib import Path
-
-# Add the project directory to the Python path
-project_dir = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(project_dir))
-
-# Set Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'c_it_project.settings')
-
 def handler(request, context):
-    """Simple handler that returns a working HTML page"""
+    """Vercel serverless function handler"""
+    
+    # Get the request path
+    path = request.get('path', '/')
+    
+    # Handle different routes
+    if path.startswith('/static/') or path in ['/favicon.ico', '/favicon.png']:
+        # Return a simple favicon response
+        return {
+            'statusCode': 200,
+            'body': 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚀</text></svg>',
+            'headers': {
+                'Content-Type': 'image/svg+xml',
+                'Cache-Control': 'public, max-age=31536000'
+            }
+        }
+    
+    # Return the main HTML page for all other routes
     return {
         'statusCode': 200,
         'body': '''
@@ -135,7 +141,7 @@ def handler(request, context):
                     </p>
                     <div class="bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-lg">
                         <p class="font-semibold">🚀 C-It is Running!</p>
-                        <p class="text-sm opacity-90">Your Django application is successfully deployed and ready to use.</p>
+                        <p class="text-sm opacity-90">Your application is successfully deployed and ready to use.</p>
                     </div>
                 </div>
             </div>

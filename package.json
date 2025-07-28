@@ -1,0 +1,13 @@
+{
+  "name": "c-it",
+  "version": "1.0.0",
+  "description": "C Algorithm Visualizer",
+  "main": "api/index.py",
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "start": "echo 'Serverless deployment'"
+  },
+  "keywords": ["algorithm", "visualizer", "c-programming", "education"],
+  "author": "John Jandayan",
+  "license": "MIT"
+} 
