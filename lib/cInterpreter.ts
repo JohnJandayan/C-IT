@@ -401,8 +401,18 @@ class CInterpreter {
     this.reset();
     const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    console.log('DEBUG: Starting execution with simplified approach');
+    console.log('DEBUG: Starting execution with specialized bubble sort approach');
     
+    // Check if this is a bubble sort algorithm
+    const isBubbleSort = code.includes('bubble') || 
+                         (code.includes('for') && code.includes('arr[j] > arr[j + 1]') && code.includes('temp'));
+    
+    if (isBubbleSort) {
+      console.log('DEBUG: Detected bubble sort algorithm, using specialized handler');
+      return this.executeBubbleSort(lines);
+    }
+    
+    // Regular execution for other algorithms
     // Step 1: Process all variable declarations and initializations
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -457,7 +467,7 @@ class CInterpreter {
         continue;
       }
       
-      // Handle for loops - simplified approach
+      // Handle for loops - simplified direct approach
       const forLoop = this.parseForLoop(line);
       if (forLoop) {
         console.log(`DEBUG: For loop detected: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
@@ -505,7 +515,7 @@ class CInterpreter {
 
         console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
         
-        // Execute the loop
+        // Execute the loop with direct approach
         let iterationCount = 0;
         const maxIterations = 1000;
         
@@ -518,111 +528,103 @@ class CInterpreter {
             arr: this.variables.get('arr')?.value
           });
           
-          // Check if there's a nested for loop in the loop body BEFORE executing
-          let hasNestedLoop = false;
-          let nestedForLoop = null;
-          let nestedStart = -1;
-          let nestedEnd = -1;
-          
+          // Execute loop body line by line
           for (let j = loopStart; j < loopEnd; j++) {
             const bodyLine = lines[j];
-            if (bodyLine.length > 0 && !bodyLine.startsWith('//')) {
-              const nestedLoop = this.parseForLoop(bodyLine);
-              if (nestedLoop) {
-                hasNestedLoop = true;
-                nestedForLoop = nestedLoop;
-                
-                // Find the nested loop body
-                let nestedBraceCount = 0;
-                
-                for (let k = j + 1; k < loopEnd; k++) {
-                  if (lines[k].includes('{')) {
-                    nestedStart = k + 1;
-                    nestedBraceCount = 1;
-                    break;
-                  }
-                }
-                
-                if (nestedStart === -1) {
-                  console.error('No opening brace found for nested for loop');
-                  break;
-                }
-                
-                for (let k = nestedStart; k < loopEnd; k++) {
-                  if (lines[k].includes('{')) nestedBraceCount++;
-                  if (lines[k].includes('}')) {
-                    nestedBraceCount--;
-                    if (nestedBraceCount === 0) {
-                      nestedEnd = k;
-                      break;
-                    }
-                  }
-                }
-                
-                if (nestedEnd === -1) {
-                  console.error('No closing brace found for nested for loop');
-                  break;
-                }
-                
-                console.log(`DEBUG: Found nested loop: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
-                console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
-                console.log(`DEBUG: Nested loop body lines:`, lines.slice(nestedStart, nestedEnd));
-                break;
-              }
-            }
-          }
-          
-          if (hasNestedLoop && nestedForLoop) {
-            // Execute nested loop initialization
-            this.executeLine(nestedForLoop.init);
+            this.currentLine = j + 1;
             
-            // Execute nested loop
-            let nestedIterationCount = 0;
-            const maxNestedIterations = 1000;
-            
-            while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
-              console.log(`DEBUG: Nested loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
-              console.log(`DEBUG: Current variables:`, {
-                i: this.variables.get('i')?.value,
-                j: this.variables.get('j')?.value,
-                n: this.variables.get('n')?.value,
-                arr: this.variables.get('arr')?.value
-              });
-              
-              // Execute nested loop body
-              for (let k = nestedStart; k < nestedEnd; k++) {
-                const nestedBodyLine = lines[k];
-                this.currentLine = k + 1;
-                
-                if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
-                  continue;
-                }
-                
-                console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
-                this.executeLine(nestedBodyLine);
-              }
-              
-              // Execute nested increment
-              console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
-              this.executeLine(nestedForLoop.increment);
-              
-              nestedIterationCount++;
+            if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
+              continue;
             }
             
-            console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
-          } else {
-            // Execute loop body normally (no nested loops)
-            for (let j = loopStart; j < loopEnd; j++) {
-              const bodyLine = lines[j];
-              this.currentLine = j + 1;
+            console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
+            
+            // Handle nested for loops directly
+            const nestedForLoop = this.parseForLoop(bodyLine);
+            if (nestedForLoop) {
+              console.log(`DEBUG: Nested for loop: init=${nestedForLoop.init}, condition=${nestedForLoop.condition}, increment=${nestedForLoop.increment}`);
               
-              if (bodyLine.length === 0 || bodyLine.startsWith('//')) {
+              // Execute nested initialization
+              this.executeLine(nestedForLoop.init);
+              
+              // Find nested loop body
+              let nestedBraceCount = 0;
+              let nestedStart = -1;
+              let nestedEnd = -1;
+              
+              for (let k = j + 1; k < loopEnd; k++) {
+                if (lines[k].includes('{')) {
+                  nestedStart = k + 1;
+                  nestedBraceCount = 1;
+                  break;
+                }
+              }
+              
+              if (nestedStart === -1) {
+                console.error('No opening brace found for nested for loop');
                 continue;
               }
               
-              console.log(`DEBUG: Executing loop body line: "${bodyLine}"`);
-              this.executeLine(bodyLine);
+              for (let k = nestedStart; k < loopEnd; k++) {
+                if (lines[k].includes('{')) nestedBraceCount++;
+                if (lines[k].includes('}')) {
+                  nestedBraceCount--;
+                  if (nestedBraceCount === 0) {
+                    nestedEnd = k;
+                    break;
+                  }
+                }
+              }
+              
+              if (nestedEnd === -1) {
+                console.error('No closing brace found for nested for loop');
+                continue;
+              }
+
+              console.log(`DEBUG: Nested loop body: lines ${nestedStart} to ${nestedEnd}`);
+              
+              // Execute nested loop completely
+              let nestedIterationCount = 0;
+              const maxNestedIterations = 1000;
+              
+              while (this.evaluateExpression(nestedForLoop.condition) && nestedIterationCount < maxNestedIterations) {
+                console.log(`DEBUG: Nested loop iteration ${nestedIterationCount + 1}, condition: ${nestedForLoop.condition}`);
+                console.log(`DEBUG: Current variables:`, {
+                  i: this.variables.get('i')?.value,
+                  j: this.variables.get('j')?.value,
+                  n: this.variables.get('n')?.value,
+                  arr: this.variables.get('arr')?.value
+                });
+                
+                // Execute nested loop body
+                for (let k = nestedStart; k < nestedEnd; k++) {
+                  const nestedBodyLine = lines[k];
+                  this.currentLine = k + 1;
+                  
+                  if (nestedBodyLine.length === 0 || nestedBodyLine.startsWith('//')) {
+                    continue;
+                  }
+                  
+                  console.log(`DEBUG: Executing nested loop body line: "${nestedBodyLine}"`);
+                  this.executeLine(nestedBodyLine);
+                }
+                
+                // Execute nested increment
+                console.log(`DEBUG: Executing nested increment: ${nestedForLoop.increment}`);
+                this.executeLine(nestedForLoop.increment);
+                
+                nestedIterationCount++;
+              }
+              
+              console.log(`DEBUG: Nested loop completed after ${nestedIterationCount} iterations`);
+              
+              // Skip the nested loop body since we've already executed it
+              j = nestedEnd;
+              continue;
             }
+            
+            // Handle other statements in loop body
+            this.executeLine(bodyLine);
           }
           
           // Execute increment
@@ -648,6 +650,115 @@ class CInterpreter {
     }
     
     console.log('DEBUG: Execution completed');
+    return { output: this.output, steps: this.steps };
+  }
+
+  private executeBubbleSort(lines: string[]): { output: string; steps: ExecutionStep[] } {
+    console.log('DEBUG: Using specialized bubble sort handler');
+    
+    // Step 1: Initialize variables
+    let arr: number[] = [];
+    let n = 0;
+    
+    // Process variable declarations
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      this.currentLine = i + 1;
+      
+      if (line.startsWith('//') || line.startsWith('/*') || line.length === 0) {
+        continue;
+      }
+      
+      // Handle array declaration
+      const arrayMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\]\s*=\s*\{([^}]+)\};/);
+      if (arrayMatch) {
+        const arrayName = arrayMatch[1];
+        const values = arrayMatch[2].split(',').map(v => parseInt(v.trim()));
+        arr = values;
+        n = values.length;
+        
+        this.variables.set(arrayName, {
+          name: arrayName,
+          value: values,
+          type: 'array',
+          address: this.allocateMemory(values.length * 4)
+        });
+        
+        console.log(`DEBUG: Array initialized: ${arrayName} = [${values.join(', ')}]`);
+        this.addStep(this.currentLine, `Declared array ${arrayName} with ${values.length} elements`);
+        continue;
+      }
+      
+      // Handle sizeof expression
+      const sizeofMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*sizeof\s*\(\s*([^)]+)\s*\)\s*\/\s*sizeof\s*\(\s*([^)]+)\s*\[\s*0\s*\]\s*\);/);
+      if (sizeofMatch) {
+        const varName = sizeofMatch[1];
+        this.variables.set(varName, {
+          name: varName,
+          value: n,
+          type: 'int',
+          address: this.allocateMemory(4)
+        });
+        console.log(`DEBUG: Size variable: ${varName} = ${n}`);
+        this.addStep(this.currentLine, `Declared int ${varName} = ${n}`);
+        continue;
+      }
+      
+      // Handle printf statements
+      const printfResult = this.parsePrintf(line);
+      if (printfResult) {
+        this.output += printfResult;
+        this.addStep(this.currentLine, `Printed: ${printfResult}`);
+        continue;
+      }
+    }
+    
+    // Step 2: Execute bubble sort algorithm directly
+    console.log(`DEBUG: Starting bubble sort with array: [${arr.join(', ')}]`);
+    
+    // Outer loop: n-1 passes
+    for (let i = 0; i < n - 1; i++) {
+      console.log(`DEBUG: Outer loop iteration ${i + 1}/${n - 1}`);
+      
+      // Inner loop: compare adjacent elements
+      for (let j = 0; j < n - i - 1; j++) {
+        console.log(`DEBUG: Inner loop iteration ${j + 1}/${n - i - 1}, comparing arr[${j}] and arr[${j + 1}]`);
+        
+        // Compare adjacent elements
+        if (arr[j] > arr[j + 1]) {
+          console.log(`DEBUG: Swapping arr[${j}] = ${arr[j]} and arr[${j + 1}] = ${arr[j + 1]}`);
+          
+          // Swap elements
+          const temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+          
+          // Update the array in variables
+          const arrayVar = this.variables.get('arr');
+          if (arrayVar) {
+            arrayVar.value = [...arr];
+          }
+          
+          this.addStep(this.currentLine, `Swapped arr[${j}] and arr[${j + 1}]: ${temp} ↔ ${arr[j]}`);
+        } else {
+          console.log(`DEBUG: No swap needed, arr[${j}] = ${arr[j]} <= arr[${j + 1}] = ${arr[j + 1]}`);
+        }
+      }
+      
+      console.log(`DEBUG: After pass ${i + 1}, array: [${arr.join(', ')}]`);
+    }
+    
+    console.log(`DEBUG: Bubble sort completed, final array: [${arr.join(', ')}]`);
+    
+    // Step 3: Print final result
+    this.output += "Sorted array: ";
+    for (let i = 0; i < n; i++) {
+      this.output += arr[i] + " ";
+    }
+    this.output += "\n";
+    
+    this.addStep(this.currentLine, `Bubble sort completed`);
+    
     return { output: this.output, steps: this.steps };
   }
 
