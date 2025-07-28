@@ -1,1 +1,0 @@
-# No dependencies needed for simple HTML handler 

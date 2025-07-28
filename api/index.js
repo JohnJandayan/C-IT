@@ -1,29 +1,23 @@
-"""
-Vercel API handler for C-It application
-"""
+/**
+ * Vercel API handler for C-It application
+ */
 
-def handler(request, context):
-    """Vercel serverless function handler"""
-    
-    # Get the request path
-    path = request.get('path', '/')
-    
-    # Handle different routes
-    if path.startswith('/static/') or path in ['/favicon.ico', '/favicon.png']:
-        # Return a simple favicon response
-        return {
-            'statusCode': 200,
-            'body': 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚀</text></svg>',
-            'headers': {
-                'Content-Type': 'image/svg+xml',
-                'Cache-Control': 'public, max-age=31536000'
-            }
-        }
-    
-    # Return the main HTML page for all other routes
-    return {
-        'statusCode': 200,
-        'body': '''
+module.exports = (req, res) => {
+  // Get the request path
+  const path = req.url || '/';
+  
+  // Handle different routes
+  if (path.startsWith('/static/') || path === '/favicon.ico' || path === '/favicon.png') {
+    // Return a simple favicon response
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.status(200).send('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚀</text></svg>');
+    return;
+  }
+  
+  // Return the main HTML page for all other routes
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,8 +190,5 @@ def handler(request, context):
     </footer>
 </body>
 </html>
-        ''',
-        'headers': {
-            'Content-Type': 'text/html; charset=utf-8'
-        }
-    } 
+  `);
+}; 
