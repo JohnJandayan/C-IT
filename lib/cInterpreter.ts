@@ -401,18 +401,8 @@ class CInterpreter {
     this.reset();
     const lines = code.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    console.log('DEBUG: Starting execution with specialized bubble sort approach');
+    console.log('DEBUG: Starting execution with versatile approach');
     
-    // Check if this is a bubble sort algorithm
-    const isBubbleSort = code.includes('bubble') || 
-                         (code.includes('for') && code.includes('arr[j] > arr[j + 1]') && code.includes('temp'));
-    
-    if (isBubbleSort) {
-      console.log('DEBUG: Detected bubble sort algorithm, using specialized handler');
-      return this.executeBubbleSort(lines);
-    }
-    
-    // Regular execution for other algorithms
     // Step 1: Process all variable declarations and initializations
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -467,7 +457,7 @@ class CInterpreter {
         continue;
       }
       
-      // Handle for loops - simplified direct approach
+      // Handle for loops - improved approach
       const forLoop = this.parseForLoop(line);
       if (forLoop) {
         console.log(`DEBUG: For loop detected: init=${forLoop.init}, condition=${forLoop.condition}, increment=${forLoop.increment}`);
@@ -515,7 +505,7 @@ class CInterpreter {
 
         console.log(`DEBUG: Loop body: lines ${loopStart} to ${loopEnd}`);
         
-        // Execute the loop with direct approach
+        // Execute the loop with improved approach
         let iterationCount = 0;
         const maxIterations = 1000;
         
@@ -644,6 +634,48 @@ class CInterpreter {
         continue;
       }
       
+      // Handle if statements
+      if (line.startsWith('if')) {
+        const conditionMatch = line.match(/if\s*\(\s*([^)]+)\s*\)/);
+        if (conditionMatch) {
+          const condition = this.evaluateExpression(conditionMatch[1]);
+          this.addStep(this.currentLine, `If condition: ${conditionMatch[1]} = ${condition}`);
+          
+          // Find the if body
+          let braceCount = 0;
+          let ifStart = i + 1;
+          let ifEnd = i + 1;
+          
+          for (let j = i + 1; j < lines.length; j++) {
+            if (lines[j].includes('{')) braceCount++;
+            if (lines[j].includes('}')) {
+              braceCount--;
+              if (braceCount === 0) {
+                ifEnd = j;
+                break;
+              }
+            }
+          }
+
+          if (condition) {
+            // Execute if body
+            for (let j = ifStart; j < ifEnd; j++) {
+              this.currentLine = j + 1;
+              this.executeLine(lines[j]);
+            }
+          }
+          
+          i = ifEnd + 1;
+          continue;
+        }
+      }
+      
+      // Handle return statement
+      if (line.startsWith('return')) {
+        this.addStep(this.currentLine, 'Return statement');
+        break;
+      }
+      
       // Handle other statements
       this.executeLine(line);
       i++;
@@ -653,120 +685,19 @@ class CInterpreter {
     return { output: this.output, steps: this.steps };
   }
 
-  private executeBubbleSort(lines: string[]): { output: string; steps: ExecutionStep[] } {
-    console.log('DEBUG: Using specialized bubble sort handler');
-    
-    // Step 1: Initialize variables
-    let arr: number[] = [];
-    let n = 0;
-    
-    // Process variable declarations
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      this.currentLine = i + 1;
-      
-      if (line.startsWith('//') || line.startsWith('/*') || line.length === 0) {
-        continue;
-      }
-      
-      // Handle array declaration
-      const arrayMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\[\]\s*=\s*\{([^}]+)\};/);
-      if (arrayMatch) {
-        const arrayName = arrayMatch[1];
-        const values = arrayMatch[2].split(',').map(v => parseInt(v.trim()));
-        arr = values;
-        n = values.length;
-        
-        this.variables.set(arrayName, {
-          name: arrayName,
-          value: values,
-          type: 'array',
-          address: this.allocateMemory(values.length * 4)
-        });
-        
-        console.log(`DEBUG: Array initialized: ${arrayName} = [${values.join(', ')}]`);
-        this.addStep(this.currentLine, `Declared array ${arrayName} with ${values.length} elements`);
-        continue;
-      }
-      
-      // Handle sizeof expression
-      const sizeofMatch = line.match(/int\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*sizeof\s*\(\s*([^)]+)\s*\)\s*\/\s*sizeof\s*\(\s*([^)]+)\s*\[\s*0\s*\]\s*\);/);
-      if (sizeofMatch) {
-        const varName = sizeofMatch[1];
-        this.variables.set(varName, {
-          name: varName,
-          value: n,
-          type: 'int',
-          address: this.allocateMemory(4)
-        });
-        console.log(`DEBUG: Size variable: ${varName} = ${n}`);
-        this.addStep(this.currentLine, `Declared int ${varName} = ${n}`);
-        continue;
-      }
-      
-      // Handle printf statements
-      const printfResult = this.parsePrintf(line);
-      if (printfResult) {
-        this.output += printfResult;
-        this.addStep(this.currentLine, `Printed: ${printfResult}`);
-        continue;
-      }
-    }
-    
-    // Step 2: Execute bubble sort algorithm directly
-    console.log(`DEBUG: Starting bubble sort with array: [${arr.join(', ')}]`);
-    
-    // Outer loop: n-1 passes
-    for (let i = 0; i < n - 1; i++) {
-      console.log(`DEBUG: Outer loop iteration ${i + 1}/${n - 1}`);
-      
-      // Inner loop: compare adjacent elements
-      for (let j = 0; j < n - i - 1; j++) {
-        console.log(`DEBUG: Inner loop iteration ${j + 1}/${n - i - 1}, comparing arr[${j}] and arr[${j + 1}]`);
-        
-        // Compare adjacent elements
-        if (arr[j] > arr[j + 1]) {
-          console.log(`DEBUG: Swapping arr[${j}] = ${arr[j]} and arr[${j + 1}] = ${arr[j + 1]}`);
-          
-          // Swap elements
-          const temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
-          
-          // Update the array in variables
-          const arrayVar = this.variables.get('arr');
-          if (arrayVar) {
-            arrayVar.value = [...arr];
-          }
-          
-          this.addStep(this.currentLine, `Swapped arr[${j}] and arr[${j + 1}]: ${temp} ↔ ${arr[j]}`);
-        } else {
-          console.log(`DEBUG: No swap needed, arr[${j}] = ${arr[j]} <= arr[${j + 1}] = ${arr[j + 1]}`);
-        }
-      }
-      
-      console.log(`DEBUG: After pass ${i + 1}, array: [${arr.join(', ')}]`);
-    }
-    
-    console.log(`DEBUG: Bubble sort completed, final array: [${arr.join(', ')}]`);
-    
-    // Step 3: Print final result
-    this.output += "Sorted array: ";
-    for (let i = 0; i < n; i++) {
-      this.output += arr[i] + " ";
-    }
-    this.output += "\n";
-    
-    this.addStep(this.currentLine, `Bubble sort completed`);
-    
-    return { output: this.output, steps: this.steps };
-  }
-
   private executeLine(line: string) {
     // Execute a single line (helper for loops and conditionals)
     this.currentLine++;
     
     console.log(`DEBUG: executeLine: "${line}"`);
+    
+    // Handle printf statements first
+    const printfResult = this.parsePrintf(line);
+    if (printfResult) {
+      this.output += printfResult;
+      this.addStep(this.currentLine, `Printed: ${printfResult}`);
+      return;
+    }
     
     // Handle variable declarations within loops
     const varDecl = this.parseVariableDeclaration(line);
@@ -801,8 +732,15 @@ class CInterpreter {
           const index = parseInt(arrayMatch[2]);
           const array = this.variables.get(arrayName);
           if (array && array.type === 'array') {
-            console.log(`DEBUG: Array assignment in loop: ${arrayName}[${index}] = ${assignment.value}`);
-            array.value[index] = assignment.value;
+            // Only allow assignment within the original array bounds
+            if (index >= 0 && index < array.value.length) {
+              console.log(`DEBUG: Array assignment in loop: ${arrayName}[${index}] = ${assignment.value}`);
+              array.value[index] = assignment.value;
+            } else {
+              console.warn(`DEBUG: Array index out of bounds: ${arrayName}[${index}] (array size: ${array.value.length})`);
+            }
+          } else {
+            console.error(`DEBUG: Array not found: ${arrayName}`);
           }
         }
       } else {
@@ -819,17 +757,11 @@ class CInterpreter {
           });
         }
       }
+      console.log(`DEBUG: Assignment in loop: ${assignment.name} = ${assignment.value}`);
       this.addStep(this.currentLine, `Assigned ${assignment.name} = ${assignment.value}`);
       return;
     }
 
-    const printfResult = this.parsePrintf(line);
-    if (printfResult) {
-      this.output += printfResult;
-      this.addStep(this.currentLine, `Printed: ${printfResult}`);
-      return;
-    }
-    
     // Handle increment expressions like j++ or i++
     const incrementMatch = line.match(/([a-zA-Z_][a-zA-Z0-9_]*)\+\+/);
     if (incrementMatch) {
@@ -872,6 +804,14 @@ class CInterpreter {
         return;
       }
     }
+    
+    // Handle empty lines and comments
+    if (line.length === 0 || line.startsWith('//')) {
+      return;
+    }
+    
+    // If we reach here, we couldn't parse the line
+    console.warn(`DEBUG: Could not parse line: "${line}"`);
   }
 }
 
