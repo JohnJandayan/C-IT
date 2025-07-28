@@ -120,7 +120,7 @@ COMPRESS_ENABLED = True
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.rCSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
-# WhiteNoise configuration
+# WhiteNoise configuration for Vercel
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -153,4 +153,12 @@ LOGGING = {
         'handlers': ['console'],
         'level': 'INFO',
     },
-} 
+}
+
+# Vercel specific settings
+if os.environ.get('VERCEL_ENV') == 'production':
+    # Ensure staticfiles directory exists
+    import os
+    staticfiles_dir = BASE_DIR / 'staticfiles'
+    if not staticfiles_dir.exists():
+        staticfiles_dir.mkdir(parents=True, exist_ok=True) 

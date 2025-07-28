@@ -1,5 +1,5 @@
 """
-WSGI config for c_it_project project for Vercel deployment.
+Vercel API handler for Django application
 """
 
 import os
@@ -10,7 +10,12 @@ from pathlib import Path
 project_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_dir))
 
+# Set Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'c_it_project.settings')
+
+# Import Django and create application
+import django
+django.setup()
 
 from django.core.wsgi import get_wsgi_application
 from django.contrib.staticfiles.handlers import StaticFilesHandler
@@ -21,5 +26,6 @@ application = get_wsgi_application()
 # Wrap with StaticFilesHandler for Vercel
 app = StaticFilesHandler(application)
 
-# Export the app variable that Vercel expects
-__all__ = ['app'] 
+# Vercel expects a handler function
+def handler(request, context):
+    return app(request, context) 
