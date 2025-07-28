@@ -13,19 +13,44 @@ sys.path.insert(0, str(project_dir))
 # Set Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'c_it_project.settings')
 
-# Import Django and create application
-import django
-django.setup()
+try:
+    # Import Django and create application
+    import django
+    django.setup()
 
-from django.core.wsgi import get_wsgi_application
-from django.contrib.staticfiles.handlers import StaticFilesHandler
+    from django.core.wsgi import get_wsgi_application
+    from django.contrib.staticfiles.handlers import StaticFilesHandler
 
-# Create the WSGI application
-application = get_wsgi_application()
+    # Create the WSGI application
+    application = get_wsgi_application()
 
-# Wrap with StaticFilesHandler for Vercel
-app = StaticFilesHandler(application)
+    # Wrap with StaticFilesHandler for Vercel
+    app = StaticFilesHandler(application)
 
-# Vercel expects a handler function
-def handler(request, context):
-    return app(request, context) 
+    # Vercel expects a handler function
+    def handler(request, context):
+        try:
+            return app(request, context)
+        except Exception as e:
+            print(f"Error in handler: {e}")
+            # Return a simple error response
+            return {
+                'statusCode': 500,
+                'body': 'Internal Server Error',
+                'headers': {
+                    'Content-Type': 'text/plain'
+                }
+            }
+
+except Exception as e:
+    print(f"Error setting up Django: {e}")
+    
+    # Fallback handler
+    def handler(request, context):
+        return {
+            'statusCode': 500,
+            'body': 'Django setup failed',
+            'headers': {
+                'Content-Type': 'text/plain'
+            }
+        } 

@@ -22,7 +22,5 @@
   ],
   "env": {
     "DJANGO_SETTINGS_MODULE": "c_it_project.settings"
-  },
-  "buildCommand": "pip install -r requirements-vercel.txt && python manage.py collectstatic --noinput",
-  "outputDirectory": "staticfiles"
+  }
 } 

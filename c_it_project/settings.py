@@ -153,12 +153,4 @@ LOGGING = {
         'handlers': ['console'],
         'level': 'INFO',
     },
-}
-
-# Vercel specific settings
-if os.environ.get('VERCEL_ENV') == 'production':
-    # Ensure staticfiles directory exists
-    import os
-    staticfiles_dir = BASE_DIR / 'staticfiles'
-    if not staticfiles_dir.exists():
-        staticfiles_dir.mkdir(parents=True, exist_ok=True) 
+} 
