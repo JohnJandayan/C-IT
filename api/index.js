@@ -343,6 +343,7 @@ function serveVisualizerPage(res) {
                                     <option value="stack">Stack</option>
                                     <option value="queue">Queue</option>
                                     <option value="binary-tree">Binary Tree</option>
+                                    <option value="custom">Custom Code</option>
                                 </select>
                             </div>
                             <div>
@@ -479,6 +480,12 @@ int main() {
                 timeComplexity: 'O(n)',
                 spaceComplexity: 'O(1)',
                 description: 'A simple search algorithm that checks each element in the list until the target is found.'
+            },
+            'custom': {
+                name: 'Custom Code',
+                timeComplexity: 'Variable',
+                spaceComplexity: 'Variable',
+                description: 'Analyze your own C code to detect algorithms, data structures, and complexity.'
             }
         };
 
@@ -514,6 +521,34 @@ int main() {
             const type = document.getElementById('algorithmType').value;
             const input = document.getElementById('inputData').value;
             
+            if (type === 'custom') {
+                const codeInput = document.getElementById('codeInput').value;
+                if (!codeInput.trim()) {
+                    alert('Please enter C code to analyze');
+                    return;
+                }
+                
+                // Show loading with animation
+                canvas.innerHTML = \`
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">Analyzing Code</p>
+                        <p class="text-sm text-gray-500">Detecting algorithms and data structures...</p>
+                        <div class="mt-4 flex justify-center space-x-1">
+                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                    </div>
+                \`;
+
+                // Simulate analysis
+                setTimeout(() => {
+                    showVisualization([], type);
+                }, 1500);
+                return;
+            }
+            
             if (!input.trim()) {
                 alert('Please enter input data');
                 return;
@@ -532,7 +567,7 @@ int main() {
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p class="text-lg font-semibold text-gray-700 mb-2">Preparing Visualization</p>
-                    <p class="text-sm text-gray-500">Setting up \${type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} algorithm...</p>
+                    <p class="text-sm text-gray-500">Setting up \${type.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())} algorithm...</p>
                     <div class="mt-4 flex justify-center space-x-1">
                         <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
                         <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
@@ -550,13 +585,154 @@ int main() {
         function showVisualization(data, type) {
             const canvas = document.getElementById('visualizationCanvas');
             
-            if (type.includes('sort')) {
+            if (type === 'custom') {
+                showCustomVisualization();
+            } else if (type.includes('sort')) {
                 showSortingVisualization(data, type);
             } else if (type.includes('search')) {
                 showSearchVisualization(data, type);
             } else {
                 showDataStructureVisualization(data, type);
             }
+        }
+
+        function showCustomVisualization() {
+            const canvas = document.getElementById('visualizationCanvas');
+            const codeInput = document.getElementById('codeInput').value;
+            
+            // Analyze the C code
+            const analysis = analyzeCCode(codeInput);
+            
+            canvas.innerHTML = \`
+                <div class="text-center mb-4">
+                    <div class="step-indicator mb-2">Code Analysis Complete</div>
+                    <p class="text-sm text-gray-600 mb-3">Analysis of your C code</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>
+                        <div class="flex flex-wrap gap-2">
+                            \${analysis.algorithms.map(algo => \`
+                                <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">\${algo}</span>
+                            \`).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-900 mb-2">Detected Data Structures:</h4>
+                        <div class="flex flex-wrap gap-2">
+                            \${analysis.dataStructures.map(ds => \`
+                                <span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${ds}</span>
+                            \`).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-900 mb-2">Complexity Analysis:</h4>
+                        <p class="text-sm text-purple-700">\${analysis.complexity}</p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-yellow-900 mb-2">Code Structure:</h4>
+                        <ul class="text-sm text-yellow-700 space-y-1">
+                            \${analysis.structure.map(item => \`<li>• \${item}</li>\`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            \`;
+        }
+
+        function analyzeCCode(code) {
+            const analysis = {
+                algorithms: [],
+                dataStructures: [],
+                complexity: 'Unable to determine complexity',
+                structure: []
+            };
+            
+            const codeLower = code.toLowerCase();
+            
+            // Detect algorithms
+            if (codeLower.includes('bubble') || codeLower.includes('for') && codeLower.includes('swap')) {
+                analysis.algorithms.push('Bubble Sort');
+            }
+            if (codeLower.includes('quick') || codeLower.includes('pivot')) {
+                analysis.algorithms.push('Quick Sort');
+            }
+            if (codeLower.includes('merge') || codeLower.includes('divide')) {
+                analysis.algorithms.push('Merge Sort');
+            }
+            if (codeLower.includes('insert') || codeLower.includes('shift')) {
+                analysis.algorithms.push('Insertion Sort');
+            }
+            if (codeLower.includes('select') || codeLower.includes('minimum')) {
+                analysis.algorithms.push('Selection Sort');
+            }
+            if (codeLower.includes('binary') && codeLower.includes('search')) {
+                analysis.algorithms.push('Binary Search');
+            }
+            if (codeLower.includes('linear') || codeLower.includes('sequential')) {
+                analysis.algorithms.push('Linear Search');
+            }
+            
+            // Detect data structures
+            if (codeLower.includes('struct') && codeLower.includes('next')) {
+                analysis.dataStructures.push('Linked List');
+            }
+            if (codeLower.includes('stack') || codeLower.includes('push') || codeLower.includes('pop')) {
+                analysis.dataStructures.push('Stack');
+            }
+            if (codeLower.includes('queue') || codeLower.includes('enqueue') || codeLower.includes('dequeue')) {
+                analysis.dataStructures.push('Queue');
+            }
+            if (codeLower.includes('tree') || codeLower.includes('node') && codeLower.includes('left') && codeLower.includes('right')) {
+                analysis.dataStructures.push('Binary Tree');
+            }
+            if (codeLower.includes('hash') || codeLower.includes('map')) {
+                analysis.dataStructures.push('Hash Map');
+            }
+            if (codeLower.includes('array') || codeLower.includes('[') && codeLower.includes(']')) {
+                analysis.dataStructures.push('Array');
+            }
+            
+            // Analyze structure
+            const lines = code.split('\\n');
+            analysis.structure.push(\`\${lines.length} lines of code\`);
+            
+            if (codeLower.includes('main')) {
+                analysis.structure.push('Contains main function');
+            }
+            if (codeLower.includes('for')) {
+                analysis.structure.push('Contains loops');
+            }
+            if (codeLower.includes('if') || codeLower.includes('else')) {
+                analysis.structure.push('Contains conditional statements');
+            }
+            if (codeLower.includes('printf') || codeLower.includes('scanf')) {
+                analysis.structure.push('Contains I/O operations');
+            }
+            if (codeLower.includes('malloc') || codeLower.includes('free')) {
+                analysis.structure.push('Contains dynamic memory allocation');
+            }
+            
+            // Estimate complexity
+            if (analysis.algorithms.length > 0) {
+                const algo = analysis.algorithms[0];
+                if (algo.includes('Sort')) {
+                    if (algo.includes('Bubble') || algo.includes('Insertion') || algo.includes('Selection')) {
+                        analysis.complexity = 'Time: O(n²), Space: O(1)';
+                    } else if (algo.includes('Quick')) {
+                        analysis.complexity = 'Time: O(n log n), Space: O(log n)';
+                    } else if (algo.includes('Merge')) {
+                        analysis.complexity = 'Time: O(n log n), Space: O(n)';
+                    }
+                } else if (algo.includes('Search')) {
+                    if (algo.includes('Binary')) {
+                        analysis.complexity = 'Time: O(log n), Space: O(1)';
+                    } else {
+                        analysis.complexity = 'Time: O(n), Space: O(1)';
+                    }
+                }
+            }
+            
+            return analysis;
         }
 
         function showSortingVisualization(data, type) {
@@ -615,6 +791,29 @@ int main() {
                             return \`<div class="\${elementClass}">\${val}</div>\`;
                         }).join('')}
                     </div>
+                    
+                    <!-- Color Legend -->
+                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Legend:</h4>
+                        <div class="flex flex-wrap gap-3 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-gray-500 rounded"></div>
+                                <span>Normal</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-blue-600 rounded"></div>
+                                <span>Comparing</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-green-600 rounded"></div>
+                                <span>Swapping</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-purple-600 rounded"></div>
+                                <span>Sorted</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="text-center text-xs text-gray-500">
                         Progress: \${Math.round(progress)}%
                     </div>
@@ -636,7 +835,7 @@ int main() {
                     for (let j = 0; j < array.length - i - 1; j++) {
                         steps.push({
                             array: [...array],
-                            description: \`Comparing \${array[j]} and \${array[j+1]}\`,
+                            description: 'Comparing ' + array[j] + ' and ' + array[j+1],
                             highlighted: [j, j+1],
                             sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
                         });
@@ -645,11 +844,90 @@ int main() {
                             [array[j], array[j+1]] = [array[j+1], array[j]];
                             steps.push({
                                 array: [...array],
-                                description: \`Swapped \${array[j]} and \${array[j+1]}\`,
+                                description: 'Swapped ' + array[j] + ' and ' + array[j+1],
                                 highlighted: [j, j+1],
                                 sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
                             });
                         }
+                    }
+                }
+            } else if (type === 'insertion-sort') {
+                for (let i = 1; i < array.length; i++) {
+                    const key = array[i];
+                    let j = i - 1;
+                    
+                    steps.push({
+                        array: [...array],
+                        description: 'Selecting ' + key + ' for insertion',
+                        highlighted: [i],
+                        sorted: Array.from({length: i}, (_, k) => k)
+                    });
+                    
+                    while (j >= 0 && array[j] > key) {
+                        steps.push({
+                            array: [...array],
+                            description: 'Comparing ' + array[j] + ' with ' + key,
+                            highlighted: [j, j+1],
+                            sorted: Array.from({length: i}, (_, k) => k)
+                        });
+                        
+                        array[j + 1] = array[j];
+                        j--;
+                        
+                        steps.push({
+                            array: [...array],
+                            description: 'Shifting ' + array[j+1] + ' to the right',
+                            highlighted: [j+1],
+                            sorted: Array.from({length: i}, (_, k) => k)
+                        });
+                    }
+                    
+                    array[j + 1] = key;
+                    steps.push({
+                        array: [...array],
+                        description: 'Inserted ' + key + ' at position ' + (j+1),
+                        highlighted: [j+1],
+                        sorted: Array.from({length: i+1}, (_, k) => k)
+                    });
+                }
+            } else if (type === 'selection-sort') {
+                for (let i = 0; i < array.length - 1; i++) {
+                    let minIdx = i;
+                    
+                    steps.push({
+                        array: [...array],
+                        description: 'Finding minimum in unsorted portion',
+                        highlighted: [i],
+                        sorted: Array.from({length: i}, (_, k) => k)
+                    });
+                    
+                    for (let j = i + 1; j < array.length; j++) {
+                        steps.push({
+                            array: [...array],
+                            description: 'Comparing ' + array[j] + ' with current minimum ' + array[minIdx],
+                            highlighted: [j, minIdx],
+                            sorted: Array.from({length: i}, (_, k) => k)
+                        });
+                        
+                        if (array[j] < array[minIdx]) {
+                            minIdx = j;
+                            steps.push({
+                                array: [...array],
+                                description: 'New minimum found: ' + array[minIdx],
+                                highlighted: [minIdx],
+                                sorted: Array.from({length: i}, (_, k) => k)
+                            });
+                        }
+                    }
+                    
+                    if (minIdx !== i) {
+                        [array[i], array[minIdx]] = [array[minIdx], array[i]];
+                        steps.push({
+                            array: [...array],
+                            description: 'Swapped ' + array[i] + ' with ' + array[minIdx],
+                            highlighted: [i, minIdx],
+                            sorted: Array.from({length: i+1}, (_, k) => k)
+                        });
                     }
                 }
             }
