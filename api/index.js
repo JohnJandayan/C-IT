@@ -283,6 +283,85 @@ function serveVisualizerPage(res) {
             0% { background-position: -200px 0; }
             100% { background-position: calc(200px + 100%) 0; }
         }
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .tree-level {
+            display: flex;
+            gap: 40px;
+        }
+        .tree-node {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: float 2s ease-in-out infinite;
+        }
+        .tree-node.root {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            transform: scale(1.2);
+        }
+        .list-node {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .arrow {
+            font-size: 24px;
+            color: #6b7280;
+            animation: slideRight 1s ease-in-out infinite;
+        }
+        @keyframes slideRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+        .stack-container, .queue-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+        .stack-item, .queue-item {
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: slideIn 0.5s ease-out;
+        }
+        .stack-item {
+            animation: stackSlide 0.5s ease-out;
+        }
+        .queue-item {
+            animation: queueSlide 0.5s ease-out;
+        }
+        @keyframes stackSlide {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes queueSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -544,7 +623,7 @@ int main() {
 
                 // Simulate analysis
                 setTimeout(() => {
-                    showVisualization([], type);
+                    showCustomVisualization();
                 }, 1500);
                 return;
             }
@@ -603,12 +682,16 @@ int main() {
             // Analyze the C code
             const analysis = analyzeCCode(codeInput);
             
+            // Generate sample data for visualization
+            const sampleData = generateSampleData(analysis);
+            
+            // Show analysis first, then transition to visualization
             canvas.innerHTML = \`
                 <div class="text-center mb-4">
                     <div class="step-indicator mb-2">Code Analysis Complete</div>
-                    <p class="text-sm text-gray-600 mb-3">Analysis of your C code</p>
+                    <p class="text-sm text-gray-600 mb-3">Detected: \${analysis.algorithms.length} algorithms, \${analysis.dataStructures.length} data structures</p>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-4 mb-6">
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>
                         <div class="flex flex-wrap gap-2">
@@ -625,18 +708,200 @@ int main() {
                             \`).join('')}
                         </div>
                     </div>
-                    <div class="bg-purple-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-purple-900 mb-2">Complexity Analysis:</h4>
-                        <p class="text-sm text-purple-700">\${analysis.complexity}</p>
-                    </div>
-                    <div class="bg-yellow-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-yellow-900 mb-2">Code Structure:</h4>
-                        <ul class="text-sm text-yellow-700 space-y-1">
-                            \${analysis.structure.map(item => \`<li>• \${item}</li>\`).join('')}
-                        </ul>
-                    </div>
+                </div>
+                <div class="text-center">
+                    <button onclick="startCustomVisualization()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                        <i class="fas fa-play mr-2"></i>Start Visualization
+                    </button>
                 </div>
             \`;
+            
+            // Store analysis for visualization
+            window.customAnalysis = analysis;
+            window.sampleData = sampleData;
+        }
+
+        function startCustomVisualization() {
+            const canvas = document.getElementById('visualizationCanvas');
+            const analysis = window.customAnalysis;
+            const sampleData = window.sampleData;
+            
+            if (!analysis || analysis.algorithms.length === 0) {
+                canvas.innerHTML = \`
+                    <div class="text-center text-gray-500">
+                        <i class="fas fa-info-circle text-4xl mb-4"></i>
+                        <p>No specific algorithms detected. Try adding more detailed code.</p>
+                    </div>
+                \`;
+                return;
+            }
+            
+            // Start with the first detected algorithm
+            const primaryAlgorithm = analysis.algorithms[0].toLowerCase();
+            let visualizationType = 'sort';
+            
+            if (primaryAlgorithm.includes('search')) {
+                visualizationType = 'search';
+            } else if (primaryAlgorithm.includes('tree')) {
+                visualizationType = 'tree';
+            } else if (primaryAlgorithm.includes('list')) {
+                visualizationType = 'list';
+            } else if (primaryAlgorithm.includes('stack') || primaryAlgorithm.includes('queue')) {
+                visualizationType = 'stack-queue';
+            }
+            
+            // Show adaptive visualization
+            showAdaptiveVisualization(sampleData, primaryAlgorithm, visualizationType, analysis);
+        }
+
+        function showAdaptiveVisualization(data, algorithm, type, analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            if (type === 'sort') {
+                showSortingVisualization(data, algorithm.replace(' ', '-'));
+            } else if (type === 'search') {
+                showSearchVisualization(data, algorithm.replace(' ', '-'));
+            } else if (type === 'tree') {
+                showTreeVisualization(data, analysis);
+            } else if (type === 'list') {
+                showLinkedListVisualization(data, analysis);
+            } else if (type === 'stack-queue') {
+                showStackQueueVisualization(data, analysis);
+            } else {
+                // Generic visualization for any algorithm
+                showGenericVisualization(data, algorithm, analysis);
+            }
+        }
+
+        function showGenericVisualization(data, algorithm, analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            const steps = generateGenericSteps(data, algorithm, analysis);
+            
+            let currentStep = 0;
+            const totalSteps = steps.length;
+            
+            function animateStep() {
+                if (currentStep >= steps.length) {
+                    canvas.innerHTML = \`
+                        <div class="text-center">
+                            <div class="step-indicator mb-4">🎉 Algorithm Complete!</div>
+                            <p class="text-sm text-gray-600 mb-4">\${algorithm} visualization finished</p>
+                            <div class="flex justify-center space-x-2">
+                                \${steps[steps.length - 1].elements.map((val, idx) => \`
+                                    <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
+                                        \${val}
+                                    </div>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \`;
+                    return;
+                }
+                
+                const step = steps[currentStep];
+                const progress = ((currentStep + 1) / totalSteps) * 100;
+                
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <div class="step-indicator mb-2">Step \${currentStep + 1} of \${totalSteps}</div>
+                        <p class="text-sm text-gray-600 mb-3">\${step.description}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: \${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-3 mb-4">
+                        \${step.elements.map((val, idx) => {
+                            let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
+                            
+                            if (step.highlighted.includes(idx)) {
+                                elementClass += ' comparing';
+                            } else if (step.processed && step.processed.includes(idx)) {
+                                elementClass += ' sorted';
+                            } else {
+                                elementClass += ' bg-gray-500';
+                            }
+                            
+                            return \`<div class="\${elementClass}">\${val}</div>\`;
+                        }).join('')}
+                    </div>
+                    <div class="text-center text-xs text-gray-500">
+                        Progress: \${Math.round(progress)}%
+                    </div>
+                \`;
+                
+                currentStep++;
+                setTimeout(animateStep, 1200);
+            }
+            
+            animateStep();
+        }
+
+        function generateGenericSteps(data, algorithm, analysis) {
+            const steps = [];
+            const elements = [...data];
+            
+            // Generate steps based on algorithm type
+            if (algorithm.includes('sort')) {
+                // Generic sorting visualization
+                for (let i = 0; i < elements.length - 1; i++) {
+                    for (let j = 0; j < elements.length - i - 1; j++) {
+                        steps.push({
+                            elements: [...elements],
+                            description: 'Comparing elements',
+                            highlighted: [j, j+1],
+                            processed: []
+                        });
+                        
+                        if (elements[j] > elements[j+1]) {
+                            [elements[j], elements[j+1]] = [elements[j+1], elements[j]];
+                            steps.push({
+                                elements: [...elements],
+                                description: 'Swapping elements',
+                                highlighted: [j, j+1],
+                                processed: []
+                            });
+                        }
+                    }
+                }
+            } else if (algorithm.includes('search')) {
+                // Generic search visualization
+                const target = Math.floor(Math.random() * Math.max(...elements)) + 1;
+                for (let i = 0; i < elements.length; i++) {
+                    steps.push({
+                        elements: [...elements],
+                        description: 'Searching for ' + target,
+                        highlighted: [i],
+                        processed: elements.slice(0, i)
+                    });
+                    
+                    if (elements[i] === target) {
+                        steps.push({
+                            elements: [...elements],
+                            description: 'Target found!',
+                            highlighted: [i],
+                            processed: elements.slice(0, i+1)
+                        });
+                        break;
+                    }
+                }
+            }
+            
+            return steps;
+        }
+
+        function generateSampleData(analysis) {
+            // Generate appropriate sample data based on detected algorithms and data structures
+            if (analysis.algorithms.some(algo => algo.includes('Sort'))) {
+                return [64, 34, 25, 12, 22, 11, 90];
+            } else if (analysis.algorithms.some(algo => algo.includes('Search'))) {
+                return [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
+            } else if (analysis.dataStructures.some(ds => ds.includes('Tree'))) {
+                return [10, 5, 15, 3, 7, 12, 18];
+            } else if (analysis.dataStructures.some(ds => ds.includes('List'))) {
+                return [1, 2, 3, 4, 5, 6, 7, 8];
+            } else {
+                return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            }
         }
 
         function analyzeCCode(code) {
@@ -933,6 +1198,120 @@ int main() {
             }
             
             return steps;
+        }
+
+        function showSearchVisualization(data, type) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            // Simple linear search visualization
+            const target = Math.floor(Math.random() * Math.max(...data)) + 1;
+            let foundIndex = -1;
+            
+            canvas.innerHTML = \`
+                <div class="text-center mb-4">
+                    <div class="step-indicator mb-2">Linear Search</div>
+                    <p class="text-sm text-gray-600 mb-3">Searching for \${target}</p>
+                </div>
+                <div class="flex justify-center space-x-3">
+                    \${data.map((val, idx) => \`
+                        <div class="array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold \${idx === foundIndex ? 'comparing' : ''}">
+                            \${val}
+                        </div>
+                    \`).join('')}
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-600">
+                    <p>Searching through: \${data.join(', ')}</p>
+                </div>
+            \`;
+        }
+
+        function showTreeVisualization(data, analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            // Create a simple binary tree visualization
+            const treeData = [10, 5, 15, 3, 7, 12, 18];
+            
+            canvas.innerHTML = \`
+                <div class="text-center mb-4">
+                    <div class="step-indicator mb-2">Binary Tree Visualization</div>
+                    <p class="text-sm text-gray-600 mb-3">Tree traversal and operations</p>
+                </div>
+                <div class="flex justify-center">
+                    <div class="tree-container">
+                        <div class="tree-node root">10</div>
+                        <div class="tree-level">
+                            <div class="tree-node left">5</div>
+                            <div class="tree-node right">15</div>
+                        </div>
+                        <div class="tree-level">
+                            <div class="tree-node left">3</div>
+                            <div class="tree-node right">7</div>
+                            <div class="tree-node left">12</div>
+                            <div class="tree-node right">18</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-600">
+                    <p>Inorder: 3, 5, 7, 10, 12, 15, 18</p>
+                    <p>Preorder: 10, 5, 3, 7, 15, 12, 18</p>
+                    <p>Postorder: 3, 7, 5, 12, 18, 15, 10</p>
+                </div>
+            \`;
+        }
+
+        function showLinkedListVisualization(data, analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            const listData = [1, 2, 3, 4, 5, 6, 7, 8];
+            
+            canvas.innerHTML = \`
+                <div class="text-center mb-4">
+                    <div class="step-indicator mb-2">Linked List Visualization</div>
+                    <p class="text-sm text-gray-600 mb-3">Node traversal and operations</p>
+                </div>
+                <div class="flex justify-center items-center space-x-2">
+                    \${listData.map((val, idx) => \`
+                        <div class="flex items-center">
+                            <div class="list-node">\${val}</div>
+                            \${idx < listData.length - 1 ? '<div class="arrow">→</div>' : ''}
+                        </div>
+                    \`).join('')}
+                </div>
+                <div class="mt-4 text-center text-sm text-gray-600">
+                    <p>Head → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → NULL</p>
+                </div>
+            \`;
+        }
+
+        function showStackQueueVisualization(data, analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            const stackData = [8, 7, 6, 5, 4, 3, 2, 1];
+            
+            canvas.innerHTML = \`
+                <div class="text-center mb-4">
+                    <div class="step-indicator mb-2">Stack/Queue Visualization</div>
+                    <p class="text-sm text-gray-600 mb-3">Push/Pop and Enqueue/Dequeue operations</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="text-center">
+                        <h4 class="font-semibold mb-2">Stack (LIFO)</h4>
+                        <div class="stack-container">
+                            \${stackData.map((val, idx) => \`
+                                <div class="stack-item" style="animation-delay: \${idx * 0.1}s">\${val}</div>
+                            \`).join('')}
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-semibold mb-2">Queue (FIFO)</h4>
+                        <div class="queue-container">
+                            \${stackData.reverse().map((val, idx) => \`
+                                <div class="queue-item" style="animation-delay: \${idx * 0.1}s">\${val}</div>
+                            \`).join('')}
+                        </div>
+                    </div>
+                </div>
+            \`;
         }
 
         function resetVisualization() {
