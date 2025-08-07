@@ -2,7 +2,9 @@
 
 A modern, elegant web application for visualizing C programming algorithms and data structures with beautiful animations and step-by-step explanations.
 
-![C-It Logo](https://img.shields.io/badge/C--It-Algorithm%20Visualizer-blue?style=for-the-badge&logo=typescript)
+![Python](https://img.shields.io/badge/C--It-Python-blue?style=for-the-badge&logo=python)
+![HTML](https://img.shields.io/badge/C--It-HTML-blue?style=for-the-badge&logo=html5)
+![C-It Logo](https://img.shields.io/badge/C--It-Algorithm%20Visualizer-blue?style=for-the-badge&logo=javascript)
 
 ## 🌟 Features
 
