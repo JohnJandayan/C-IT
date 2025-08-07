@@ -2,7 +2,7 @@
 
 A modern, elegant web application for visualizing C programming algorithms and data structures with beautiful animations and step-by-step explanations.
 
-![Python](https://img.shields.io/badge/Python-blue?style=for-the-badge&logo=python&labelColor=grey)
+![Python](https://img.shields.io/badge/Python-blue?style=for-the-badge&logo=python&labelColor=grey&logoColor=ffdd54)
 ![HTML](https://img.shields.io/badge/HTML-red?style=for-the-badge&logo=html5&labelColor=grey)
 ![JavaScript](https://img.shields.io/badge/JavaScript-yellow?style=for-the-badge&logo=javascript&labelColor=grey)
 
