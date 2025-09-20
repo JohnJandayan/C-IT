@@ -607,10 +607,10 @@ int main() {
     <script>
         // Example code templates
         const codeExamples = {
-            'pattern': '#include <stdio.h>\\nint main() {\\n    for(int i = 1; i <= 5; i++) {\\n        for(int j = 1; j <= i; j++) {\\n            printf("* ");\\n        }\\n        printf("\\\\n");\\n    }\\n    return 0;\\n}',
-            'bubble-sort': '#include <stdio.h>\\nvoid bubbleSort(int arr[], int n) {\\n    for (int i = 0; i < n-1; i++) {\\n        for (int j = 0; j < n-i-1; j++) {\\n            if (arr[j] > arr[j+1]) {\\n                int temp = arr[j];\\n                arr[j] = arr[j+1];\\n                arr[j+1] = temp;\\n            }\\n        }\\n    }\\n}\\nint main() {\\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\\n    int n = sizeof(arr)/sizeof(arr[0]);\\n    bubbleSort(arr, n);\\n    return 0;\\n}',
-            'loops': '#include <stdio.h>\\nint main() {\\n    for(int i = 0; i < 3; i++) {\\n        for(int j = 0; j < 4; j++) {\\n            printf("(%d,%d) ", i, j);\\n        }\\n        printf("\\\\n");\\n    }\\n    return 0;\\n}',
-            'array-ops': '#include <stdio.h>\\nint main() {\\n    int arr[] = {5, 2, 8, 1, 9, 3};\\n    int n = 6;\\n    int sum = 0;\\n    for(int i = 0; i < n; i++) {\\n        sum += arr[i];\\n    }\\n    printf("Sum: %d\\\\n", sum);\\n    return 0;\\n}'
+            'pattern': '#include <stdio.h>\nint main() {\n    for(int i = 1; i <= 5; i++) {\n        for(int j = 1; j <= i; j++) {\n            printf("* ");\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
+            'bubble-sort': '#include <stdio.h>\nvoid bubbleSort(int arr[], int n) {\n    for (int i = 0; i < n-1; i++) {\n        for (int j = 0; j < n-i-1; j++) {\n            if (arr[j] > arr[j+1]) {\n                int temp = arr[j];\n                arr[j] = arr[j+1];\n                arr[j+1] = temp;\n            }\n        }\n    }\n}\nint main() {\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\n    int n = sizeof(arr)/sizeof(arr[0]);\n    bubbleSort(arr, n);\n    return 0;\n}',
+            'loops': '#include <stdio.h>\nint main() {\n    for(int i = 0; i < 3; i++) {\n        for(int j = 0; j < 4; j++) {\n            printf("(%d,%d) ", i, j);\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
+            'array-ops': '#include <stdio.h>\nint main() {\n    int arr[] = {5, 2, 8, 1, 9, 3};\n    int n = 6;\n    int sum = 0;\n    for(int i = 0; i < n; i++) {\n        sum += arr[i];\n    }\n    printf("Sum: %d\\n", sum);\n    return 0;\n}'
         };
 
         function loadExample(type) {
@@ -1528,9 +1528,9 @@ int main() {
                         <div class="output-display mt-4">
                             <h4 class="font-semibold mb-2">Current Output: ' + iteration.output + '</h4>
                             <div class="output-history">
-                                ' + outputHistory.map((output, idx) => \`
-                                    <span class="output-item ' + idx === outputHistory.length - 1 ? 'highlight' : ''}">' + output + '</span>
-                                \`).join(' ')}
+                                ' + outputHistory.map((output, idx) => 
+                                    '<span class="output-item ' + (idx === outputHistory.length - 1 ? 'highlight' : '') + '">' + output + '</span>'
+                                ).join(' ') +
                             </div>
                         </div>
                     </div>
@@ -1564,11 +1564,11 @@ int main() {
                         <div class="text-center">
                             <div class="step-indicator mb-4">🎉 Array Operations Complete!</div>
                             <div class="flex justify-center space-x-2 mb-4">
-                                ' + currentArray.map((val, idx) => \`
-                                    <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
-                                        ' + val + '
-                                    </div>
-                                \`).join('')}
+                                ' + currentArray.map((val, idx) => 
+                                    '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + 
+                                        val + 
+                                    '</div>'
+                                ).join('') +
                             </div>
                             <p class="text-sm text-gray-600">Final array sum: ' + sum + '</p>
                         </div>
@@ -1602,8 +1602,8 @@ int main() {
                                 elementClass += ' bg-gray-500';
                             }
                             
-                            return \`<div class="' + elementClass + '">' + val + '</div>\`;
-                        }).join('')}
+                            return '<div class="' + elementClass + '">' + val + '</div>';
+                        }).join('') +
                     </div>
                     <div class="text-center text-sm text-gray-600">
                         Operation ' + currentOp + 1 + ' of ' + operations.length + '
@@ -1662,9 +1662,9 @@ int main() {
                             <div class="step-indicator mb-4">🎉 Variable Operations Complete!</div>
                             <div class="variable-display">
                                 <h4 class="font-semibold mb-2">Final Variable Values:</h4>
-                                ' + Object.entries(currentVariables).map(([name, value]) => \`
-                                    <div class="variable-item">' + name + ' = ' + value + '</div>
-                                \`).join('')}
+                                ' + Object.entries(currentVariables).map(([name, value]) => 
+                                    '<div class="variable-item">' + name + ' = ' + value + '</div>'
+                                ).join('') +
                             </div>
                         </div>
                     ';
@@ -1686,13 +1686,13 @@ int main() {
                             <code class="bg-gray-100 px-3 py-2 rounded">' + step.operation + '</code>
                         </div>
                         <div class="variable-table">
-                            ' + Object.entries(step.variables).map(([name, value]) => \`
-                                <div class="variable-row">
-                                    <span class="variable-name">' + name + '</span>
-                                    <span class="variable-equals">=</span>
-                                    <span class="variable-value">' + value + '</span>
-                                </div>
-                            \`).join('')}
+                            ' + Object.entries(step.variables).map(([name, value]) => 
+                                '<div class="variable-row">' +
+                                    '<span class="variable-name">' + name + '</span>' +
+                                    '<span class="variable-equals">=</span>' +
+                                    '<span class="variable-value">' + value + '</span>' +
+                                '</div>'
+                            ).join('') +
                         </div>
                     </div>
                 ';
