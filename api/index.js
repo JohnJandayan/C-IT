@@ -1166,14 +1166,14 @@ int main() {
                 if (currentStep >= steps.length) {
                     // Show completion message
                     const finalElements = steps[steps.length - 1].array.map((val, idx) => 
-                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">\' + val + '</div>'
+                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + val + '</div>'
                     ).join('');
                     
                     canvas.innerHTML = 
                         '<div class="text-center">' +
                             '<div class="step-indicator mb-4">🎉 Algorithm Complete!</div>' +
                             '<p class="text-sm text-gray-600 mb-4">All elements have been sorted successfully</p>' +
-                            '<div class="flex justify-center space-x-2">\' + finalElements + '</div>' +
+                            '<div class="flex justify-center space-x-2">' + finalElements + '</div>' +
                         '</div>';
                     return;
                 }
@@ -1196,18 +1196,18 @@ int main() {
                         elementClass += ' bg-gray-500';
                     }
                     
-                    return '<div class="\' + elementClass + '">\' + val + '</div>';
+                    return '<div class="' + elementClass + '">' + val + '</div>';
                 }).join('');
                 
                 canvas.innerHTML = 
                     '<div class="text-center mb-4">' +
-                        '<div class="step-indicator mb-2">Step \' + (currentStep + 1)} of \' + totalSteps + '</div>' +
-                        '<p class="text-sm text-gray-600 mb-3">\' + step.description}</p>' +
+                        '<div class="step-indicator mb-2">Step ' + (currentStep + 1) + ' of ' + totalSteps + '</div>' +
+                        '<p class="text-sm text-gray-600 mb-3">' + step.description + '</p>' +
                         '<div class="progress-bar">' +
-                            '<div class="progress-fill" style="width: \' + progress + '%"></div>' +
+                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="flex justify-center space-x-3 mb-4">\' + stepElements}</div>' +
+                    '<div class="flex justify-center space-x-3 mb-4">' + stepElements + '</div>' +
                     '<!-- Color Legend -->' +
                     '<div class="mt-4 p-3 bg-gray-50 rounded-lg">' +
                         '<h4 class="text-sm font-semibold text-gray-700 mb-2">Legend:</h4>' +
@@ -1230,7 +1230,7 @@ int main() {
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="text-center text-xs text-gray-500">Progress: \' + Math.round(progress)}%</div>';
+                    '<div class="text-center text-xs text-gray-500">Progress: ' + Math.round(progress) + '%</div>';
                 
                 currentStep++;
                 setTimeout(animateStep, 1200);
@@ -1248,18 +1248,18 @@ int main() {
                     for (let j = 0; j < array.length - i - 1; j++) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing \' + array[j]} and \' + array[j+1],
+                            description: 'Comparing ' + array[j] + ' and ' + array[j+1],
                             highlighted: [j, j+1],
-                            sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
+                            sorted: Array.from({length: i + ', (_, k) => array.length - 1 - k)
                         });
                         
                         if (array[j] > array[j+1]) {
                             [array[j], array[j+1]] = [array[j+1], array[j]];
                             steps.push({
                                 array: [...array],
-                                description: 'Swapped \' + array[j]} and \' + array[j+1],
+                                description: 'Swapped ' + array[j] + ' and ' + array[j+1],
                                 highlighted: [j, j+1],
-                                sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
+                                sorted: Array.from({length: i + ', (_, k) => array.length - 1 - k)
                             });
                         }
                     }
@@ -1271,17 +1271,17 @@ int main() {
                     
                     steps.push({
                         array: [...array],
-                        description: 'Selecting \' + key} for insertion',
+                        description: 'Selecting ' + key + ' for insertion',
                         highlighted: [i],
-                        sorted: Array.from({length: i}, (_, k) => k)
+                        sorted: Array.from({length: i + ', (_, k) => k)
                     });
                     
                     while (j >= 0 && array[j] > key) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing \' + array[j]} with \' + key,
+                            description: 'Comparing ' + array[j] + ' with ' + key,
                             highlighted: [j, j+1],
-                            sorted: Array.from({length: i}, (_, k) => k)
+                            sorted: Array.from({length: i + ', (_, k) => k)
                         });
                         
                         array[j + 1] = array[j];
@@ -1289,16 +1289,16 @@ int main() {
                         
                         steps.push({
                             array: [...array],
-                            description: 'Shifting \' + array[j+1]} to the right',
+                            description: 'Shifting ' + array[j+1] + ' to the right',
                             highlighted: [j+1],
-                            sorted: Array.from({length: i}, (_, k) => k)
+                            sorted: Array.from({length: i + ', (_, k) => k)
                         });
                     }
                     
                     array[j + 1] = key;
                     steps.push({
                         array: [...array],
-                        description: 'Inserted \' + key} at position \' + (j+1),
+                        description: 'Inserted ' + key + ' at position ' + (j+1),
                         highlighted: [j+1],
                         sorted: Array.from({length: i+1}, (_, k) => k)
                     });
@@ -1311,24 +1311,24 @@ int main() {
                         array: [...array],
                         description: 'Finding minimum in unsorted portion',
                         highlighted: [i],
-                        sorted: Array.from({length: i}, (_, k) => k)
+                        sorted: Array.from({length: i + ', (_, k) => k)
                     });
                     
                     for (let j = i + 1; j < array.length; j++) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing \' + array[j]} with current minimum \' + array[minIdx],
+                            description: 'Comparing ' + array[j] + ' with current minimum ' + array[minIdx],
                             highlighted: [j, minIdx],
-                            sorted: Array.from({length: i}, (_, k) => k)
+                            sorted: Array.from({length: i + ', (_, k) => k)
                         });
                         
                         if (array[j] < array[minIdx]) {
                             minIdx = j;
                             steps.push({
                                 array: [...array],
-                                description: 'New minimum found: \' + array[minIdx],
+                                description: 'New minimum found: ' + array[minIdx],
                                 highlighted: [minIdx],
-                                sorted: Array.from({length: i}, (_, k) => k)
+                                sorted: Array.from({length: i + ', (_, k) => k)
                             });
                         }
                     }
@@ -1337,7 +1337,7 @@ int main() {
                         [array[i], array[minIdx]] = [array[minIdx], array[i]];
                         steps.push({
                             array: [...array],
-                            description: 'Swapped \' + array[i]} with \' + array[minIdx],
+                            description: 'Swapped ' + array[i] + ' with ' + array[minIdx],
                             highlighted: [i, minIdx],
                             sorted: Array.from({length: i+1}, (_, k) => k)
                         });
@@ -1356,7 +1356,7 @@ int main() {
             let foundIndex = -1;
             
             const searchElements = data.map((val, idx) => 
-                '<div class="array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold \' + (idx === foundIndex ? 'comparing' : '')}">\' + val + '</div>'
+                '<div class="array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold ' + (idx === foundIndex ? 'comparing' : '')}">' + val + '</div>'
             ).join('');
             
             canvas.innerHTML = 
@@ -1410,7 +1410,7 @@ int main() {
             
             const listElements = listData.map((val, idx) => 
                 '<div class="flex items-center">' +
-                    '<div class="list-node">\' + val + '</div>' +
+                    '<div class="list-node">' + val + '</div>' +
                     (idx < listData.length - 1 ? '<div class="arrow">→</div>' : '') +
                 '</div>'
             ).join('');
@@ -1420,7 +1420,7 @@ int main() {
                     '<div class="step-indicator mb-2">Linked List Visualization</div>' +
                     '<p class="text-sm text-gray-600 mb-3">Node traversal and operations</p>' +
                 '</div>' +
-                '<div class="flex justify-center items-center space-x-2">\' + listElements}</div>' +
+                '<div class="flex justify-center items-center space-x-2">' + listElements + '</div>' +
                 '<div class="mt-4 text-center text-sm text-gray-600">' +
                     '<p>Head → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → NULL</p>' +
                 '</div>';
@@ -1456,7 +1456,7 @@ int main() {
                 patternSteps.push({
                     row: i,
                     pattern: currentPattern,
-                    description: 'Row \' + i}: Adding \' + i} star(s)'
+                    description: 'Row ' + i + ': Adding ' + i + ' star(s)'
                 });
             }
             
@@ -1490,8 +1490,8 @@ int main() {
                     iterations.push({
                         outerLoop: i + 1,
                         innerLoop: j + 1,
-                        description: 'Outer: i=\' + (i+1)}, Inner: j=\' + (j+1),
-                        output: '(\' + (i+1)},\' + (j+1)})'
+                        description: 'Outer: i=' + (i+1) + ', Inner: j=' + (j+1),
+                        output: '(' + (i+1) + ',' + (j+1) + ')'
                     });
                 }
             }
@@ -1511,25 +1511,25 @@ int main() {
                 
                 canvas.innerHTML = '
                     <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">Loop Execution - \' + iteration.description}</div>
+                        <div class="step-indicator mb-2">Loop Execution - ' + iteration.description + '</div>
                         <div class="progress-bar mb-4">
-                            <div class="progress-fill" style="width: \' + progress + '%"></div>
+                            <div class="progress-fill" style="width: ' + progress + '%"></div>
                         </div>
                     </div>
                     <div class="loop-visualization">
                         <div class="loop-state">
-                            <div class="outer-loop \' + iteration.innerLoop === 1 ? 'active' : ''}">
-                                Outer Loop (i = \' + iteration.outerLoop})
+                            <div class="outer-loop ' + iteration.innerLoop === 1 ? 'active' : ''}">
+                                Outer Loop (i = ' + iteration.outerLoop + ')
                             </div>
                             <div class="inner-loop active">
-                                Inner Loop (j = \' + iteration.innerLoop})
+                                Inner Loop (j = ' + iteration.innerLoop + ')
                             </div>
                         </div>
                         <div class="output-display mt-4">
-                            <h4 class="font-semibold mb-2">Current Output: \' + iteration.output}</h4>
+                            <h4 class="font-semibold mb-2">Current Output: ' + iteration.output + '</h4>
                             <div class="output-history">
-                                \' + outputHistory.map((output, idx) => \`
-                                    <span class="output-item \' + idx === outputHistory.length - 1 ? 'highlight' : ''}">\' + output}</span>
+                                ' + outputHistory.map((output, idx) => \`
+                                    <span class="output-item ' + idx === outputHistory.length - 1 ? 'highlight' : ''}">' + output + '</span>
                                 \`).join(' ')}
                             </div>
                         </div>
@@ -1564,13 +1564,13 @@ int main() {
                         <div class="text-center">
                             <div class="step-indicator mb-4">🎉 Array Operations Complete!</div>
                             <div class="flex justify-center space-x-2 mb-4">
-                                \' + currentArray.map((val, idx) => \`
+                                ' + currentArray.map((val, idx) => \`
                                     <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
-                                        \' + val + '
+                                        ' + val + '
                                     </div>
                                 \`).join('')}
                             </div>
-                            <p class="text-sm text-gray-600">Final array sum: \' + sum}</p>
+                            <p class="text-sm text-gray-600">Final array sum: ' + sum + '</p>
                         </div>
                     ';
                     return;
@@ -1585,13 +1585,13 @@ int main() {
                 
                 canvas.innerHTML = '
                     <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">\' + operation.description}</div>
+                        <div class="step-indicator mb-2">' + operation.description + '</div>
                         <div class="progress-bar mb-4">
-                            <div class="progress-fill" style="width: \' + progress + '%"></div>
+                            <div class="progress-fill" style="width: ' + progress + '%"></div>
                         </div>
                     </div>
                     <div class="flex justify-center space-x-2 mb-4">
-                        \' + currentArray.map((val, idx) => {
+                        ' + currentArray.map((val, idx) => {
                             let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
                             
                             if (operation.index === idx && operation.type !== 'sum') {
@@ -1602,11 +1602,11 @@ int main() {
                                 elementClass += ' bg-gray-500';
                             }
                             
-                            return \`<div class="\' + elementClass + '">\' + val + '</div>\`;
+                            return \`<div class="' + elementClass + '">' + val + '</div>\`;
                         }).join('')}
                     </div>
                     <div class="text-center text-sm text-gray-600">
-                        Operation \' + currentOp + 1} of \' + operations.length}
+                        Operation ' + currentOp + 1 + ' of ' + operations.length + '
                     </div>
                 ';
                 
@@ -1633,22 +1633,22 @@ int main() {
                     
                     // Simple evaluation for demonstration
                     if (!isNaN(varValue)) {
-                        currentVariables[varName] = parseInt(varValue);
+                        currentVariables[varName] + ' = parseInt(varValue);
                     } else if (varValue.includes('+')) {
                         const operands = varValue.split('+').map(op => op.trim());
                         if (currentVariables[operands[0]] !== undefined && currentVariables[operands[1]] !== undefined) {
-                            currentVariables[varName] = currentVariables[operands[0]] + currentVariables[operands[1]];
+                            currentVariables[varName] + ' = currentVariables[operands[0]] + currentVariables[operands[1]];
                         } else {
-                            currentVariables[varName] = varValue;
+                            currentVariables[varName] + ' = varValue;
                         }
                     } else {
-                        currentVariables[varName] = varValue;
+                        currentVariables[varName] + ' = varValue;
                     }
                     
                     variableSteps.push({
                         operation: varAssign,
                         variables: { ...currentVariables },
-                        description: 'Assigning \' + varName} = \' + currentVariables[varName]
+                        description: 'Assigning ' + varName + ' = ' + currentVariables[varName] + '
                     });
                 }
             });
@@ -1662,8 +1662,8 @@ int main() {
                             <div class="step-indicator mb-4">🎉 Variable Operations Complete!</div>
                             <div class="variable-display">
                                 <h4 class="font-semibold mb-2">Final Variable Values:</h4>
-                                \' + Object.entries(currentVariables).map(([name, value]) => \`
-                                    <div class="variable-item">\' + name} = \' + value}</div>
+                                ' + Object.entries(currentVariables).map(([name, value]) => \`
+                                    <div class="variable-item">' + name + ' = ' + value + '</div>
                                 \`).join('')}
                             </div>
                         </div>
@@ -1676,21 +1676,21 @@ int main() {
                 
                 canvas.innerHTML = '
                     <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">\' + step.description}</div>
+                        <div class="step-indicator mb-2">' + step.description + '</div>
                         <div class="progress-bar mb-4">
-                            <div class="progress-fill" style="width: \' + progress + '%"></div>
+                            <div class="progress-fill" style="width: ' + progress + '%"></div>
                         </div>
                     </div>
                     <div class="variable-display">
                         <div class="current-operation mb-4">
-                            <code class="bg-gray-100 px-3 py-2 rounded">\' + step.operation}</code>
+                            <code class="bg-gray-100 px-3 py-2 rounded">' + step.operation + '</code>
                         </div>
                         <div class="variable-table">
-                            \' + Object.entries(step.variables).map(([name, value]) => \`
+                            ' + Object.entries(step.variables).map(([name, value]) => \`
                                 <div class="variable-row">
-                                    <span class="variable-name">\' + name}</span>
+                                    <span class="variable-name">' + name + '</span>
                                     <span class="variable-equals">=</span>
-                                    <span class="variable-value">\' + value}</span>
+                                    <span class="variable-value">' + value + '</span>
                                 </div>
                             \`).join('')}
                         </div>
