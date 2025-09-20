@@ -607,10 +607,10 @@ int main() {
     <script>
         // Example code templates
         const codeExamples = {
-            'pattern': '#include <stdio.h>\n\nint main() {\n    for(int i = 1; i <= 5; i++) {\n        for(int j = 1; j <= i; j++) {\n            printf("* ");\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
-            'bubble-sort': '#include <stdio.h>\n\nvoid bubbleSort(int arr[], int n) {\n    for (int i = 0; i < n-1; i++) {\n        for (int j = 0; j < n-i-1; j++) {\n            if (arr[j] > arr[j+1]) {\n                int temp = arr[j];\n                arr[j] = arr[j+1];\n                arr[j+1] = temp;\n            }\n        }\n    }\n}\n\nint main() {\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\n    int n = sizeof(arr)/sizeof(arr[0]);\n    bubbleSort(arr, n);\n    return 0;\n}',
-            'loops': '#include <stdio.h>\n\nint main() {\n    for(int i = 0; i < 3; i++) {\n        for(int j = 0; j < 4; j++) {\n            printf("(%d,%d) ", i, j);\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
-            'array-ops': '#include <stdio.h>\n\nint main() {\n    int arr[] = {5, 2, 8, 1, 9, 3};\n    int n = 6;\n    int sum = 0;\n    for(int i = 0; i < n; i++) {\n        sum += arr[i];\n    }\n    printf("Sum: %d\\n", sum);\n    return 0;\n}'
+            'pattern': '#include <stdio.h>\\nint main() {\\n    for(int i = 1; i <= 5; i++) {\\n        for(int j = 1; j <= i; j++) {\\n            printf("* ");\\n        }\\n        printf("\\\\n");\\n    }\\n    return 0;\\n}',
+            'bubble-sort': '#include <stdio.h>\\nvoid bubbleSort(int arr[], int n) {\\n    for (int i = 0; i < n-1; i++) {\\n        for (int j = 0; j < n-i-1; j++) {\\n            if (arr[j] > arr[j+1]) {\\n                int temp = arr[j];\\n                arr[j] = arr[j+1];\\n                arr[j+1] = temp;\\n            }\\n        }\\n    }\\n}\\nint main() {\\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\\n    int n = sizeof(arr)/sizeof(arr[0]);\\n    bubbleSort(arr, n);\\n    return 0;\\n}',
+            'loops': '#include <stdio.h>\\nint main() {\\n    for(int i = 0; i < 3; i++) {\\n        for(int j = 0; j < 4; j++) {\\n            printf("(%d,%d) ", i, j);\\n        }\\n        printf("\\\\n");\\n    }\\n    return 0;\\n}',
+            'array-ops': '#include <stdio.h>\\nint main() {\\n    int arr[] = {5, 2, 8, 1, 9, 3};\\n    int n = 6;\\n    int sum = 0;\\n    for(int i = 0; i < n; i++) {\\n        sum += arr[i];\\n    }\\n    printf("Sum: %d\\\\n", sum);\\n    return 0;\\n}'
         };
 
         function loadExample(type) {
