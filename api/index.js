@@ -667,7 +667,7 @@ int main() {
             let algorithmTags = '';
             if (analysis.algorithms.length > 0) {
                 algorithmTags = analysis.algorithms.map(algo => 
-                    '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${algo}</span>'
+                    '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">' + algo + '</span>'
                 ).join('');
             }
             
@@ -675,7 +675,7 @@ int main() {
             let patternTags = '';
             if (analysis.patterns.length > 0) {
                 patternTags = analysis.patterns.map(pattern => 
-                    '<span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">\${pattern}</span>'
+                    '<span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">' + pattern + '</span>'
                 ).join('');
             }
             
@@ -683,7 +683,7 @@ int main() {
             let operationTags = '';
             if (analysis.operations.length > 0) {
                 operationTags = analysis.operations.map(op => 
-                    '<span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">\${op}</span>'
+                    '<span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">' + op + '</span>'
                 ).join('');
             }
             
@@ -695,32 +695,32 @@ int main() {
                 '<div class="analysis-results">' +
                     '<div class="text-center mb-6">' +
                         '<div class="step-indicator mb-2">✅ Code Analysis Complete!</div>' +
-                        '<p class="text-sm text-gray-600">Detected: \${visualizationType} Visualization</p>' +
+                        '<p class="text-sm text-gray-600">Detected: ' + visualizationType + ' Visualization</p>' +
                     '</div>' +
                     '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
                         '<div class="bg-blue-50 p-4 rounded-lg">' +
                             '<h4 class="font-semibold text-blue-900 mb-2">Code Type:</h4>' +
-                            '<span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">\${codeType}</span>' +
+                            '<span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">' + codeType + '</span>' +
                         '</div>' +
                         '<div class="bg-purple-50 p-4 rounded-lg">' +
                             '<h4 class="font-semibold text-purple-900 mb-2">Complexity:</h4>' +
-                            '<span class="text-purple-700 text-sm font-medium">\${analysis.complexity}</span>' +
+                            '<span class="text-purple-700 text-sm font-medium">' + analysis.complexity + '</span>' +
                         '</div>' +
                     '</div>' +
                     (analysis.algorithms.length > 0 ? 
                         '<div class="bg-green-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-green-900 mb-2">Detected Algorithms:</h4>' +
-                            '<div class="flex flex-wrap gap-2">\${algorithmTags}</div>' +
+                            '<div class="flex flex-wrap gap-2">' + algorithmTags + '</div>' +
                         '</div>' : '') +
                     (analysis.patterns.length > 0 ? 
                         '<div class="bg-yellow-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-yellow-900 mb-2">Detected Patterns:</h4>' +
-                            '<div class="flex flex-wrap gap-2">\${patternTags}</div>' +
+                            '<div class="flex flex-wrap gap-2">' + patternTags + '</div>' +
                         '</div>' : '') +
                     (analysis.operations.length > 0 ? 
                         '<div class="bg-indigo-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-indigo-900 mb-2">Detected Operations:</h4>' +
-                            '<div class="flex flex-wrap gap-2">\${operationTags}</div>' +
+                            '<div class="flex flex-wrap gap-2">' + operationTags + '</div>' +
                         '</div>' : '') +
                     '<div class="text-center">' +
                         '<button onclick="startAutoVisualization()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">' +
@@ -761,37 +761,8 @@ int main() {
             // Generate sample data for visualization
             const sampleData = generateSampleData(analysis);
             
-            // Create algorithm tags
-            const algorithmTags = analysis.algorithms.map(algo => 
-                '<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">\${algo}</span>'
-            ).join('');
-            
-            // Create data structure tags
-            const dataStructureTags = analysis.dataStructures.map(ds => 
-                '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${ds}</span>'
-            ).join('');
-            
-            // Show analysis first, then transition to visualization
-            canvas.innerHTML = 
-                '<div class="text-center mb-4">' +
-                    '<div class="step-indicator mb-2">Code Analysis Complete</div>' +
-                    '<p class="text-sm text-gray-600 mb-3">Detected: \${analysis.algorithms.length} algorithms, \${analysis.dataStructures.length} data structures</p>' +
-                '</div>' +
-                '<div class="space-y-4 mb-6">' +
-                    '<div class="bg-blue-50 p-4 rounded-lg">' +
-                        '<h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>' +
-                        '<div class="flex flex-wrap gap-2">\${algorithmTags}</div>' +
-                    '</div>' +
-                    '<div class="bg-green-50 p-4 rounded-lg">' +
-                        '<h4 class="font-semibold text-green-900 mb-2">Detected Data Structures:</h4>' +
-                        '<div class="flex flex-wrap gap-2">\${dataStructureTags}</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="text-center">' +
-                    '<button onclick="startCustomVisualization()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">' +
-                        '<i class="fas fa-play mr-2"></i>Start Visualization' +
-                    '</button>' +
-                '</div>';
+            // Simple display without complex template literals
+            canvas.innerHTML = '<div class="text-center"><h3>Code Analysis Complete</h3><p>Your code has been analyzed successfully!</p><button onclick="startCustomVisualization()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">Start Visualization</button></div>';
             
             // Store analysis for visualization
             window.customAnalysis = analysis;
@@ -1136,20 +1107,20 @@ int main() {
                 analysis.structure.push('Contains main function');
             }
             if (forLoops > 0) {
-                analysis.structure.push(forLoops} for loop(s)');
-                analysis.loops.push('for loops: \${forLoops);
+                analysis.structure.push(forLoops + ' for loop(s)');
+                analysis.loops.push('for loops: ' + forLoops);
             }
             if (whileLoops > 0) {
-                analysis.structure.push(whileLoops} while loop(s)');
-                analysis.loops.push('while loops: \${whileLoops);
+                analysis.structure.push(whileLoops + ' while loop(s)');
+                analysis.loops.push('while loops: ' + whileLoops);
             }
             if (codeLower.includes('if') || codeLower.includes('else')) {
                 const ifCount = (code.match(/if\s*\(/g) || []).length;
-                analysis.structure.push(ifCount} conditional statement(s)');
+                analysis.structure.push(ifCount + ' conditional statement(s)');
             }
             if (analysis.operations.includes('Output')) {
                 const printCount = (code.match(/printf|cout/g) || []).length;
-                analysis.structure.push(printCount} output statement(s)');
+                analysis.structure.push(printCount + ' output statement(s)');
             }
             if (codeLower.includes('malloc') || codeLower.includes('free')) {
                 analysis.structure.push('Dynamic memory allocation');
