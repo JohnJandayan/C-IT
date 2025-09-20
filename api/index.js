@@ -720,64 +720,71 @@ int main() {
         function showCodeAnalysis(analysis, sampleData) {
             const canvas = document.getElementById('visualizationCanvas');
             
-            canvas.innerHTML = \`
-                <div class="analysis-results">
-                    <div class="text-center mb-6">
-                        <div class="step-indicator mb-2">✅ Code Analysis Complete!</div>
-                        <p class="text-sm text-gray-600">Detected: \${analysis.visualizationType.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())} Visualization</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-blue-900 mb-2">Code Type:</h4>
-                            <span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">\${analysis.codeType.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}</span>
-                        </div>
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-purple-900 mb-2">Complexity:</h4>
-                            <span class="text-purple-700 text-sm font-medium">\${analysis.complexity}</span>
-                        </div>
-                    </div>
-                    
-                    \${analysis.algorithms.length > 0 ? \`
-                        <div class="bg-green-50 p-4 rounded-lg mb-4">
-                            <h4 class="font-semibold text-green-900 mb-2">Detected Algorithms:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                \${analysis.algorithms.map(algo => \`
-                                    <span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${algo}</span>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    \` : ''}
-                    
-                    \${analysis.patterns.length > 0 ? \`
-                        <div class="bg-yellow-50 p-4 rounded-lg mb-4">
-                            <h4 class="font-semibold text-yellow-900 mb-2">Detected Patterns:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                \${analysis.patterns.map(pattern => \`
-                                    <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">\${pattern}</span>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    \` : ''}
-                    
-                    \${analysis.operations.length > 0 ? \`
-                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
-                            <h4 class="font-semibold text-indigo-900 mb-2">Detected Operations:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                \${analysis.operations.map(op => \`
-                                    <span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">\${op}</span>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    \` : ''}
-                    
-                    <div class="text-center">
-                        <button onclick="startAutoVisualization()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                            <i class="fas fa-play mr-2"></i>Start Visualization
-                        </button>
-                    </div>
-                </div>
-            \`;
+            // Create algorithm tags
+            let algorithmTags = '';
+            if (analysis.algorithms.length > 0) {
+                algorithmTags = analysis.algorithms.map(algo => 
+                    '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">' + algo + '</span>'
+                ).join('');
+            }
+            
+            // Create pattern tags
+            let patternTags = '';
+            if (analysis.patterns.length > 0) {
+                patternTags = analysis.patterns.map(pattern => 
+                    '<span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">' + pattern + '</span>'
+                ).join('');
+            }
+            
+            // Create operation tags
+            let operationTags = '';
+            if (analysis.operations.length > 0) {
+                operationTags = analysis.operations.map(op => 
+                    '<span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">' + op + '</span>'
+                ).join('');
+            }
+            
+            // Format visualization type and code type
+            const visualizationType = analysis.visualizationType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const codeType = analysis.codeType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            canvas.innerHTML = 
+                '<div class="analysis-results">' +
+                    '<div class="text-center mb-6">' +
+                        '<div class="step-indicator mb-2">✅ Code Analysis Complete!</div>' +
+                        '<p class="text-sm text-gray-600">Detected: ' + visualizationType + ' Visualization</p>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+                        '<div class="bg-blue-50 p-4 rounded-lg">' +
+                            '<h4 class="font-semibold text-blue-900 mb-2">Code Type:</h4>' +
+                            '<span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">' + codeType + '</span>' +
+                        '</div>' +
+                        '<div class="bg-purple-50 p-4 rounded-lg">' +
+                            '<h4 class="font-semibold text-purple-900 mb-2">Complexity:</h4>' +
+                            '<span class="text-purple-700 text-sm font-medium">' + analysis.complexity + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    (analysis.algorithms.length > 0 ? 
+                        '<div class="bg-green-50 p-4 rounded-lg mb-4">' +
+                            '<h4 class="font-semibold text-green-900 mb-2">Detected Algorithms:</h4>' +
+                            '<div class="flex flex-wrap gap-2">' + algorithmTags + '</div>' +
+                        '</div>' : '') +
+                    (analysis.patterns.length > 0 ? 
+                        '<div class="bg-yellow-50 p-4 rounded-lg mb-4">' +
+                            '<h4 class="font-semibold text-yellow-900 mb-2">Detected Patterns:</h4>' +
+                            '<div class="flex flex-wrap gap-2">' + patternTags + '</div>' +
+                        '</div>' : '') +
+                    (analysis.operations.length > 0 ? 
+                        '<div class="bg-indigo-50 p-4 rounded-lg mb-4">' +
+                            '<h4 class="font-semibold text-indigo-900 mb-2">Detected Operations:</h4>' +
+                            '<div class="flex flex-wrap gap-2">' + operationTags + '</div>' +
+                        '</div>' : '') +
+                    '<div class="text-center">' +
+                        '<button onclick="startAutoVisualization()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">' +
+                            '<i class="fas fa-play mr-2"></i>Start Visualization' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
         }
         
         function startAutoVisualization() {
@@ -811,36 +818,37 @@ int main() {
             // Generate sample data for visualization
             const sampleData = generateSampleData(analysis);
             
+            // Create algorithm tags
+            const algorithmTags = analysis.algorithms.map(algo => 
+                '<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">' + algo + '</span>'
+            ).join('');
+            
+            // Create data structure tags
+            const dataStructureTags = analysis.dataStructures.map(ds => 
+                '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">' + ds + '</span>'
+            ).join('');
+            
             // Show analysis first, then transition to visualization
-            canvas.innerHTML = \`
-                <div class="text-center mb-4">
-                    <div class="step-indicator mb-2">Code Analysis Complete</div>
-                    <p class="text-sm text-gray-600 mb-3">Detected: \${analysis.algorithms.length} algorithms, \${analysis.dataStructures.length} data structures</p>
-                </div>
-                <div class="space-y-4 mb-6">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>
-                        <div class="flex flex-wrap gap-2">
-                            \${analysis.algorithms.map(algo => \`
-                                <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">\${algo}</span>
-                            \`).join('')}
-                        </div>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-green-900 mb-2">Detected Data Structures:</h4>
-                        <div class="flex flex-wrap gap-2">
-                            \${analysis.dataStructures.map(ds => \`
-                                <span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${ds}</span>
-                            \`).join('')}
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <button onclick="startCustomVisualization()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                        <i class="fas fa-play mr-2"></i>Start Visualization
-                    </button>
-                </div>
-            \`;
+            canvas.innerHTML = 
+                '<div class="text-center mb-4">' +
+                    '<div class="step-indicator mb-2">Code Analysis Complete</div>' +
+                    '<p class="text-sm text-gray-600 mb-3">Detected: ' + analysis.algorithms.length + ' algorithms, ' + analysis.dataStructures.length + ' data structures</p>' +
+                '</div>' +
+                '<div class="space-y-4 mb-6">' +
+                    '<div class="bg-blue-50 p-4 rounded-lg">' +
+                        '<h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>' +
+                        '<div class="flex flex-wrap gap-2">' + algorithmTags + '</div>' +
+                    '</div>' +
+                    '<div class="bg-green-50 p-4 rounded-lg">' +
+                        '<h4 class="font-semibold text-green-900 mb-2">Detected Data Structures:</h4>' +
+                        '<div class="flex flex-wrap gap-2">' + dataStructureTags + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="text-center">' +
+                    '<button onclick="startCustomVisualization()" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">' +
+                        '<i class="fas fa-play mr-2"></i>Start Visualization' +
+                    '</button>' +
+                '</div>';
             
             // Store analysis for visualization
             window.customAnalysis = analysis;
@@ -921,52 +929,46 @@ int main() {
             
             function animateStep() {
                 if (currentStep >= steps.length) {
-                    canvas.innerHTML = \`
-                        <div class="text-center">
-                            <div class="step-indicator mb-4">🎉 Algorithm Complete!</div>
-                            <p class="text-sm text-gray-600 mb-4">\${algorithm} visualization finished</p>
-                            <div class="flex justify-center space-x-2">
-                                \${steps[steps.length - 1].elements.map((val, idx) => \`
-                                    <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
-                                        \${val}
-                                    </div>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    \`;
+                    const finalElements = steps[steps.length - 1].elements.map((val, idx) => 
+                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + val + '</div>'
+                    ).join('');
+                    
+                    canvas.innerHTML = 
+                        '<div class="text-center">' +
+                            '<div class="step-indicator mb-4">🎉 Algorithm Complete!</div>' +
+                            '<p class="text-sm text-gray-600 mb-4">' + algorithm + ' visualization finished</p>' +
+                            '<div class="flex justify-center space-x-2">' + finalElements + '</div>' +
+                        '</div>';
                     return;
                 }
                 
                 const step = steps[currentStep];
                 const progress = ((currentStep + 1) / totalSteps) * 100;
                 
-                canvas.innerHTML = \`
-                    <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">Step \${currentStep + 1} of \${totalSteps}</div>
-                        <p class="text-sm text-gray-600 mb-3">\${step.description}</p>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: \${progress}%"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-center space-x-3 mb-4">
-                        \${step.elements.map((val, idx) => {
-                            let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
-                            
-                            if (step.highlighted.includes(idx)) {
-                                elementClass += ' comparing';
-                            } else if (step.processed && step.processed.includes(idx)) {
-                                elementClass += ' sorted';
-                            } else {
-                                elementClass += ' bg-gray-500';
-                            }
-                            
-                            return \`<div class="\${elementClass}">\${val}</div>\`;
-                        }).join('')}
-                    </div>
-                    <div class="text-center text-xs text-gray-500">
-                        Progress: \${Math.round(progress)}%
-                    </div>
-                \`;
+                const stepElements = step.elements.map((val, idx) => {
+                    let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
+                    
+                    if (step.highlighted.includes(idx)) {
+                        elementClass += ' comparing';
+                    } else if (step.processed && step.processed.includes(idx)) {
+                        elementClass += ' sorted';
+                    } else {
+                        elementClass += ' bg-gray-500';
+                    }
+                    
+                    return '<div class="' + elementClass + '">' + val + '</div>';
+                }).join('');
+                
+                canvas.innerHTML = 
+                    '<div class="text-center mb-4">' +
+                        '<div class="step-indicator mb-2">Step ' + (currentStep + 1) + ' of ' + totalSteps + '</div>' +
+                        '<p class="text-sm text-gray-600 mb-3">' + step.description + '</p>' +
+                        '<div class="progress-bar">' +
+                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="flex justify-center space-x-3 mb-4">' + stepElements + '</div>' +
+                    '<div class="text-center text-xs text-gray-500">Progress: ' + Math.round(progress) + '%</div>';
                 
                 currentStep++;
                 setTimeout(animateStep, 1200);
@@ -1250,79 +1252,72 @@ int main() {
             function animateStep() {
                 if (currentStep >= steps.length) {
                     // Show completion message
-                    canvas.innerHTML = \`
-                        <div class="text-center">
-                            <div class="step-indicator mb-4">🎉 Algorithm Complete!</div>
-                            <p class="text-sm text-gray-600 mb-4">All elements have been sorted successfully</p>
-                            <div class="flex justify-center space-x-2">
-                                \${steps[steps.length - 1].array.map((val, idx) => \`
-                                    <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
-                                        \${val}
-                                    </div>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    \`;
+                    const finalElements = steps[steps.length - 1].array.map((val, idx) => 
+                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + val + '</div>'
+                    ).join('');
+                    
+                    canvas.innerHTML = 
+                        '<div class="text-center">' +
+                            '<div class="step-indicator mb-4">🎉 Algorithm Complete!</div>' +
+                            '<p class="text-sm text-gray-600 mb-4">All elements have been sorted successfully</p>' +
+                            '<div class="flex justify-center space-x-2">' + finalElements + '</div>' +
+                        '</div>';
                     return;
                 }
                 
                 const step = steps[currentStep];
                 const progress = ((currentStep + 1) / totalSteps) * 100;
                 
-                canvas.innerHTML = \`
-                    <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">Step \${currentStep + 1} of \${totalSteps}</div>
-                        <p class="text-sm text-gray-600 mb-3">\${step.description}</p>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: \${progress}%"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-center space-x-3 mb-4">
-                        \${step.array.map((val, idx) => {
-                            let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
-                            
-                            if (step.highlighted.includes(idx)) {
-                                if (step.description.includes('Swapped')) {
-                                    elementClass += ' swapping';
-                                } else {
-                                    elementClass += ' comparing';
-                                }
-                            } else if (step.sorted && step.sorted.includes(idx)) {
-                                elementClass += ' sorted';
-                            } else {
-                                elementClass += ' bg-gray-500';
-                            }
-                            
-                            return \`<div class="\${elementClass}">\${val}</div>\`;
-                        }).join('')}
-                    </div>
+                const stepElements = step.array.map((val, idx) => {
+                    let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
                     
-                    <!-- Color Legend -->
-                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Legend:</h4>
-                        <div class="flex flex-wrap gap-3 text-xs">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-4 h-4 bg-gray-500 rounded"></div>
-                                <span>Normal</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="w-4 h-4 bg-blue-600 rounded"></div>
-                                <span>Comparing</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="w-4 h-4 bg-green-600 rounded"></div>
-                                <span>Swapping</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="w-4 h-4 bg-purple-600 rounded"></div>
-                                <span>Sorted</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center text-xs text-gray-500">
-                        Progress: \${Math.round(progress)}%
-                    </div>
-                \`;
+                    if (step.highlighted.includes(idx)) {
+                        if (step.description.includes('Swapped')) {
+                            elementClass += ' swapping';
+                        } else {
+                            elementClass += ' comparing';
+                        }
+                    } else if (step.sorted && step.sorted.includes(idx)) {
+                        elementClass += ' sorted';
+                    } else {
+                        elementClass += ' bg-gray-500';
+                    }
+                    
+                    return '<div class="' + elementClass + '">' + val + '</div>';
+                }).join('');
+                
+                canvas.innerHTML = 
+                    '<div class="text-center mb-4">' +
+                        '<div class="step-indicator mb-2">Step ' + (currentStep + 1) + ' of ' + totalSteps + '</div>' +
+                        '<p class="text-sm text-gray-600 mb-3">' + step.description + '</p>' +
+                        '<div class="progress-bar">' +
+                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="flex justify-center space-x-3 mb-4">' + stepElements + '</div>' +
+                    '<!-- Color Legend -->' +
+                    '<div class="mt-4 p-3 bg-gray-50 rounded-lg">' +
+                        '<h4 class="text-sm font-semibold text-gray-700 mb-2">Legend:</h4>' +
+                        '<div class="flex flex-wrap gap-3 text-xs">' +
+                            '<div class="flex items-center space-x-2">' +
+                                '<div class="w-4 h-4 bg-gray-500 rounded"></div>' +
+                                '<span>Normal</span>' +
+                            '</div>' +
+                            '<div class="flex items-center space-x-2">' +
+                                '<div class="w-4 h-4 bg-blue-600 rounded"></div>' +
+                                '<span>Comparing</span>' +
+                            '</div>' +
+                            '<div class="flex items-center space-x-2">' +
+                                '<div class="w-4 h-4 bg-green-600 rounded"></div>' +
+                                '<span>Swapping</span>' +
+                            '</div>' +
+                            '<div class="flex items-center space-x-2">' +
+                                '<div class="w-4 h-4 bg-purple-600 rounded"></div>' +
+                                '<span>Sorted</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="text-center text-xs text-gray-500">Progress: ' + Math.round(progress) + '%</div>';
                 
                 currentStep++;
                 setTimeout(animateStep, 1200);
