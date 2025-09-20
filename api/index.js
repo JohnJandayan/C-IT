@@ -358,10 +358,116 @@ function serveVisualizerPage(res) {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        @keyframes queueSlide {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+         @keyframes queueSlide {
+             from { transform: translateX(-20px); opacity: 0; }
+             to { transform: translateX(0); opacity: 1; }
+         }
+         .pattern-display {
+             font-family: 'Courier New', monospace;
+             font-size: 18px;
+             line-height: 1.2;
+             background: #f8fafc;
+             padding: 20px;
+             border-radius: 8px;
+             border: 2px solid #e2e8f0;
+             text-align: left;
+             color: #4a5568;
+         }
+         .loop-visualization {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+         }
+         .loop-state {
+             display: flex;
+             flex-direction: column;
+             gap: 10px;
+             margin-bottom: 20px;
+         }
+         .outer-loop, .inner-loop {
+             padding: 12px 20px;
+             border-radius: 8px;
+             font-weight: bold;
+             text-align: center;
+             transition: all 0.3s ease;
+         }
+         .outer-loop {
+             background: #ddd6fe;
+             color: #7c3aed;
+             border: 2px solid #a78bfa;
+         }
+         .inner-loop {
+             background: #bfdbfe;
+             color: #2563eb;
+             border: 2px solid #60a5fa;
+         }
+         .outer-loop.active, .inner-loop.active {
+             animation: pulse 1s ease-in-out infinite;
+         }
+         .output-display {
+             text-align: center;
+         }
+         .output-item {
+             display: inline-block;
+             padding: 6px 12px;
+             margin: 2px;
+             background: #f0f9ff;
+             border: 1px solid #0ea5e9;
+             border-radius: 6px;
+             color: #0369a1;
+             font-weight: bold;
+         }
+         .output-item.highlight {
+             background: #fef3c7;
+             border-color: #f59e0b;
+             color: #92400e;
+             animation: highlight 0.5s ease-in-out;
+         }
+         @keyframes highlight {
+             0%, 100% { transform: scale(1); }
+             50% { transform: scale(1.1); }
+         }
+         .variable-display {
+             max-width: 400px;
+             margin: 0 auto;
+         }
+         .current-operation {
+             text-align: center;
+         }
+         .variable-table {
+             display: flex;
+             flex-direction: column;
+             gap: 8px;
+         }
+         .variable-row {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             padding: 8px 16px;
+             background: #f8fafc;
+             border-radius: 6px;
+             border: 1px solid #e2e8f0;
+         }
+         .variable-name {
+             font-weight: bold;
+             color: #4c51bf;
+         }
+         .variable-equals {
+             color: #6b7280;
+         }
+         .variable-value {
+             font-weight: bold;
+             color: #059669;
+         }
+         .variable-item {
+             padding: 8px 16px;
+             margin: 4px;
+             background: #ecfdf5;
+             border: 1px solid #10b981;
+             border-radius: 6px;
+             color: #047857;
+             font-weight: bold;
+         }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -757,19 +863,38 @@ int main() {
         function showAdaptiveVisualization(data, algorithm, type, analysis) {
             const canvas = document.getElementById('visualizationCanvas');
             
-            if (type === 'sort') {
-                showSortingVisualization(data, algorithm.replace(' ', '-'));
-            } else if (type === 'search') {
-                showSearchVisualization(data, algorithm.replace(' ', '-'));
-            } else if (type === 'tree') {
-                showTreeVisualization(data, analysis);
-            } else if (type === 'list') {
-                showLinkedListVisualization(data, analysis);
-            } else if (type === 'stack-queue') {
-                showStackQueueVisualization(data, analysis);
-            } else {
-                // Generic visualization for any algorithm
-                showGenericVisualization(data, algorithm, analysis);
+            // Route to appropriate visualization based on analysis
+            switch (analysis.visualizationType) {
+                case 'sort':
+                    showSortingVisualization(data, algorithm.replace(' ', '-'));
+                    break;
+                case 'search':
+                    showSearchVisualization(data, algorithm.replace(' ', '-'));
+                    break;
+                case 'pattern':
+                    showPatternVisualization(analysis);
+                    break;
+                case 'loop-flow':
+                    showLoopFlowVisualization(analysis);
+                    break;
+                case 'array-operations':
+                    showArrayOperationsVisualization(analysis);
+                    break;
+                case 'variable-flow':
+                    showVariableFlowVisualization(analysis);
+                    break;
+                case 'tree':
+                    showTreeVisualization(data, analysis);
+                    break;
+                case 'list':
+                    showLinkedListVisualization(data, analysis);
+                    break;
+                case 'stack-queue':
+                    showStackQueueVisualization(data, analysis);
+                    break;
+                default:
+                    // Generic visualization for any algorithm
+                    showGenericVisualization(data, algorithm, analysis);
             }
         }
 
@@ -891,16 +1016,26 @@ int main() {
 
         function generateSampleData(analysis) {
             // Generate appropriate sample data based on detected algorithms and data structures
-            if (analysis.algorithms.some(algo => algo.includes('Sort'))) {
-                return [64, 34, 25, 12, 22, 11, 90];
-            } else if (analysis.algorithms.some(algo => algo.includes('Search'))) {
-                return [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
-            } else if (analysis.dataStructures.some(ds => ds.includes('Tree'))) {
-                return [10, 5, 15, 3, 7, 12, 18];
-            } else if (analysis.dataStructures.some(ds => ds.includes('List'))) {
-                return [1, 2, 3, 4, 5, 6, 7, 8];
-            } else {
-                return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            switch (analysis.visualizationType) {
+                case 'sort':
+                case 'search':
+                    return [64, 34, 25, 12, 22, 11, 90];
+                case 'pattern':
+                    return null; // No data needed for pattern visualization
+                case 'loop-flow':
+                    return null; // No data needed for loop flow visualization
+                case 'array-operations':
+                    return [5, 2, 8, 1, 9, 3];
+                case 'variable-flow':
+                    return null; // Uses variables from analysis
+                case 'tree':
+                    return [10, 5, 15, 3, 7, 12, 18];
+                case 'list':
+                    return [1, 2, 3, 4, 5, 6, 7, 8];
+                case 'stack-queue':
+                    return [8, 7, 6, 5, 4, 3, 2, 1];
+                default:
+                    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             }
         }
 
@@ -909,32 +1044,54 @@ int main() {
                 algorithms: [],
                 dataStructures: [],
                 complexity: 'Unable to determine complexity',
-                structure: []
+                structure: [],
+                codeType: 'general', // New field to identify code type
+                patterns: [], // New field for detected patterns
+                operations: [], // New field for detected operations
+                visualizationType: 'flow', // Default visualization type
+                loops: [], // Track loop information
+                variables: [], // Track variables
+                outputs: [] // Track print statements
             };
             
             const codeLower = code.toLowerCase();
+            const lines = code.split('\n').filter(line => line.trim() !== '');
             
             // Detect algorithms
-            if (codeLower.includes('bubble') || codeLower.includes('for') && codeLower.includes('swap')) {
+            if (codeLower.includes('bubble') || (codeLower.includes('for') && codeLower.includes('swap'))) {
                 analysis.algorithms.push('Bubble Sort');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'sort';
             }
             if (codeLower.includes('quick') || codeLower.includes('pivot')) {
                 analysis.algorithms.push('Quick Sort');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'sort';
             }
             if (codeLower.includes('merge') || codeLower.includes('divide')) {
                 analysis.algorithms.push('Merge Sort');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'sort';
             }
             if (codeLower.includes('insert') || codeLower.includes('shift')) {
                 analysis.algorithms.push('Insertion Sort');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'sort';
             }
             if (codeLower.includes('select') || codeLower.includes('minimum')) {
                 analysis.algorithms.push('Selection Sort');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'sort';
             }
             if (codeLower.includes('binary') && codeLower.includes('search')) {
                 analysis.algorithms.push('Binary Search');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'search';
             }
             if (codeLower.includes('linear') || codeLower.includes('sequential')) {
                 analysis.algorithms.push('Linear Search');
+                analysis.codeType = 'algorithm';
+                analysis.visualizationType = 'search';
             }
             
             // Detect data structures
@@ -947,54 +1104,123 @@ int main() {
             if (codeLower.includes('queue') || codeLower.includes('enqueue') || codeLower.includes('dequeue')) {
                 analysis.dataStructures.push('Queue');
             }
-            if (codeLower.includes('tree') || codeLower.includes('node') && codeLower.includes('left') && codeLower.includes('right')) {
+            if (codeLower.includes('tree') || (codeLower.includes('node') && codeLower.includes('left') && codeLower.includes('right'))) {
                 analysis.dataStructures.push('Binary Tree');
             }
             if (codeLower.includes('hash') || codeLower.includes('map')) {
                 analysis.dataStructures.push('Hash Map');
             }
-            if (codeLower.includes('array') || codeLower.includes('[') && codeLower.includes(']')) {
+            if (codeLower.includes('array') || (codeLower.includes('[') && codeLower.includes(']'))) {
                 analysis.dataStructures.push('Array');
             }
             
+            // Detect patterns and visual structures
+            const starPattern = /printf.*\*|cout.*\*/g;
+            const hashPattern = /printf.*#|cout.*#/g;
+            const spacePattern = /printf.*%d|cout.*<<.*<<|printf.*" "/g;
+            
+            if (starPattern.test(code) || hashPattern.test(code)) {
+                analysis.patterns.push('Character Pattern');
+                analysis.codeType = 'pattern';
+                analysis.visualizationType = 'pattern';
+            }
+            
+            if (codeLower.includes('pyramid') || codeLower.includes('triangle')) {
+                analysis.patterns.push('Pyramid/Triangle');
+                analysis.codeType = 'pattern';
+                analysis.visualizationType = 'pattern';
+            }
+            
+            if (codeLower.includes('diamond')) {
+                analysis.patterns.push('Diamond');
+                analysis.codeType = 'pattern';
+                analysis.visualizationType = 'pattern';
+            }
+            
+            // Detect nested loops for pattern generation
+            const forLoops = (code.match(/for\s*\(/g) || []).length;
+            const whileLoops = (code.match(/while\s*\(/g) || []).length;
+            
+            if (forLoops >= 2) {
+                analysis.patterns.push('Nested Loop Pattern');
+                if (analysis.codeType === 'general') {
+                    analysis.codeType = 'nested-loop';
+                    analysis.visualizationType = 'loop-flow';
+                }
+            }
+            
+            // Detect operations
+            if (codeLower.includes('printf') || codeLower.includes('cout')) {
+                analysis.operations.push('Output');
+                const printMatches = code.match(/printf\s*\([^)]*\)|cout\s*<<[^;]*/g) || [];
+                analysis.outputs = printMatches.slice(0, 10); // Limit to first 10
+            }
+            if (codeLower.includes('scanf') || codeLower.includes('cin')) {
+                analysis.operations.push('Input');
+            }
+            if (codeLower.includes('=') && !codeLower.includes('==')) {
+                analysis.operations.push('Assignment');
+                // Extract variable assignments
+                const assignments = code.match(/\w+\s*=\s*[^;]+/g) || [];
+                analysis.variables = assignments.slice(0, 5).map(assign => assign.trim());
+            }
+            if (codeLower.includes('++') || codeLower.includes('--')) {
+                analysis.operations.push('Increment/Decrement');
+            }
+            if (codeLower.includes('+') || codeLower.includes('-') || codeLower.includes('*') || codeLower.includes('/')) {
+                analysis.operations.push('Arithmetic');
+            }
+            
             // Analyze structure
-            const lines = code.split('\\n');
             analysis.structure.push(\`\${lines.length} lines of code\`);
             
             if (codeLower.includes('main')) {
                 analysis.structure.push('Contains main function');
             }
-            if (codeLower.includes('for')) {
-                analysis.structure.push('Contains loops');
+            if (forLoops > 0) {
+                analysis.structure.push(\`\${forLoops} for loop(s)\`);
+                analysis.loops.push(\`for loops: \${forLoops}\`);
+            }
+            if (whileLoops > 0) {
+                analysis.structure.push(\`\${whileLoops} while loop(s)\`);
+                analysis.loops.push(\`while loops: \${whileLoops}\`);
             }
             if (codeLower.includes('if') || codeLower.includes('else')) {
-                analysis.structure.push('Contains conditional statements');
+                const ifCount = (code.match(/if\s*\(/g) || []).length;
+                analysis.structure.push(\`\${ifCount} conditional statement(s)\`);
             }
-            if (codeLower.includes('printf') || codeLower.includes('scanf')) {
-                analysis.structure.push('Contains I/O operations');
+            if (analysis.operations.includes('Output')) {
+                const printCount = (code.match(/printf|cout/g) || []).length;
+                analysis.structure.push(\`\${printCount} output statement(s)\`);
             }
             if (codeLower.includes('malloc') || codeLower.includes('free')) {
-                analysis.structure.push('Contains dynamic memory allocation');
+                analysis.structure.push('Dynamic memory allocation');
+            }
+            
+            // Determine visualization type if not already set
+            if (analysis.visualizationType === 'flow') {
+                if (analysis.patterns.length > 0) {
+                    analysis.visualizationType = 'pattern';
+                } else if (forLoops >= 2 || (forLoops > 0 && analysis.operations.includes('Output'))) {
+                    analysis.visualizationType = 'loop-flow';
+                } else if (analysis.dataStructures.includes('Array')) {
+                    analysis.visualizationType = 'array-operations';
+                } else if (analysis.operations.length > 0) {
+                    analysis.visualizationType = 'variable-flow';
+                }
             }
             
             // Estimate complexity
-            if (analysis.algorithms.length > 0) {
-                const algo = analysis.algorithms[0];
-                if (algo.includes('Sort')) {
-                    if (algo.includes('Bubble') || algo.includes('Insertion') || algo.includes('Selection')) {
-                        analysis.complexity = 'Time: O(n²), Space: O(1)';
-                    } else if (algo.includes('Quick')) {
-                        analysis.complexity = 'Time: O(n log n), Space: O(log n)';
-                    } else if (algo.includes('Merge')) {
-                        analysis.complexity = 'Time: O(n log n), Space: O(n)';
-                    }
-                } else if (algo.includes('Search')) {
-                    if (algo.includes('Binary')) {
-                        analysis.complexity = 'Time: O(log n), Space: O(1)';
-                    } else {
-                        analysis.complexity = 'Time: O(n), Space: O(1)';
-                    }
-                }
+            if (forLoops >= 3) {
+                analysis.complexity = 'O(n³) - Cubic time';
+            } else if (forLoops >= 2) {
+                analysis.complexity = 'O(n²) - Quadratic time';
+            } else if (forLoops === 1 || whileLoops > 0) {
+                analysis.complexity = 'O(n) - Linear time';
+            } else if (analysis.algorithms.some(algo => algo.includes('Binary Search'))) {
+                analysis.complexity = 'O(log n) - Logarithmic time';
+            } else {
+                analysis.complexity = 'O(1) - Constant time';
             }
             
             return analysis;
@@ -1312,6 +1538,308 @@ int main() {
                     </div>
                 </div>
             \`;
+        }
+
+        function showPatternVisualization(analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            // Create pyramid/triangle pattern visualization
+            let patternSteps = [];
+            let currentPattern = '';
+            
+            // Simulate nested loop execution for pattern generation
+            for (let i = 1; i <= 5; i++) {
+                let line = '';
+                // Add spaces
+                for (let j = 1; j <= 5 - i; j++) {
+                    line += '&nbsp;';
+                }
+                // Add stars
+                for (let k = 1; k <= i; k++) {
+                    line += '* ';
+                }
+                currentPattern += line + '<br>';
+                patternSteps.push({
+                    row: i,
+                    pattern: currentPattern,
+                    description: \`Row \${i}: Adding \${i} star(s)\`
+                });
+            }
+            
+            let currentStep = 0;
+            
+            function animatePattern() {
+                if (currentStep >= patternSteps.length) {
+                    canvas.innerHTML = \`
+                        <div class="text-center">
+                            <div class="step-indicator mb-4">🎉 Pattern Complete!</div>
+                            <div class="pattern-display">
+                                \${patternSteps[patternSteps.length - 1].pattern}
+                            </div>
+                        </div>
+                    \`;
+                    return;
+                }
+                
+                const step = patternSteps[currentStep];
+                const progress = ((currentStep + 1) / patternSteps.length) * 100;
+                
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <div class="step-indicator mb-2">Pattern Generation - \${step.description}</div>
+                        <div class="progress-bar mb-4">
+                            <div class="progress-fill" style="width: \${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="pattern-display">
+                        \${step.pattern}
+                    </div>
+                    <div class="mt-4 text-center text-xs text-gray-500">
+                        Outer loop iteration: \${step.row}/5
+                    </div>
+                \`;
+                
+                currentStep++;
+                setTimeout(animatePattern, 1000);
+            }
+            
+            animatePattern();
+        }
+
+        function showLoopFlowVisualization(analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            // Simulate nested loop execution
+            const iterations = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 3; j++) {
+                    iterations.push({
+                        outerLoop: i + 1,
+                        innerLoop: j + 1,
+                        description: \`Outer: i=\${i+1}, Inner: j=\${j+1}\`,
+                        output: \`(\${i+1}, \${j+1})\`
+                    });
+                }
+            }
+            
+            let currentIteration = 0;
+            let outputHistory = [];
+            
+            function animateLoop() {
+                if (currentIteration >= iterations.length) {
+                    canvas.innerHTML = \`
+                        <div class="text-center">
+                            <div class="step-indicator mb-4">🎉 Loop Execution Complete!</div>
+                            <div class="output-display">
+                                <h4 class="font-semibold mb-2">All Outputs:</h4>
+                                <div class="grid grid-cols-3 gap-2">
+                                    \${outputHistory.map(output => \`
+                                        <div class="output-item">\${output}</div>
+                                    \`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    return;
+                }
+                
+                const iteration = iterations[currentIteration];
+                outputHistory.push(iteration.output);
+                const progress = ((currentIteration + 1) / iterations.length) * 100;
+                
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <div class="step-indicator mb-2">Loop Execution - \${iteration.description}</div>
+                        <div class="progress-bar mb-4">
+                            <div class="progress-fill" style="width: \${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="loop-visualization">
+                        <div class="loop-state">
+                            <div class="outer-loop \${iteration.innerLoop === 1 ? 'active' : ''}">
+                                Outer Loop (i = \${iteration.outerLoop})
+                            </div>
+                            <div class="inner-loop active">
+                                Inner Loop (j = \${iteration.innerLoop})
+                            </div>
+                        </div>
+                        <div class="output-display mt-4">
+                            <h4 class="font-semibold mb-2">Current Output: \${iteration.output}</h4>
+                            <div class="output-history">
+                                \${outputHistory.map((output, idx) => \`
+                                    <span class="output-item \${idx === outputHistory.length - 1 ? 'highlight' : ''}">\${output}</span>
+                                \`).join(' ')}
+                            </div>
+                        </div>
+                    </div>
+                \`;
+                
+                currentIteration++;
+                setTimeout(animateLoop, 800);
+            }
+            
+            animateLoop();
+        }
+
+        function showArrayOperationsVisualization(analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            const arrayData = [5, 2, 8, 1, 9, 3];
+            const operations = [
+                { type: 'access', index: 0, value: 5, description: 'Accessing array[0]' },
+                { type: 'modify', index: 1, oldValue: 2, newValue: 7, description: 'Modifying array[1] = 7' },
+                { type: 'access', index: 2, value: 8, description: 'Accessing array[2]' },
+                { type: 'sum', description: 'Calculating sum of all elements' }
+            ];
+            
+            let currentOp = 0;
+            let currentArray = [...arrayData];
+            
+            function animateArrayOps() {
+                if (currentOp >= operations.length) {
+                    const sum = currentArray.reduce((a, b) => a + b, 0);
+                    canvas.innerHTML = \`
+                        <div class="text-center">
+                            <div class="step-indicator mb-4">🎉 Array Operations Complete!</div>
+                            <div class="flex justify-center space-x-2 mb-4">
+                                \${currentArray.map((val, idx) => \`
+                                    <div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">
+                                        \${val}
+                                    </div>
+                                \`).join('')}
+                            </div>
+                            <p class="text-sm text-gray-600">Final array sum: \${sum}</p>
+                        </div>
+                    \`;
+                    return;
+                }
+                
+                const operation = operations[currentOp];
+                const progress = ((currentOp + 1) / operations.length) * 100;
+                
+                if (operation.type === 'modify') {
+                    currentArray[operation.index] = operation.newValue;
+                }
+                
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <div class="step-indicator mb-2">\${operation.description}</div>
+                        <div class="progress-bar mb-4">
+                            <div class="progress-fill" style="width: \${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-2 mb-4">
+                        \${currentArray.map((val, idx) => {
+                            let elementClass = 'array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold';
+                            
+                            if (operation.index === idx && operation.type !== 'sum') {
+                                elementClass += ' comparing';
+                            } else if (operation.type === 'sum') {
+                                elementClass += ' swapping';
+                            } else {
+                                elementClass += ' bg-gray-500';
+                            }
+                            
+                            return \`<div class="\${elementClass}">\${val}</div>\`;
+                        }).join('')}
+                    </div>
+                    <div class="text-center text-sm text-gray-600">
+                        Operation \${currentOp + 1} of \${operations.length}
+                    </div>
+                \`;
+                
+                currentOp++;
+                setTimeout(animateArrayOps, 1200);
+            }
+            
+            animateArrayOps();
+        }
+
+        function showVariableFlowVisualization(analysis) {
+            const canvas = document.getElementById('visualizationCanvas');
+            
+            // Simulate variable operations
+            const variables = analysis.variables.length > 0 ? analysis.variables : ['a = 5', 'b = 10', 'c = a + b'];
+            const variableSteps = [];
+            let currentVariables = {};
+            
+            variables.forEach((varAssign, idx) => {
+                const parts = varAssign.split('=');
+                if (parts.length === 2) {
+                    const varName = parts[0].trim();
+                    const varValue = parts[1].trim();
+                    
+                    // Simple evaluation for demonstration
+                    if (!isNaN(varValue)) {
+                        currentVariables[varName] = parseInt(varValue);
+                    } else if (varValue.includes('+')) {
+                        const operands = varValue.split('+').map(op => op.trim());
+                        if (currentVariables[operands[0]] !== undefined && currentVariables[operands[1]] !== undefined) {
+                            currentVariables[varName] = currentVariables[operands[0]] + currentVariables[operands[1]];
+                        } else {
+                            currentVariables[varName] = varValue;
+                        }
+                    } else {
+                        currentVariables[varName] = varValue;
+                    }
+                    
+                    variableSteps.push({
+                        operation: varAssign,
+                        variables: { ...currentVariables },
+                        description: \`Assigning \${varName} = \${currentVariables[varName]}\`
+                    });
+                }
+            });
+            
+            let currentStep = 0;
+            
+            function animateVariables() {
+                if (currentStep >= variableSteps.length) {
+                    canvas.innerHTML = \`
+                        <div class="text-center">
+                            <div class="step-indicator mb-4">🎉 Variable Operations Complete!</div>
+                            <div class="variable-display">
+                                <h4 class="font-semibold mb-2">Final Variable Values:</h4>
+                                \${Object.entries(currentVariables).map(([name, value]) => \`
+                                    <div class="variable-item">\${name} = \${value}</div>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \`;
+                    return;
+                }
+                
+                const step = variableSteps[currentStep];
+                const progress = ((currentStep + 1) / variableSteps.length) * 100;
+                
+                canvas.innerHTML = \`
+                    <div class="text-center mb-4">
+                        <div class="step-indicator mb-2">\${step.description}</div>
+                        <div class="progress-bar mb-4">
+                            <div class="progress-fill" style="width: \${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="variable-display">
+                        <div class="current-operation mb-4">
+                            <code class="bg-gray-100 px-3 py-2 rounded">\${step.operation}</code>
+                        </div>
+                        <div class="variable-table">
+                            \${Object.entries(step.variables).map(([name, value]) => \`
+                                <div class="variable-row">
+                                    <span class="variable-name">\${name}</span>
+                                    <span class="variable-equals">=</span>
+                                    <span class="variable-value">\${value}</span>
+                                </div>
+                            \`).join('')}
+                        </div>
+                    </div>
+                \`;
+                
+                currentStep++;
+                setTimeout(animateVariables, 1500);
+            }
+            
+            animateVariables();
         }
 
         function resetVisualization() {
