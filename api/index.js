@@ -605,6 +605,13 @@ int main() {
     </main>
 
     <script>
+        console.log('Script starting...');
+        
+        // Test function definitions
+        window.testFunction = function() {
+            console.log('Test function works!');
+        };
+        
         // Example code templates
         const codeExamples = {
             'pattern': '#include <stdio.h>\nint main() {\n    for(int i = 1; i <= 5; i++) {\n        for(int j = 1; j <= i; j++) {\n            printf("* ");\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
@@ -625,6 +632,7 @@ int main() {
         }
 
         function analyzeAndVisualize() {
+            console.log('analyzeAndVisualize called');
             const canvas = document.getElementById('visualizationCanvas');
             const codeInput = document.getElementById('codeInput').value;
             
@@ -1705,6 +1713,7 @@ int main() {
         }
 
         function resetVisualization() {
+            console.log('resetVisualization called');
             document.getElementById('visualizationCanvas').innerHTML = 
                 '<div class="text-center text-gray-500">' +
                     '<i class="fas fa-play-circle text-4xl mb-4"></i>' +
@@ -1716,6 +1725,12 @@ int main() {
             window.customAnalysis = null;
             window.sampleData = null;
         }
+        
+        // Make functions globally accessible
+        window.analyzeAndVisualize = analyzeAndVisualize;
+        window.resetVisualization = resetVisualization;
+        
+        console.log('Script loaded successfully. Functions defined:', typeof analyzeAndVisualize, typeof resetVisualization);
     </script>
 </body>
 </html>
