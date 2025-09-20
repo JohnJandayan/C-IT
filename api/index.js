@@ -607,66 +607,10 @@ int main() {
     <script>
         // Example code templates
         const codeExamples = {
-            'pattern': \`#include <stdio.h>
-
-int main() {
-    // Star pyramid pattern
-    for(int i = 1; i <= 5; i++) {
-        for(int j = 1; j <= i; j++) {
-            printf("* ");
-        }
-        printf("\\n");
-    }
-    return 0;
-}\`,
-            'bubble-sort': \`#include <stdio.h>
-
-void bubbleSort(int arr[], int n) {
-    for (int i = 0; i < n-1; i++) {
-        for (int j = 0; j < n-i-1; j++) {
-            if (arr[j] > arr[j+1]) {
-                // Swap elements
-                int temp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = temp;
-            }
-        }
-    }
-}
-
-int main() {
-    int arr[] = {64, 34, 25, 12, 22, 11, 90};
-    int n = sizeof(arr)/sizeof(arr[0]);
-    bubbleSort(arr, n);
-    return 0;
-}\`,
-            'loops': \`#include <stdio.h>
-
-int main() {
-    // Nested loop demonstration
-    for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < 4; j++) {
-            printf("(%d,%d) ", i, j);
-        }
-        printf("\\n");
-    }
-    return 0;
-}\`,
-            'array-ops': \`#include <stdio.h>
-
-int main() {
-    int arr[] = {5, 2, 8, 1, 9, 3};
-    int n = 6;
-    int sum = 0;
-    
-    // Calculate sum of array
-    for(int i = 0; i < n; i++) {
-        sum += arr[i];
-    }
-    
-    printf("Sum: %d\\n", sum);
-    return 0;
-}\`
+            'pattern': '#include <stdio.h>\n\nint main() {\n    // Star pyramid pattern\n    for(int i = 1; i <= 5; i++) {\n        for(int j = 1; j <= i; j++) {\n            printf("* ");\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
+            'bubble-sort': '#include <stdio.h>\n\nvoid bubbleSort(int arr[], int n) {\n    for (int i = 0; i < n-1; i++) {\n        for (int j = 0; j < n-i-1; j++) {\n            if (arr[j] > arr[j+1]) {\n                // Swap elements\n                int temp = arr[j];\n                arr[j] = arr[j+1];\n                arr[j+1] = temp;\n            }\n        }\n    }\n}\n\nint main() {\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\n    int n = sizeof(arr)/sizeof(arr[0]);\n    bubbleSort(arr, n);\n    return 0;\n}',
+            'loops': '#include <stdio.h>\n\nint main() {\n    // Nested loop demonstration\n    for(int i = 0; i < 3; i++) {\n        for(int j = 0; j < 4; j++) {\n            printf("(%d,%d) ", i, j);\n        }\n        printf("\\n");\n    }\n    return 0;\n}',
+            'array-ops': '#include <stdio.h>\n\nint main() {\n    int arr[] = {5, 2, 8, 1, 9, 3};\n    int n = 6;\n    int sum = 0;\n    \n    // Calculate sum of array\n    for(int i = 0; i < n; i++) {\n        sum += arr[i];\n    }\n    \n    printf("Sum: %d\\n", sum);\n    return 0;\n}'
         };
 
         function loadExample(type) {
@@ -1188,26 +1132,26 @@ int main() {
             }
             
             // Analyze structure
-            analysis.structure.push(\`\${lines.length} lines of code\`);
+            analysis.structure.push(lines.length + ' lines of code');
             
             if (codeLower.includes('main')) {
                 analysis.structure.push('Contains main function');
             }
             if (forLoops > 0) {
-                analysis.structure.push(\`\${forLoops} for loop(s)\`);
-                analysis.loops.push(\`for loops: \${forLoops}\`);
+                analysis.structure.push(forLoops + ' for loop(s)');
+                analysis.loops.push('for loops: ' + forLoops);
             }
             if (whileLoops > 0) {
-                analysis.structure.push(\`\${whileLoops} while loop(s)\`);
-                analysis.loops.push(\`while loops: \${whileLoops}\`);
+                analysis.structure.push(whileLoops + ' while loop(s)');
+                analysis.loops.push('while loops: ' + whileLoops);
             }
             if (codeLower.includes('if') || codeLower.includes('else')) {
                 const ifCount = (code.match(/if\s*\(/g) || []).length;
-                analysis.structure.push(\`\${ifCount} conditional statement(s)\`);
+                analysis.structure.push(ifCount + ' conditional statement(s)');
             }
             if (analysis.operations.includes('Output')) {
                 const printCount = (code.match(/printf|cout/g) || []).length;
-                analysis.structure.push(\`\${printCount} output statement(s)\`);
+                analysis.structure.push(printCount + ' output statement(s)');
             }
             if (codeLower.includes('malloc') || codeLower.includes('free')) {
                 analysis.structure.push('Dynamic memory allocation');
@@ -1571,7 +1515,7 @@ int main() {
                 patternSteps.push({
                     row: i,
                     pattern: currentPattern,
-                    description: \`Row \${i}: Adding \${i} star(s)\`
+                    description: 'Row ' + i + ': Adding ' + i + ' star(s)'
                 });
             }
             
@@ -1625,8 +1569,8 @@ int main() {
                     iterations.push({
                         outerLoop: i + 1,
                         innerLoop: j + 1,
-                        description: \`Outer: i=\${i+1}, Inner: j=\${j+1}\`,
-                        output: \`(\${i+1}, \${j+1})\`
+                        description: 'Outer: i=' + (i+1) + ', Inner: j=' + (j+1),
+                        output: '(' + (i+1) + ',' + (j+1) + ')'
                     });
                 }
             }
@@ -1795,7 +1739,7 @@ int main() {
                     variableSteps.push({
                         operation: varAssign,
                         variables: { ...currentVariables },
-                        description: \`Assigning \${varName} = \${currentVariables[varName]}\`
+                        description: 'Assigning ' + varName + ' = ' + currentVariables[varName]
                     });
                 }
             });
