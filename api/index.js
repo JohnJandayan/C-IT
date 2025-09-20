@@ -527,24 +527,15 @@ function serveVisualizerPage(res) {
                                 <label class="block text-sm font-medium text-gray-700 mb-2">C Code</label>
                                 <textarea id="codeInput" rows="15" 
                                           class="code-editor w-full p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                          placeholder="// Paste your C code here - any algorithm, pattern, or general code
-// Examples you can try:
-// - Sorting algorithms (bubble sort, quick sort, etc.)
-// - Pattern printing (pyramids, stars, numbers)  
-// - Array operations (sum, search, etc.)
-// - Loop structures (nested loops, etc.)
-// - Variable operations and arithmetic
-// - Data structures (linked lists, stacks, etc.)
-
-#include <stdio.h>
+                                          placeholder="// Paste your C code here - any algorithm, pattern, or general code&#10;// Examples you can try:&#10;// - Sorting algorithms (bubble sort, quick sort, etc.)&#10;// - Pattern printing (pyramids, stars, numbers)&#10;// - Array operations (sum, search, etc.)&#10;// - Loop structures (nested loops, etc.)&#10;// - Variable operations and arithmetic&#10;// - Data structures (linked lists, stacks, etc.)&#10;&#10;#include &lt;stdio.h&gt;&#10;&#10;int main() {&#10;    // Example: Pattern printing&#10;    for(int i = 1; i &lt;= 5; i++) {&#10;        for(int j = 1; j &lt;= i; j++) {&#10;            printf(&quot;* &quot;);&#10;        }&#10;        printf(&quot;\\n&quot;);&#10;    }&#10;    return 0;&#10;}">#include <stdio.h>
 
 int main() {
     // Example: Pattern printing
     for(int i = 1; i <= 5; i++) {
         for(int j = 1; j <= i; j++) {
-            printf(\"* \");
+            printf("* ");
         }
-        printf(\"\\n\");
+        printf("\n");
     }
     return 0;
 }</textarea>
@@ -570,7 +561,8 @@ int main() {
                         <div class="visualization-canvas p-6" id="visualizationCanvas">
                             <div class="text-center text-gray-500">
                                 <i class="fas fa-play-circle text-4xl mb-4"></i>
-                                <p>Click "Visualize" to see the algorithm in action</p>
+                                <p>Click "Analyze & Visualize" to see your code in action</p>
+                                <p class="text-sm mt-2">Try the example patterns or paste your own C code!</p>
                             </div>
                         </div>
                         <div class="mt-4">
@@ -1868,13 +1860,15 @@ int main() {
             document.getElementById('visualizationCanvas').innerHTML = \`
                 <div class="text-center text-gray-500">
                     <i class="fas fa-play-circle text-4xl mb-4"></i>
-                    <p>Click "Visualize" to see the algorithm in action</p>
+                    <p>Click "Analyze & Visualize" to see your code in action</p>
+                    <p class="text-sm mt-2">Try the example patterns or paste your own C code!</p>
                 </div>
             \`;
+            
+            // Clear stored analysis
+            window.customAnalysis = null;
+            window.sampleData = null;
         }
-
-        // Initialize
-        updateAlgorithmInfo();
     </script>
 </body>
 </html>
