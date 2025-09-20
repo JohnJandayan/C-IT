@@ -634,18 +634,17 @@ int main() {
             }
             
             // Show loading with animation
-            canvas.innerHTML = \`
-                <div class="text-center">
-                    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p class="text-lg font-semibold text-gray-700 mb-2">Analyzing Code</p>
-                    <p class="text-sm text-gray-500">Detecting algorithms, data structures, patterns, and operations...</p>
-                    <div class="mt-4 flex justify-center space-x-1">
-                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                    </div>
-                </div>
-            \`;
+            canvas.innerHTML = 
+                '<div class="text-center">' +
+                    '<div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>' +
+                    '<p class="text-lg font-semibold text-gray-700 mb-2">Analyzing Code</p>' +
+                    '<p class="text-sm text-gray-500">Detecting algorithms, data structures, patterns, and operations...</p>' +
+                    '<div class="mt-4 flex justify-center space-x-1">' +
+                        '<div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>' +
+                        '<div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>' +
+                        '<div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>' +
+                    '</div>' +
+                '</div>';
 
             // Analyze the code
             setTimeout(() => {
@@ -668,7 +667,7 @@ int main() {
             let algorithmTags = '';
             if (analysis.algorithms.length > 0) {
                 algorithmTags = analysis.algorithms.map(algo => 
-                    '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">' + algo + '</span>'
+                    '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${algo}</span>'
                 ).join('');
             }
             
@@ -676,7 +675,7 @@ int main() {
             let patternTags = '';
             if (analysis.patterns.length > 0) {
                 patternTags = analysis.patterns.map(pattern => 
-                    '<span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">' + pattern + '</span>'
+                    '<span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">\${pattern}</span>'
                 ).join('');
             }
             
@@ -684,7 +683,7 @@ int main() {
             let operationTags = '';
             if (analysis.operations.length > 0) {
                 operationTags = analysis.operations.map(op => 
-                    '<span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">' + op + '</span>'
+                    '<span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">\${op}</span>'
                 ).join('');
             }
             
@@ -696,32 +695,32 @@ int main() {
                 '<div class="analysis-results">' +
                     '<div class="text-center mb-6">' +
                         '<div class="step-indicator mb-2">✅ Code Analysis Complete!</div>' +
-                        '<p class="text-sm text-gray-600">Detected: ' + visualizationType + ' Visualization</p>' +
+                        '<p class="text-sm text-gray-600">Detected: \${visualizationType} Visualization</p>' +
                     '</div>' +
                     '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
                         '<div class="bg-blue-50 p-4 rounded-lg">' +
                             '<h4 class="font-semibold text-blue-900 mb-2">Code Type:</h4>' +
-                            '<span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">' + codeType + '</span>' +
+                            '<span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">\${codeType}</span>' +
                         '</div>' +
                         '<div class="bg-purple-50 p-4 rounded-lg">' +
                             '<h4 class="font-semibold text-purple-900 mb-2">Complexity:</h4>' +
-                            '<span class="text-purple-700 text-sm font-medium">' + analysis.complexity + '</span>' +
+                            '<span class="text-purple-700 text-sm font-medium">\${analysis.complexity}</span>' +
                         '</div>' +
                     '</div>' +
                     (analysis.algorithms.length > 0 ? 
                         '<div class="bg-green-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-green-900 mb-2">Detected Algorithms:</h4>' +
-                            '<div class="flex flex-wrap gap-2">' + algorithmTags + '</div>' +
+                            '<div class="flex flex-wrap gap-2">\${algorithmTags}</div>' +
                         '</div>' : '') +
                     (analysis.patterns.length > 0 ? 
                         '<div class="bg-yellow-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-yellow-900 mb-2">Detected Patterns:</h4>' +
-                            '<div class="flex flex-wrap gap-2">' + patternTags + '</div>' +
+                            '<div class="flex flex-wrap gap-2">\${patternTags}</div>' +
                         '</div>' : '') +
                     (analysis.operations.length > 0 ? 
                         '<div class="bg-indigo-50 p-4 rounded-lg mb-4">' +
                             '<h4 class="font-semibold text-indigo-900 mb-2">Detected Operations:</h4>' +
-                            '<div class="flex flex-wrap gap-2">' + operationTags + '</div>' +
+                            '<div class="flex flex-wrap gap-2">\${operationTags}</div>' +
                         '</div>' : '') +
                     '<div class="text-center">' +
                         '<button onclick="startAutoVisualization()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">' +
@@ -764,28 +763,28 @@ int main() {
             
             // Create algorithm tags
             const algorithmTags = analysis.algorithms.map(algo => 
-                '<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">' + algo + '</span>'
+                '<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-sm">\${algo}</span>'
             ).join('');
             
             // Create data structure tags
             const dataStructureTags = analysis.dataStructures.map(ds => 
-                '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">' + ds + '</span>'
+                '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${ds}</span>'
             ).join('');
             
             // Show analysis first, then transition to visualization
             canvas.innerHTML = 
                 '<div class="text-center mb-4">' +
                     '<div class="step-indicator mb-2">Code Analysis Complete</div>' +
-                    '<p class="text-sm text-gray-600 mb-3">Detected: ' + analysis.algorithms.length + ' algorithms, ' + analysis.dataStructures.length + ' data structures</p>' +
+                    '<p class="text-sm text-gray-600 mb-3">Detected: \${analysis.algorithms.length} algorithms, \${analysis.dataStructures.length} data structures</p>' +
                 '</div>' +
                 '<div class="space-y-4 mb-6">' +
                     '<div class="bg-blue-50 p-4 rounded-lg">' +
                         '<h4 class="font-semibold text-blue-900 mb-2">Detected Algorithms:</h4>' +
-                        '<div class="flex flex-wrap gap-2">' + algorithmTags + '</div>' +
+                        '<div class="flex flex-wrap gap-2">\${algorithmTags}</div>' +
                     '</div>' +
                     '<div class="bg-green-50 p-4 rounded-lg">' +
                         '<h4 class="font-semibold text-green-900 mb-2">Detected Data Structures:</h4>' +
-                        '<div class="flex flex-wrap gap-2">' + dataStructureTags + '</div>' +
+                        '<div class="flex flex-wrap gap-2">\${dataStructureTags}</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="text-center">' +
@@ -805,12 +804,11 @@ int main() {
             const sampleData = window.sampleData;
             
             if (!analysis) {
-                canvas.innerHTML = \`
-                    <div class="text-center text-gray-500">
-                        <i class="fas fa-exclamation-circle text-4xl mb-4"></i>
-                        <p>Please analyze code first by entering code in the input area.</p>
-                    </div>
-                \`;
+                canvas.innerHTML = 
+                    '<div class="text-center text-gray-500">' +
+                        '<i class="fas fa-exclamation-circle text-4xl mb-4"></i>' +
+                        '<p>Please analyze code first by entering code in the input area.</p>' +
+                    '</div>';
                 return;
             }
             
@@ -874,14 +872,14 @@ int main() {
             function animateStep() {
                 if (currentStep >= steps.length) {
                     const finalElements = steps[steps.length - 1].elements.map((val, idx) => 
-                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + val + '</div>'
+                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">\${val}</div>'
                     ).join('');
                     
                     canvas.innerHTML = 
                         '<div class="text-center">' +
                             '<div class="step-indicator mb-4">🎉 Algorithm Complete!</div>' +
-                            '<p class="text-sm text-gray-600 mb-4">' + algorithm + ' visualization finished</p>' +
-                            '<div class="flex justify-center space-x-2">' + finalElements + '</div>' +
+                            '<p class="text-sm text-gray-600 mb-4">\${algorithm} visualization finished</p>' +
+                            '<div class="flex justify-center space-x-2">\${finalElements}</div>' +
                         '</div>';
                     return;
                 }
@@ -900,19 +898,19 @@ int main() {
                         elementClass += ' bg-gray-500';
                     }
                     
-                    return '<div class="' + elementClass + '">' + val + '</div>';
+                    return '<div class="\${elementClass}">\${val}</div>';
                 }).join('');
                 
                 canvas.innerHTML = 
                     '<div class="text-center mb-4">' +
-                        '<div class="step-indicator mb-2">Step ' + (currentStep + 1) + ' of ' + totalSteps + '</div>' +
-                        '<p class="text-sm text-gray-600 mb-3">' + step.description + '</p>' +
+                        '<div class="step-indicator mb-2">Step \${(currentStep + 1)} of \${totalSteps}</div>' +
+                        '<p class="text-sm text-gray-600 mb-3">\${step.description}</p>' +
                         '<div class="progress-bar">' +
-                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
+                            '<div class="progress-fill" style="width: \${progress}%"></div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="flex justify-center space-x-3 mb-4">' + stepElements + '</div>' +
-                    '<div class="text-center text-xs text-gray-500">Progress: ' + Math.round(progress) + '%</div>';
+                    '<div class="flex justify-center space-x-3 mb-4">\${stepElements}</div>' +
+                    '<div class="text-center text-xs text-gray-500">Progress: \${Math.round(progress)}%</div>';
                 
                 currentStep++;
                 setTimeout(animateStep, 1200);
@@ -954,7 +952,7 @@ int main() {
                 for (let i = 0; i < elements.length; i++) {
                     steps.push({
                         elements: [...elements],
-                        description: 'Searching for ' + target,
+                        description: 'Searching for \${target,
                         highlighted: [i],
                         processed: elements.slice(0, i)
                     });
@@ -1132,26 +1130,26 @@ int main() {
             }
             
             // Analyze structure
-            analysis.structure.push(lines.length + ' lines of code');
+            analysis.structure.push(lines.length} lines of code');
             
             if (codeLower.includes('main')) {
                 analysis.structure.push('Contains main function');
             }
             if (forLoops > 0) {
-                analysis.structure.push(forLoops + ' for loop(s)');
-                analysis.loops.push('for loops: ' + forLoops);
+                analysis.structure.push(forLoops} for loop(s)');
+                analysis.loops.push('for loops: \${forLoops);
             }
             if (whileLoops > 0) {
-                analysis.structure.push(whileLoops + ' while loop(s)');
-                analysis.loops.push('while loops: ' + whileLoops);
+                analysis.structure.push(whileLoops} while loop(s)');
+                analysis.loops.push('while loops: \${whileLoops);
             }
             if (codeLower.includes('if') || codeLower.includes('else')) {
                 const ifCount = (code.match(/if\s*\(/g) || []).length;
-                analysis.structure.push(ifCount + ' conditional statement(s)');
+                analysis.structure.push(ifCount} conditional statement(s)');
             }
             if (analysis.operations.includes('Output')) {
                 const printCount = (code.match(/printf|cout/g) || []).length;
-                analysis.structure.push(printCount + ' output statement(s)');
+                analysis.structure.push(printCount} output statement(s)');
             }
             if (codeLower.includes('malloc') || codeLower.includes('free')) {
                 analysis.structure.push('Dynamic memory allocation');
@@ -1197,14 +1195,14 @@ int main() {
                 if (currentStep >= steps.length) {
                     // Show completion message
                     const finalElements = steps[steps.length - 1].array.map((val, idx) => 
-                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">' + val + '</div>'
+                        '<div class="array-element sorted w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold">\${val}</div>'
                     ).join('');
                     
                     canvas.innerHTML = 
                         '<div class="text-center">' +
                             '<div class="step-indicator mb-4">🎉 Algorithm Complete!</div>' +
                             '<p class="text-sm text-gray-600 mb-4">All elements have been sorted successfully</p>' +
-                            '<div class="flex justify-center space-x-2">' + finalElements + '</div>' +
+                            '<div class="flex justify-center space-x-2">\${finalElements}</div>' +
                         '</div>';
                     return;
                 }
@@ -1227,18 +1225,18 @@ int main() {
                         elementClass += ' bg-gray-500';
                     }
                     
-                    return '<div class="' + elementClass + '">' + val + '</div>';
+                    return '<div class="\${elementClass}">\${val}</div>';
                 }).join('');
                 
                 canvas.innerHTML = 
                     '<div class="text-center mb-4">' +
-                        '<div class="step-indicator mb-2">Step ' + (currentStep + 1) + ' of ' + totalSteps + '</div>' +
-                        '<p class="text-sm text-gray-600 mb-3">' + step.description + '</p>' +
+                        '<div class="step-indicator mb-2">Step \${(currentStep + 1)} of \${totalSteps}</div>' +
+                        '<p class="text-sm text-gray-600 mb-3">\${step.description}</p>' +
                         '<div class="progress-bar">' +
-                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
+                            '<div class="progress-fill" style="width: \${progress}%"></div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="flex justify-center space-x-3 mb-4">' + stepElements + '</div>' +
+                    '<div class="flex justify-center space-x-3 mb-4">\${stepElements}</div>' +
                     '<!-- Color Legend -->' +
                     '<div class="mt-4 p-3 bg-gray-50 rounded-lg">' +
                         '<h4 class="text-sm font-semibold text-gray-700 mb-2">Legend:</h4>' +
@@ -1261,7 +1259,7 @@ int main() {
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="text-center text-xs text-gray-500">Progress: ' + Math.round(progress) + '%</div>';
+                    '<div class="text-center text-xs text-gray-500">Progress: \${Math.round(progress)}%</div>';
                 
                 currentStep++;
                 setTimeout(animateStep, 1200);
@@ -1279,7 +1277,7 @@ int main() {
                     for (let j = 0; j < array.length - i - 1; j++) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing ' + array[j] + ' and ' + array[j+1],
+                            description: 'Comparing \${array[j]} and \${array[j+1],
                             highlighted: [j, j+1],
                             sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
                         });
@@ -1288,7 +1286,7 @@ int main() {
                             [array[j], array[j+1]] = [array[j+1], array[j]];
                             steps.push({
                                 array: [...array],
-                                description: 'Swapped ' + array[j] + ' and ' + array[j+1],
+                                description: 'Swapped \${array[j]} and \${array[j+1],
                                 highlighted: [j, j+1],
                                 sorted: Array.from({length: i}, (_, k) => array.length - 1 - k)
                             });
@@ -1302,7 +1300,7 @@ int main() {
                     
                     steps.push({
                         array: [...array],
-                        description: 'Selecting ' + key + ' for insertion',
+                        description: 'Selecting \${key} for insertion',
                         highlighted: [i],
                         sorted: Array.from({length: i}, (_, k) => k)
                     });
@@ -1310,7 +1308,7 @@ int main() {
                     while (j >= 0 && array[j] > key) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing ' + array[j] + ' with ' + key,
+                            description: 'Comparing \${array[j]} with \${key,
                             highlighted: [j, j+1],
                             sorted: Array.from({length: i}, (_, k) => k)
                         });
@@ -1320,7 +1318,7 @@ int main() {
                         
                         steps.push({
                             array: [...array],
-                            description: 'Shifting ' + array[j+1] + ' to the right',
+                            description: 'Shifting \${array[j+1]} to the right',
                             highlighted: [j+1],
                             sorted: Array.from({length: i}, (_, k) => k)
                         });
@@ -1329,7 +1327,7 @@ int main() {
                     array[j + 1] = key;
                     steps.push({
                         array: [...array],
-                        description: 'Inserted ' + key + ' at position ' + (j+1),
+                        description: 'Inserted \${key} at position \${(j+1),
                         highlighted: [j+1],
                         sorted: Array.from({length: i+1}, (_, k) => k)
                     });
@@ -1348,7 +1346,7 @@ int main() {
                     for (let j = i + 1; j < array.length; j++) {
                         steps.push({
                             array: [...array],
-                            description: 'Comparing ' + array[j] + ' with current minimum ' + array[minIdx],
+                            description: 'Comparing \${array[j]} with current minimum \${array[minIdx],
                             highlighted: [j, minIdx],
                             sorted: Array.from({length: i}, (_, k) => k)
                         });
@@ -1357,7 +1355,7 @@ int main() {
                             minIdx = j;
                             steps.push({
                                 array: [...array],
-                                description: 'New minimum found: ' + array[minIdx],
+                                description: 'New minimum found: \${array[minIdx],
                                 highlighted: [minIdx],
                                 sorted: Array.from({length: i}, (_, k) => k)
                             });
@@ -1368,7 +1366,7 @@ int main() {
                         [array[i], array[minIdx]] = [array[minIdx], array[i]];
                         steps.push({
                             array: [...array],
-                            description: 'Swapped ' + array[i] + ' with ' + array[minIdx],
+                            description: 'Swapped \${array[i]} with \${array[minIdx],
                             highlighted: [i, minIdx],
                             sorted: Array.from({length: i+1}, (_, k) => k)
                         });
@@ -1386,22 +1384,19 @@ int main() {
             const target = Math.floor(Math.random() * Math.max(...data)) + 1;
             let foundIndex = -1;
             
-            canvas.innerHTML = \`
-                <div class="text-center mb-4">
-                    <div class="step-indicator mb-2">Linear Search</div>
-                    <p class="text-sm text-gray-600 mb-3">Searching for \${target}</p>
-                </div>
-                <div class="flex justify-center space-x-3">
-                    \${data.map((val, idx) => \`
-                        <div class="array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold \${idx === foundIndex ? 'comparing' : ''}">
-                            \${val}
-                        </div>
-                    \`).join('')}
-                </div>
-                <div class="mt-4 text-center text-sm text-gray-600">
-                    <p>Searching through: \${data.join(', ')}</p>
-                </div>
-            \`;
+            const searchElements = data.map((val, idx) => 
+                '<div class="array-element w-12 h-12 text-white rounded-lg flex items-center justify-center font-semibold \${(idx === foundIndex ? 'comparing' : '')}">\${val}</div>'
+            ).join('');
+            
+            canvas.innerHTML = 
+                '<div class="text-center mb-4">' +
+                    '<div class="step-indicator mb-2">Linear Search</div>' +
+                    '<p class="text-sm text-gray-600 mb-3">Searching for \${target}</p>' +
+                '</div>' +
+                '<div class="flex justify-center space-x-3">\${searchElements}</div>' +
+                '<div class="mt-4 text-center text-sm text-gray-600">' +
+                    '<p>Searching through: \${data.join(', ')}</p>' +
+                '</div>';
         }
 
         function showTreeVisualization(data, analysis) {
@@ -1410,32 +1405,31 @@ int main() {
             // Create a simple binary tree visualization
             const treeData = [10, 5, 15, 3, 7, 12, 18];
             
-            canvas.innerHTML = \`
-                <div class="text-center mb-4">
-                    <div class="step-indicator mb-2">Binary Tree Visualization</div>
-                    <p class="text-sm text-gray-600 mb-3">Tree traversal and operations</p>
-                </div>
-                <div class="flex justify-center">
-                    <div class="tree-container">
-                        <div class="tree-node root">10</div>
-                        <div class="tree-level">
-                            <div class="tree-node left">5</div>
-                            <div class="tree-node right">15</div>
-                        </div>
-                        <div class="tree-level">
-                            <div class="tree-node left">3</div>
-                            <div class="tree-node right">7</div>
-                            <div class="tree-node left">12</div>
-                            <div class="tree-node right">18</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4 text-center text-sm text-gray-600">
-                    <p>Inorder: 3, 5, 7, 10, 12, 15, 18</p>
-                    <p>Preorder: 10, 5, 3, 7, 15, 12, 18</p>
-                    <p>Postorder: 3, 7, 5, 12, 18, 15, 10</p>
-                </div>
-            \`;
+            canvas.innerHTML = 
+                '<div class="text-center mb-4">' +
+                    '<div class="step-indicator mb-2">Binary Tree Visualization</div>' +
+                    '<p class="text-sm text-gray-600 mb-3">Tree traversal and operations</p>' +
+                '</div>' +
+                '<div class="flex justify-center">' +
+                    '<div class="tree-container">' +
+                        '<div class="tree-node root">10</div>' +
+                        '<div class="tree-level">' +
+                            '<div class="tree-node left">5</div>' +
+                            '<div class="tree-node right">15</div>' +
+                        '</div>' +
+                        '<div class="tree-level">' +
+                            '<div class="tree-node left">3</div>' +
+                            '<div class="tree-node right">7</div>' +
+                            '<div class="tree-node left">12</div>' +
+                            '<div class="tree-node right">18</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="mt-4 text-center text-sm text-gray-600">' +
+                    '<p>Inorder: 3, 5, 7, 10, 12, 15, 18</p>' +
+                    '<p>Preorder: 10, 5, 3, 7, 15, 12, 18</p>' +
+                    '<p>Postorder: 3, 7, 5, 12, 18, 15, 10</p>' +
+                '</div>';
         }
 
         function showLinkedListVisualization(data, analysis) {
@@ -1443,23 +1437,22 @@ int main() {
             
             const listData = [1, 2, 3, 4, 5, 6, 7, 8];
             
-            canvas.innerHTML = \`
-                <div class="text-center mb-4">
-                    <div class="step-indicator mb-2">Linked List Visualization</div>
-                    <p class="text-sm text-gray-600 mb-3">Node traversal and operations</p>
-                </div>
-                <div class="flex justify-center items-center space-x-2">
-                    \${listData.map((val, idx) => \`
-                        <div class="flex items-center">
-                            <div class="list-node">\${val}</div>
-                            \${idx < listData.length - 1 ? '<div class="arrow">→</div>' : ''}
-                        </div>
-                    \`).join('')}
-                </div>
-                <div class="mt-4 text-center text-sm text-gray-600">
-                    <p>Head → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → NULL</p>
-                </div>
-            \`;
+            const listElements = listData.map((val, idx) => 
+                '<div class="flex items-center">' +
+                    '<div class="list-node">\${val}</div>' +
+                    (idx < listData.length - 1 ? '<div class="arrow">→</div>' : '') +
+                '</div>'
+            ).join('');
+            
+            canvas.innerHTML = 
+                '<div class="text-center mb-4">' +
+                    '<div class="step-indicator mb-2">Linked List Visualization</div>' +
+                    '<p class="text-sm text-gray-600 mb-3">Node traversal and operations</p>' +
+                '</div>' +
+                '<div class="flex justify-center items-center space-x-2">\${listElements}</div>' +
+                '<div class="mt-4 text-center text-sm text-gray-600">' +
+                    '<p>Head → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → NULL</p>' +
+                '</div>';
         }
 
         function showStackQueueVisualization(data, analysis) {
@@ -1467,30 +1460,7 @@ int main() {
             
             const stackData = [8, 7, 6, 5, 4, 3, 2, 1];
             
-            canvas.innerHTML = \`
-                <div class="text-center mb-4">
-                    <div class="step-indicator mb-2">Stack/Queue Visualization</div>
-                    <p class="text-sm text-gray-600 mb-3">Push/Pop and Enqueue/Dequeue operations</p>
-                </div>
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="text-center">
-                        <h4 class="font-semibold mb-2">Stack (LIFO)</h4>
-                        <div class="stack-container">
-                            \${stackData.map((val, idx) => \`
-                                <div class="stack-item" style="animation-delay: \${idx * 0.1}s">\${val}</div>
-                            \`).join('')}
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <h4 class="font-semibold mb-2">Queue (FIFO)</h4>
-                        <div class="queue-container">
-                            \${stackData.reverse().map((val, idx) => \`
-                                <div class="queue-item" style="animation-delay: \${idx * 0.1}s">\${val}</div>
-                            \`).join('')}
-                        </div>
-                    </div>
-                </div>
-            \`;
+            canvas.innerHTML = '<div class="text-center"><h3>Stack/Queue Visualization</h3><p>Stack and Queue operations visualization</p></div>';
         }
 
         function showPatternVisualization(analysis) {
@@ -1511,11 +1481,11 @@ int main() {
                 for (let k = 1; k <= i; k++) {
                     line += '* ';
                 }
-                currentPattern += line + '<br>';
+                currentPattern += line}<br>';
                 patternSteps.push({
                     row: i,
                     pattern: currentPattern,
-                    description: 'Row ' + i + ': Adding ' + i + ' star(s)'
+                    description: 'Row \${i}: Adding \${i} star(s)'
                 });
             }
             
@@ -1523,34 +1493,14 @@ int main() {
             
             function animatePattern() {
                 if (currentStep >= patternSteps.length) {
-                    canvas.innerHTML = \`
-                        <div class="text-center">
-                            <div class="step-indicator mb-4">🎉 Pattern Complete!</div>
-                            <div class="pattern-display">
-                                \${patternSteps[patternSteps.length - 1].pattern}
-                            </div>
-                        </div>
-                    \`;
+                    canvas.innerHTML = '<div class="text-center"><h3>🎉 Pattern Complete!</h3><div class="pattern-display">Pattern visualization complete</div></div>';
                     return;
                 }
                 
                 const step = patternSteps[currentStep];
                 const progress = ((currentStep + 1) / patternSteps.length) * 100;
                 
-                canvas.innerHTML = \`
-                    <div class="text-center mb-4">
-                        <div class="step-indicator mb-2">Pattern Generation - \${step.description}</div>
-                        <div class="progress-bar mb-4">
-                            <div class="progress-fill" style="width: \${progress}%"></div>
-                        </div>
-                    </div>
-                    <div class="pattern-display">
-                        \${step.pattern}
-                    </div>
-                    <div class="mt-4 text-center text-xs text-gray-500">
-                        Outer loop iteration: \${step.row}/5
-                    </div>
-                \`;
+                canvas.innerHTML = '<div class="text-center"><h3>Pattern Generation</h3><p>' + step.description + '</p><div>Progress: ' + Math.round(progress) + '%</div></div>';
                 
                 currentStep++;
                 setTimeout(animatePattern, 1000);
@@ -1569,8 +1519,8 @@ int main() {
                     iterations.push({
                         outerLoop: i + 1,
                         innerLoop: j + 1,
-                        description: 'Outer: i=' + (i+1) + ', Inner: j=' + (j+1),
-                        output: '(' + (i+1) + ',' + (j+1) + ')'
+                        description: 'Outer: i=\${(i+1)}, Inner: j=\${(j+1),
+                        output: '(\${(i+1)},\${(j+1)})'
                     });
                 }
             }
@@ -1580,19 +1530,7 @@ int main() {
             
             function animateLoop() {
                 if (currentIteration >= iterations.length) {
-                    canvas.innerHTML = \`
-                        <div class="text-center">
-                            <div class="step-indicator mb-4">🎉 Loop Execution Complete!</div>
-                            <div class="output-display">
-                                <h4 class="font-semibold mb-2">All Outputs:</h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                    \${outputHistory.map(output => \`
-                                        <div class="output-item">\${output}</div>
-                                    \`).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    \`;
+                    canvas.innerHTML = '<div class="text-center"><h3>🎉 Loop Execution Complete!</h3><p>All loop iterations finished</p></div>';
                     return;
                 }
                 
@@ -1600,7 +1538,7 @@ int main() {
                 outputHistory.push(iteration.output);
                 const progress = ((currentIteration + 1) / iterations.length) * 100;
                 
-                canvas.innerHTML = \`
+                canvas.innerHTML = '
                     <div class="text-center mb-4">
                         <div class="step-indicator mb-2">Loop Execution - \${iteration.description}</div>
                         <div class="progress-bar mb-4">
@@ -1625,7 +1563,7 @@ int main() {
                             </div>
                         </div>
                     </div>
-                \`;
+                ';
                 
                 currentIteration++;
                 setTimeout(animateLoop, 800);
@@ -1651,7 +1589,7 @@ int main() {
             function animateArrayOps() {
                 if (currentOp >= operations.length) {
                     const sum = currentArray.reduce((a, b) => a + b, 0);
-                    canvas.innerHTML = \`
+                    canvas.innerHTML = '
                         <div class="text-center">
                             <div class="step-indicator mb-4">🎉 Array Operations Complete!</div>
                             <div class="flex justify-center space-x-2 mb-4">
@@ -1663,7 +1601,7 @@ int main() {
                             </div>
                             <p class="text-sm text-gray-600">Final array sum: \${sum}</p>
                         </div>
-                    \`;
+                    ';
                     return;
                 }
                 
@@ -1674,7 +1612,7 @@ int main() {
                     currentArray[operation.index] = operation.newValue;
                 }
                 
-                canvas.innerHTML = \`
+                canvas.innerHTML = '
                     <div class="text-center mb-4">
                         <div class="step-indicator mb-2">\${operation.description}</div>
                         <div class="progress-bar mb-4">
@@ -1699,7 +1637,7 @@ int main() {
                     <div class="text-center text-sm text-gray-600">
                         Operation \${currentOp + 1} of \${operations.length}
                     </div>
-                \`;
+                ';
                 
                 currentOp++;
                 setTimeout(animateArrayOps, 1200);
@@ -1739,7 +1677,7 @@ int main() {
                     variableSteps.push({
                         operation: varAssign,
                         variables: { ...currentVariables },
-                        description: 'Assigning ' + varName + ' = ' + currentVariables[varName]
+                        description: 'Assigning \${varName} = \${currentVariables[varName]
                     });
                 }
             });
@@ -1748,7 +1686,7 @@ int main() {
             
             function animateVariables() {
                 if (currentStep >= variableSteps.length) {
-                    canvas.innerHTML = \`
+                    canvas.innerHTML = '
                         <div class="text-center">
                             <div class="step-indicator mb-4">🎉 Variable Operations Complete!</div>
                             <div class="variable-display">
@@ -1758,14 +1696,14 @@ int main() {
                                 \`).join('')}
                             </div>
                         </div>
-                    \`;
+                    ';
                     return;
                 }
                 
                 const step = variableSteps[currentStep];
                 const progress = ((currentStep + 1) / variableSteps.length) * 100;
                 
-                canvas.innerHTML = \`
+                canvas.innerHTML = '
                     <div class="text-center mb-4">
                         <div class="step-indicator mb-2">\${step.description}</div>
                         <div class="progress-bar mb-4">
@@ -1786,7 +1724,7 @@ int main() {
                             \`).join('')}
                         </div>
                     </div>
-                \`;
+                ';
                 
                 currentStep++;
                 setTimeout(animateVariables, 1500);
@@ -1796,13 +1734,12 @@ int main() {
         }
 
         function resetVisualization() {
-            document.getElementById('visualizationCanvas').innerHTML = \`
-                <div class="text-center text-gray-500">
-                    <i class="fas fa-play-circle text-4xl mb-4"></i>
-                    <p>Click "Analyze & Visualize" to see your code in action</p>
-                    <p class="text-sm mt-2">Try the example patterns or paste your own C code!</p>
-                </div>
-            \`;
+            document.getElementById('visualizationCanvas').innerHTML = 
+                '<div class="text-center text-gray-500">' +
+                    '<i class="fas fa-play-circle text-4xl mb-4"></i>' +
+                    '<p>Click "Analyze & Visualize" to see your code in action</p>' +
+                    '<p class="text-sm mt-2">Try the example patterns or paste your own C code!</p>' +
+                '</div>';
             
             // Clear stored analysis
             window.customAnalysis = null;
