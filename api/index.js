@@ -511,71 +511,47 @@ function serveVisualizerPage(res) {
                 <div class="space-y-4">
                     <div class="bg-white rounded-lg shadow-lg p-6">
                         <h2 class="text-xl font-semibold mb-4 text-gray-900">
-                            <i class="fas fa-code mr-2 text-blue-600"></i>Code Input
+                            <i class="fas fa-code mr-2 text-blue-600"></i>C Code Input
                         </h2>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-magic text-blue-600 mr-2"></i>
+                                <div>
+                                    <h3 class="font-semibold text-blue-900">Smart Auto-Detection</h3>
+                                    <p class="text-sm text-blue-700">Just paste your C code below - we'll automatically detect algorithms, data structures, patterns, and more!</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Algorithm Type</label>
-                                <select id="algorithmType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="bubble-sort">Bubble Sort</option>
-                                    <option value="quick-sort">Quick Sort</option>
-                                    <option value="merge-sort">Merge Sort</option>
-                                    <option value="insertion-sort">Insertion Sort</option>
-                                    <option value="selection-sort">Selection Sort</option>
-                                    <option value="binary-search">Binary Search</option>
-                                    <option value="linear-search">Linear Search</option>
-                                    <option value="linked-list">Linked List</option>
-                                    <option value="stack">Stack</option>
-                                    <option value="queue">Queue</option>
-                                    <option value="binary-tree">Binary Tree</option>
-                                    <option value="custom">Custom Code</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Input Data</label>
-                                <input type="text" id="inputData" placeholder="Enter numbers separated by commas (e.g., 64,34,25,12,22,11,90)" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">C Code</label>
                                 <textarea id="codeInput" rows="15" 
                                           class="code-editor w-full p-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                          placeholder="// Your C code will appear here based on the algorithm type">#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
+                                          placeholder="// Paste your C code here - any algorithm, pattern, or general code
+// Examples you can try:
+// - Sorting algorithms (bubble sort, quick sort, etc.)
+// - Pattern printing (pyramids, stars, numbers)  
+// - Array operations (sum, search, etc.)
+// - Loop structures (nested loops, etc.)
+// - Variable operations and arithmetic
+// - Data structures (linked lists, stacks, etc.)
 
-void bubbleSort(int arr[], int n) {
-    for (int i = 0; i < n-1; i++) {
-        for (int j = 0; j < n-i-1; j++) {
-            if (arr[j] > arr[j+1]) {
-                // Swap elements
-                int temp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = temp;
-            }
-        }
-    }
-}
+#include <stdio.h>
 
 int main() {
-    int arr[] = {64, 34, 25, 12, 22, 11, 90};
-    int n = sizeof(arr)/sizeof(arr[0]);
-    
-    printf("Original array: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    
-    bubbleSort(arr, n);
-    
-    printf("\\nSorted array: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    
+    // Example: Pattern printing
+    for(int i = 1; i <= 5; i++) {
+        for(int j = 1; j <= i; j++) {
+            printf(\"* \");
+        }
+        printf(\"\\n\");
+    }
     return 0;
 }</textarea>
                             </div>
                             <div class="flex space-x-4">
-                                <button onclick="visualizeAlgorithm()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex-1">
-                                    <i class="fas fa-play mr-2"></i>Visualize
+                                <button onclick="analyzeAndVisualize()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex-1">
+                                    <i class="fas fa-play mr-2"></i>Analyze & Visualize
                                 </button>
                                 <button onclick="resetVisualization()" class="btn-secondary text-white px-6 py-3 rounded-lg font-semibold">
                                     <i class="fas fa-redo mr-2"></i>Reset
@@ -609,150 +585,124 @@ int main() {
                 </div>
             </div>
 
-            <!-- Algorithm Information -->
+            <!-- Code Analysis Results -->
             <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-semibold mb-4 text-gray-900">
-                    <i class="fas fa-info-circle mr-2 text-purple-600"></i>Algorithm Information
+                    <i class="fas fa-info-circle mr-2 text-purple-600"></i>Quick Examples
                 </h2>
-                <div id="algorithmInfo" class="text-gray-600">
-                    <p>Select an algorithm type to see detailed information about its complexity and implementation.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="example-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" onclick="loadExample('pattern')">
+                        <h3 class="font-semibold text-gray-900 mb-2">🌟 Pattern Printing</h3>
+                        <p class="text-sm text-gray-600">Star pyramids, triangles, and character patterns</p>
+                    </div>
+                    <div class="example-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" onclick="loadExample('bubble-sort')">
+                        <h3 class="font-semibold text-gray-900 mb-2">🔄 Bubble Sort</h3>
+                        <p class="text-sm text-gray-600">Classic sorting algorithm visualization</p>
+                    </div>
+                    <div class="example-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" onclick="loadExample('loops')">
+                        <h3 class="font-semibold text-gray-900 mb-2">🔁 Nested Loops</h3>
+                        <p class="text-sm text-gray-600">Loop execution and variable tracking</p>
+                    </div>
+                    <div class="example-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors" onclick="loadExample('array-ops')">
+                        <h3 class="font-semibold text-gray-900 mb-2">📊 Array Operations</h3>
+                        <p class="text-sm text-gray-600">Array access, modification, and processing</p>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Algorithm information
-        const algorithmInfo = {
-            'bubble-sort': {
-                name: 'Bubble Sort',
-                timeComplexity: 'O(n²)',
-                spaceComplexity: 'O(1)',
-                description: 'A simple sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.'
-            },
-            'quick-sort': {
-                name: 'Quick Sort',
-                timeComplexity: 'O(n log n)',
-                spaceComplexity: 'O(log n)',
-                description: 'A highly efficient, comparison-based sorting algorithm that uses a divide-and-conquer strategy.'
-            },
-            'merge-sort': {
-                name: 'Merge Sort',
-                timeComplexity: 'O(n log n)',
-                spaceComplexity: 'O(n)',
-                description: 'A stable, divide-and-conquer sorting algorithm that produces a sorted array by merging sorted subarrays.'
-            },
-            'insertion-sort': {
-                name: 'Insertion Sort',
-                timeComplexity: 'O(n²)',
-                spaceComplexity: 'O(1)',
-                description: 'A simple sorting algorithm that builds the final sorted array one item at a time.'
-            },
-            'selection-sort': {
-                name: 'Selection Sort',
-                timeComplexity: 'O(n²)',
-                spaceComplexity: 'O(1)',
-                description: 'A simple sorting algorithm that divides the input into a sorted and unsorted region.'
-            },
-            'binary-search': {
-                name: 'Binary Search',
-                timeComplexity: 'O(log n)',
-                spaceComplexity: 'O(1)',
-                description: 'An efficient search algorithm that finds the position of a target value within a sorted array.'
-            },
-            'linear-search': {
-                name: 'Linear Search',
-                timeComplexity: 'O(n)',
-                spaceComplexity: 'O(1)',
-                description: 'A simple search algorithm that checks each element in the list until the target is found.'
-            },
-            'custom': {
-                name: 'Custom Code',
-                timeComplexity: 'Variable',
-                spaceComplexity: 'Variable',
-                description: 'Analyze your own C code to detect algorithms, data structures, and complexity.'
+        // Example code templates
+        const codeExamples = {
+            'pattern': \`#include <stdio.h>
+
+int main() {
+    // Star pyramid pattern
+    for(int i = 1; i <= 5; i++) {
+        for(int j = 1; j <= i; j++) {
+            printf("* ");
+        }
+        printf("\\n");
+    }
+    return 0;
+}\`,
+            'bubble-sort': \`#include <stdio.h>
+
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap elements
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
             }
+        }
+    }
+}
+
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    bubbleSort(arr, n);
+    return 0;
+}\`,
+            'loops': \`#include <stdio.h>
+
+int main() {
+    // Nested loop demonstration
+    for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 4; j++) {
+            printf("(%d,%d) ", i, j);
+        }
+        printf("\\n");
+    }
+    return 0;
+}\`,
+            'array-ops': \`#include <stdio.h>
+
+int main() {
+    int arr[] = {5, 2, 8, 1, 9, 3};
+    int n = 6;
+    int sum = 0;
+    
+    // Calculate sum of array
+    for(int i = 0; i < n; i++) {
+        sum += arr[i];
+    }
+    
+    printf("Sum: %d\\n", sum);
+    return 0;
+}\`
         };
 
-        // Update algorithm info when type changes
-        document.getElementById('algorithmType').addEventListener('change', function() {
-            updateAlgorithmInfo();
-        });
-
-        function updateAlgorithmInfo() {
-            const type = document.getElementById('algorithmType').value;
-            const info = algorithmInfo[type] || {};
-            
-            document.getElementById('algorithmInfo').innerHTML = \`
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <h3 class="font-semibold text-gray-900">\${info.name || 'Algorithm'}</h3>
-                        <p class="text-sm">\${info.description || 'Select an algorithm to see details.'}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-gray-900">Time Complexity</h4>
-                        <p class="text-sm text-blue-600">\${info.timeComplexity || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-gray-900">Space Complexity</h4>
-                        <p class="text-sm text-green-600">\${info.spaceComplexity || 'N/A'}</p>
-                    </div>
-                </div>
-            \`;
+        function loadExample(type) {
+            const codeInput = document.getElementById('codeInput');
+            if (codeExamples[type]) {
+                codeInput.value = codeExamples[type];
+                // Auto-analyze the loaded example
+                setTimeout(() => {
+                    analyzeAndVisualize();
+                }, 500);
+            }
         }
 
-        function visualizeAlgorithm() {
+        function analyzeAndVisualize() {
             const canvas = document.getElementById('visualizationCanvas');
-            const type = document.getElementById('algorithmType').value;
-            const input = document.getElementById('inputData').value;
+            const codeInput = document.getElementById('codeInput').value;
             
-            if (type === 'custom') {
-                const codeInput = document.getElementById('codeInput').value;
-                if (!codeInput.trim()) {
-                    alert('Please enter C code to analyze');
-                    return;
-                }
-                
-                // Show loading with animation
-                canvas.innerHTML = \`
-                    <div class="text-center">
-                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p class="text-lg font-semibold text-gray-700 mb-2">Analyzing Code</p>
-                        <p class="text-sm text-gray-500">Detecting algorithms and data structures...</p>
-                        <div class="mt-4 flex justify-center space-x-1">
-                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                        </div>
-                    </div>
-                \`;
-
-                // Simulate analysis
-                setTimeout(() => {
-                    showCustomVisualization();
-                }, 1500);
+            if (!codeInput.trim()) {
+                alert('Please enter C code to analyze');
                 return;
             }
             
-            if (!input.trim()) {
-                alert('Please enter input data');
-                return;
-            }
-
-            // Parse input data
-            const data = input.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
-            
-            if (data.length === 0) {
-                alert('Please enter valid numbers');
-                return;
-            }
-
             // Show loading with animation
             canvas.innerHTML = \`
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p class="text-lg font-semibold text-gray-700 mb-2">Preparing Visualization</p>
-                    <p class="text-sm text-gray-500">Setting up \${type.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())} algorithm...</p>
+                    <p class="text-lg font-semibold text-gray-700 mb-2">Analyzing Code</p>
+                    <p class="text-sm text-gray-500">Detecting algorithms, data structures, patterns, and operations...</p>
                     <div class="mt-4 flex justify-center space-x-1">
                         <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
                         <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
@@ -761,25 +711,103 @@ int main() {
                 </div>
             \`;
 
-            // Simulate visualization
+            // Analyze the code
             setTimeout(() => {
-                showVisualization(data, type);
+                const analysis = analyzeCCode(codeInput);
+                const sampleData = generateSampleData(analysis);
+                
+                // Store analysis for visualization
+                window.customAnalysis = analysis;
+                window.sampleData = sampleData;
+                
+                // Show analysis results first
+                showCodeAnalysis(analysis, sampleData);
             }, 1500);
         }
-
-        function showVisualization(data, type) {
+        
+        function showCodeAnalysis(analysis, sampleData) {
             const canvas = document.getElementById('visualizationCanvas');
             
-            if (type === 'custom') {
-                showCustomVisualization();
-            } else if (type.includes('sort')) {
-                showSortingVisualization(data, type);
-            } else if (type.includes('search')) {
-                showSearchVisualization(data, type);
-            } else {
-                showDataStructureVisualization(data, type);
-            }
+            canvas.innerHTML = \`
+                <div class="analysis-results">
+                    <div class="text-center mb-6">
+                        <div class="step-indicator mb-2">✅ Code Analysis Complete!</div>
+                        <p class="text-sm text-gray-600">Detected: \${analysis.visualizationType.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())} Visualization</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-900 mb-2">Code Type:</h4>
+                            <span class="bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium">\${analysis.codeType.replace('-', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}</span>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-purple-900 mb-2">Complexity:</h4>
+                            <span class="text-purple-700 text-sm font-medium">\${analysis.complexity}</span>
+                        </div>
+                    </div>
+                    
+                    \${analysis.algorithms.length > 0 ? \`
+                        <div class="bg-green-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-green-900 mb-2">Detected Algorithms:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                \${analysis.algorithms.map(algo => \`
+                                    <span class="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">\${algo}</span>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \` : ''}
+                    
+                    \${analysis.patterns.length > 0 ? \`
+                        <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-yellow-900 mb-2">Detected Patterns:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                \${analysis.patterns.map(pattern => \`
+                                    <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">\${pattern}</span>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \` : ''}
+                    
+                    \${analysis.operations.length > 0 ? \`
+                        <div class="bg-indigo-50 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-indigo-900 mb-2">Detected Operations:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                \${analysis.operations.map(op => \`
+                                    <span class="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-sm">\${op}</span>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \` : ''}
+                    
+                    <div class="text-center">
+                        <button onclick="startAutoVisualization()" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-play mr-2"></i>Start Visualization
+                        </button>
+                    </div>
+                </div>
+            \`;
         }
+        
+        function startAutoVisualization() {
+            const analysis = window.customAnalysis;
+            const sampleData = window.sampleData;
+            
+            if (!analysis) {
+                alert('Please analyze code first');
+                return;
+            }
+            
+            // Get the primary algorithm if any are detected
+            let primaryAlgorithm = 'Custom Code';
+            if (analysis.algorithms.length > 0) {
+                primaryAlgorithm = analysis.algorithms[0];
+            }
+            
+            // Show adaptive visualization using the enhanced routing system
+            showAdaptiveVisualization(sampleData, primaryAlgorithm, analysis.visualizationType, analysis);
+        }
+
+        // Legacy function - no longer used in auto-detection system
 
         function showCustomVisualization() {
             const canvas = document.getElementById('visualizationCanvas');
@@ -832,32 +860,26 @@ int main() {
             const analysis = window.customAnalysis;
             const sampleData = window.sampleData;
             
-            if (!analysis || analysis.algorithms.length === 0) {
+            if (!analysis) {
                 canvas.innerHTML = \`
                     <div class="text-center text-gray-500">
-                        <i class="fas fa-info-circle text-4xl mb-4"></i>
-                        <p>No specific algorithms detected. Try adding more detailed code.</p>
+                        <i class="fas fa-exclamation-circle text-4xl mb-4"></i>
+                        <p>Please analyze code first by entering code in the input area.</p>
                     </div>
                 \`;
                 return;
             }
             
-            // Start with the first detected algorithm
-            const primaryAlgorithm = analysis.algorithms[0].toLowerCase();
-            let visualizationType = 'sort';
+            // Use the enhanced analysis system
+            let primaryAlgorithm = 'Custom Code';
             
-            if (primaryAlgorithm.includes('search')) {
-                visualizationType = 'search';
-            } else if (primaryAlgorithm.includes('tree')) {
-                visualizationType = 'tree';
-            } else if (primaryAlgorithm.includes('list')) {
-                visualizationType = 'list';
-            } else if (primaryAlgorithm.includes('stack') || primaryAlgorithm.includes('queue')) {
-                visualizationType = 'stack-queue';
+            // Get the primary algorithm if any are detected
+            if (analysis.algorithms.length > 0) {
+                primaryAlgorithm = analysis.algorithms[0];
             }
             
-            // Show adaptive visualization
-            showAdaptiveVisualization(sampleData, primaryAlgorithm, visualizationType, analysis);
+            // Show adaptive visualization using the enhanced routing system
+            showAdaptiveVisualization(sampleData, primaryAlgorithm, analysis.visualizationType, analysis);
         }
 
         function showAdaptiveVisualization(data, algorithm, type, analysis) {
