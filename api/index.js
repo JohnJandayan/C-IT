@@ -11,7 +11,7 @@ module.exports = (req, res) => {
   if (path.startsWith('/static/js/')) {
     // Redirect to GitHub CDN for JavaScript files
     const fileName = path.replace('/static/js/', '');
-    res.setHeader('Location', `https://cdn.jsdelivr.net/gh/JohnJandayan/C-IT@9c98efe0/static/js/${fileName}`);
+    res.setHeader('Location', `https://cdn.jsdelivr.net/gh/JohnJandayan/C-IT@main/static/js/${fileName}`);
     res.status(302).end();
     return;
   }
@@ -31,6 +31,8 @@ module.exports = (req, res) => {
     return serveAboutPage(res);
   } else if (path === '/api/compile') {
     return handleCompileRequest(req, res);
+  } else if (path.startsWith('/visualize/parse_and_visualize')) {
+    return handleParseRequest(req, res);
   } else if (path === '/') {
     return serveHomePage(res);
   }
@@ -326,7 +328,7 @@ int main() {
     </main>
 
     <!-- Load external fixed visualizer JavaScript from GitHub CDN -->
-    <script src="https://cdn.jsdelivr.net/gh/JohnJandayan/C-IT@9c98efe0/static/js/visualizer.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/JohnJandayan/C-IT@main/static/js/visualizer.js" defer></script>
 </body>
 </html>
   `);
@@ -520,6 +522,113 @@ async function handleCompileRequest(req, res) {
     } catch (error) {
       console.error('[Compile] Request error:', error);
       res.status(400).json({ error: 'Invalid request format' });
+    }
+  });
+}
+
+/**
+ * Handle visualization parsing requests (client-side parsing fallback)
+ */
+function handleParseRequest(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRFToken');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  // Only allow POST
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  let body = '';
+  req.on('data', chunk => { body += chunk.toString(); });
+  req.on('end', () => {
+    try {
+      const { code } = JSON.parse(body);
+      
+      if (!code || !code.trim()) {
+        res.status(400).json({ 
+          success: false,
+          error: 'No code provided' 
+        });
+        return;
+      }
+      
+      // Simple pattern detection
+      const hasLoops = /for\s*\(|while\s*\(|do\s+{/.test(code);
+      const hasArrays = /\[\s*\d+\s*\]|\[\s*\]/.test(code);
+      const hasSort = /sort/i.test(code);
+      const hasBubbleSort = /bubble.*sort|for.*for.*arr\[j\].*arr\[j\+1\]/is.test(code);
+      const hasPatterns = /printf.*\*|printf.*pattern/i.test(code);
+      
+      // Determine visualization type
+      let visualizationType = 'code-flow';
+      let algorithms = [];
+      let patterns = [];
+      
+      if (hasBubbleSort) {
+        visualizationType = 'sorting';
+        algorithms.push('Bubble Sort');
+      } else if (hasSort) {
+        visualizationType = 'sorting';
+        algorithms.push('Sorting Algorithm');
+      }
+      
+      if (hasPatterns) {
+        visualizationType = 'pattern';
+        patterns.push('Pattern Generation');
+      }
+      
+      if (hasLoops) {
+        patterns.push('Loops');
+      }
+      
+      if (hasArrays) {
+        patterns.push('Arrays');
+      }
+      
+      // Create a simple visualization
+      const visualization = {
+        type: visualizationType,
+        steps: [
+          {
+            step: 1,
+            title: 'Code Analysis',
+            description: 'Your code has been analyzed',
+            state: {
+              message: 'Visualization feature is in development. Use "Run Code" to execute your program.'
+            }
+          }
+        ]
+      };
+      
+      const parsed_data = {
+        algorithms,
+        patterns,
+        complexity: 'O(n)',
+        visualization_type: visualizationType
+      };
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(JSON.stringify({
+        success: true,
+        visualization,
+        parsed_data
+      }));
+      
+    } catch (error) {
+      console.error('[Parse] Request error:', error);
+      res.status(400).json({ 
+        success: false,
+        error: 'Invalid request format' 
+      });
     }
   });
 }

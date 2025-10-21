@@ -967,8 +967,9 @@ function getCSRFToken() {
         token = formInput ? formInput.value : '';
     }
     
+    // Note: CSRF not needed for Vercel serverless functions
     if (!token) {
-        console.warn('[Visualizer] CSRF token not found');
+        console.log('[Visualizer] CSRF token not found (not needed for serverless deployment)');
     }
     
     return token;
