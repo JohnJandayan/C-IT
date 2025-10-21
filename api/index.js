@@ -243,7 +243,7 @@ function serveVisualizerPage(res) {
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Enter Your C Code</label>
                 <div class="code-editor p-4">
-                    <textarea id="codeInput" rows="12" class="w-full bg-transparent text-green-400 font-mono text-sm focus:outline-none resize-none" placeholder="// Enter your C code here...
+                    <textarea id="codeEditor" rows="12" class="w-full bg-transparent text-green-400 font-mono text-sm focus:outline-none resize-none" placeholder="// Enter your C code here...
 #include <stdio.h>
 
 int main() {

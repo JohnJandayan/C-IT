@@ -74,15 +74,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== EVENT LISTENER SETUP =====
 function attachEventListeners() {
-    DOM.visualizeBtn.addEventListener('click', startVisualization);
-    DOM.stepBtn.addEventListener('click', stepThroughVisualization);
-    DOM.loadExampleBtn.addEventListener('click', showExampleModal);
-    DOM.clearBtn.addEventListener('click', clearCode);
-    DOM.closeModalBtn.addEventListener('click', hideExampleModal);
-    DOM.speedSlider.addEventListener('input', updateSpeed);
-    DOM.pauseBtn.addEventListener('click', togglePause);
-    DOM.prevStepBtn.addEventListener('click', previousStep);
-    DOM.nextStepBtn.addEventListener('click', nextStep);
+    // Attach listeners only to elements that exist
+    if (DOM.visualizeBtn) DOM.visualizeBtn.addEventListener('click', startVisualization);
+    if (DOM.stepBtn) DOM.stepBtn.addEventListener('click', stepThroughVisualization);
+    if (DOM.loadExampleBtn) DOM.loadExampleBtn.addEventListener('click', showExampleModal);
+    if (DOM.clearBtn) DOM.clearBtn.addEventListener('click', clearCode);
+    if (DOM.closeModalBtn) DOM.closeModalBtn.addEventListener('click', hideExampleModal);
+    if (DOM.speedSlider) DOM.speedSlider.addEventListener('input', updateSpeed);
+    if (DOM.pauseBtn) DOM.pauseBtn.addEventListener('click', togglePause);
+    if (DOM.prevStepBtn) DOM.prevStepBtn.addEventListener('click', previousStep);
+    if (DOM.nextStepBtn) DOM.nextStepBtn.addEventListener('click', nextStep);
 
     // Example buttons - event delegation
     document.addEventListener('click', function(e) {
@@ -93,6 +94,20 @@ function attachEventListeners() {
     
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
+        // Tab key handling for code editor indentation
+        if (e.key === 'Tab' && document.activeElement === DOM.codeEditor) {
+            e.preventDefault();
+            const start = DOM.codeEditor.selectionStart;
+            const end = DOM.codeEditor.selectionEnd;
+            const value = DOM.codeEditor.value;
+            
+            // Insert 4 spaces at cursor position
+            DOM.codeEditor.value = value.substring(0, start) + '    ' + value.substring(end);
+            
+            // Move cursor after the inserted spaces
+            DOM.codeEditor.selectionStart = DOM.codeEditor.selectionEnd = start + 4;
+        }
+        
         // Ctrl/Cmd + Enter to visualize
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             if (document.activeElement === DOM.codeEditor) {
@@ -209,13 +224,13 @@ function displayVisualization(visualization) {
     totalSteps = visualization.steps.length;
     isPlaying = false;
     
-    // Update UI
-    DOM.currentStepSpan.textContent = currentStep + 1;
-    DOM.totalStepsSpan.textContent = totalSteps;
-    DOM.progressBar.style.width = '0%';
+    // Update UI (only if elements exist)
+    if (DOM.currentStepSpan) DOM.currentStepSpan.textContent = currentStep + 1;
+    if (DOM.totalStepsSpan) DOM.totalStepsSpan.textContent = totalSteps;
+    if (DOM.progressBar) DOM.progressBar.style.width = '0%';
     
-    // Show control panel
-    DOM.controlPanel.classList.remove('hidden');
+    // Show control panel (only if it exists)
+    if (DOM.controlPanel) DOM.controlPanel.classList.remove('hidden');
     if (DOM.stepIndicators) {
         DOM.stepIndicators.classList.remove('hidden');
     }
@@ -264,6 +279,8 @@ function displayStep(step) {
 }
 
 function setStepDescription(title, description) {
+    if (!DOM.stepDescription) return; // Skip if element doesn't exist
+    
     DOM.stepDescription.innerHTML = '';
     
     const titleDiv = document.createElement('div');
@@ -554,22 +571,28 @@ function goToStep(stepIndex) {
 }
 
 function updateStepDisplay() {
-    DOM.currentStepSpan.textContent = currentStep + 1;
-    DOM.progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+    if (DOM.currentStepSpan) DOM.currentStepSpan.textContent = currentStep + 1;
+    if (DOM.progressBar) DOM.progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
     
-    // Update step indicators
-    const indicators = DOM.stepList.querySelectorAll('.step-indicator');
-    indicators.forEach((indicator, index) => {
-        indicator.classList.remove('active');
-        if (index === currentStep) {
-            indicator.classList.add('active');
-        }
-    });
+    // Update step indicators (only if element exists)
+    if (DOM.stepList) {
+        const indicators = DOM.stepList.querySelectorAll('.step-indicator');
+        indicators.forEach((indicator, index) => {
+            indicator.classList.remove('active');
+            if (index === currentStep) {
+                indicator.classList.add('active');
+            }
+        });
+    }
 }
 
 function updateSpeed() {
-    animationSpeed = parseFloat(DOM.speedSlider.value);
-    DOM.speedValue.textContent = animationSpeed + 'x';
+    if (DOM.speedSlider) {
+        animationSpeed = parseFloat(DOM.speedSlider.value);
+    }
+    if (DOM.speedValue) {
+        DOM.speedValue.textContent = animationSpeed + 'x';
+    }
     
     if (isPlaying) {
         stopAnimation();
