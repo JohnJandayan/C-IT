@@ -136,7 +136,7 @@ db.sqlite3-journal
 
 # Static files
 staticfiles/
-static/
+# static/ - REMOVED: We need to track source static files for Vercel
 
 # Media files
 media/
