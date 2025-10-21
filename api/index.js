@@ -29,6 +29,8 @@ module.exports = (req, res) => {
     return serveVisualizerPage(res);
   } else if (path === '/about') {
     return serveAboutPage(res);
+  } else if (path === '/api/compile') {
+    return handleCompileRequest(req, res);
   } else if (path === '/') {
     return serveHomePage(res);
   }
@@ -257,6 +259,9 @@ int main() {
                 <button id="visualizeBtn" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold">
                     <i class="fas fa-play mr-2"></i>Analyze and Visualize
                 </button>
+                <button id="runCodeBtn" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg">
+                    <i class="fas fa-terminal mr-2"></i>Run Code
+                </button>
                 <button id="clearBtn" class="btn-secondary text-white px-6 py-3 rounded-lg font-semibold">
                     <i class="fas fa-eraser mr-2"></i>Reset
                 </button>
@@ -295,6 +300,20 @@ int main() {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Execution Output Panel (hidden by default) -->
+        <div id="executionOutput" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-terminal text-green-600 mr-2"></i>
+                    Execution Output
+                </h2>
+                <button id="closeOutputBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="outputContent" class="font-mono text-sm"></div>
         </div>
 
         <div id="visualizationCanvas" class="visualization-canvas p-8 shadow-lg">
@@ -400,4 +419,107 @@ function serveAboutPage(res) {
 </body>
 </html>
   `);
+}
+
+/**
+ * Handle code compilation requests via Piston API
+ */
+async function handleCompileRequest(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  // Only allow POST
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  let body = '';
+  req.on('data', chunk => { body += chunk.toString(); });
+  req.on('end', async () => {
+    try {
+      const { code } = JSON.parse(body);
+      
+      if (!code || !code.trim()) {
+        res.status(400).json({ error: 'No code provided' });
+        return;
+      }
+      
+      console.log('[Compile] Executing code via Piston API...');
+      
+      // Call Piston API
+      const https = require('https');
+      const pistonData = JSON.stringify({
+        language: 'c',
+        version: '10.2.0',
+        files: [{
+          name: 'main.c',
+          content: code
+        }]
+      });
+      
+      const options = {
+        hostname: 'emkc.org',
+        port: 443,
+        path: '/api/v2/piston/execute',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(pistonData)
+        }
+      };
+      
+      const pistonReq = https.request(options, (pistonRes) => {
+        let responseData = '';
+        
+        pistonRes.on('data', (chunk) => {
+          responseData += chunk;
+        });
+        
+        pistonRes.on('end', () => {
+          try {
+            const result = JSON.parse(responseData);
+            console.log('[Compile] Piston response:', result);
+            
+            // Format response
+            const response = {
+              success: !result.compile || result.compile.code === 0,
+              stdout: result.run ? result.run.stdout : '',
+              stderr: result.run ? result.run.stderr : '',
+              compile_output: result.compile ? result.compile.output : '',
+              exit_code: result.run ? result.run.code : null,
+              language: result.language,
+              version: result.version
+            };
+            
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(JSON.stringify(response));
+          } catch (error) {
+            console.error('[Compile] Error parsing Piston response:', error);
+            res.status(500).json({ error: 'Failed to parse compiler response' });
+          }
+        });
+      });
+      
+      pistonReq.on('error', (error) => {
+        console.error('[Compile] Piston API error:', error);
+        res.status(500).json({ error: 'Compiler API request failed' });
+      });
+      
+      pistonReq.write(pistonData);
+      pistonReq.end();
+      
+    } catch (error) {
+      console.error('[Compile] Request error:', error);
+      res.status(400).json({ error: 'Invalid request format' });
+    }
+  });
 }

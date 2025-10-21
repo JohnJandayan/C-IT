@@ -84,6 +84,14 @@ function attachEventListeners() {
     if (DOM.pauseBtn) DOM.pauseBtn.addEventListener('click', togglePause);
     if (DOM.prevStepBtn) DOM.prevStepBtn.addEventListener('click', previousStep);
     if (DOM.nextStepBtn) DOM.nextStepBtn.addEventListener('click', nextStep);
+    
+    // Run Code button for compiler integration
+    const runCodeBtn = document.getElementById('runCodeBtn');
+    if (runCodeBtn) runCodeBtn.addEventListener('click', executeCode);
+    
+    // Close output panel button
+    const closeOutputBtn = document.getElementById('closeOutputBtn');
+    if (closeOutputBtn) closeOutputBtn.addEventListener('click', closeExecutionOutput);
 
     // Example buttons - event delegation
     document.addEventListener('click', function(e) {
@@ -985,6 +993,200 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ===== CODE EXECUTION (PISTON API INTEGRATION) =====
+async function executeCode() {
+    const code = DOM.codeEditor ? DOM.codeEditor.value : '';
+    
+    if (!code.trim()) {
+        showNotification('Please enter C code to execute', 'warning');
+        return;
+    }
+    
+    console.log('[Execute] Compiling and running code...');
+    
+    // Show loading state
+    const runBtn = document.getElementById('runCodeBtn');
+    if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Running...';
+    }
+    
+    try {
+        const response = await fetch('/api/compile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('[Execute] Result:', result);
+        
+        displayExecutionResult(result);
+        
+    } catch (error) {
+        console.error('[Execute] Error:', error);
+        showNotification('Failed to execute code. Please try again.', 'error');
+        displayExecutionError(error.message);
+    } finally {
+        // Restore button state
+        if (runBtn) {
+            runBtn.disabled = false;
+            runBtn.innerHTML = '<i class="fas fa-terminal mr-2"></i>Run Code';
+        }
+    }
+}
+
+function displayExecutionResult(result) {
+    const outputPanel = document.getElementById('executionOutput');
+    const outputContent = document.getElementById('outputContent');
+    
+    if (!outputPanel || !outputContent) {
+        console.warn('[Execute] Output elements not found');
+        return;
+    }
+    
+    // Show the output panel
+    outputPanel.classList.remove('hidden');
+    
+    // Clear previous content
+    outputContent.innerHTML = '';
+    
+    // Build output HTML
+    let html = '';
+    
+    // Success or error header
+    if (result.success) {
+        html += `
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="font-bold text-green-800">✅ Compilation & Execution Successful</p>
+                        <p class="text-sm text-green-700">Language: ${escapeHtml(result.language)} ${escapeHtml(result.version)}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-times-circle text-red-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="font-bold text-red-800">❌ Compilation or Execution Failed</p>
+                        <p class="text-sm text-red-700">Please check your code for errors</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Compilation output (if any)
+    if (result.compile_output && result.compile_output.trim()) {
+        html += `
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-cog text-blue-600 mr-2"></i>Compilation Output
+                </h3>
+                <div class="bg-gray-900 text-red-400 p-4 rounded-lg overflow-x-auto">
+                    <pre class="text-sm whitespace-pre-wrap">${escapeHtml(result.compile_output)}</pre>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Standard output
+    if (result.stdout) {
+        html += `
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-terminal text-green-600 mr-2"></i>Standard Output (stdout)
+                </h3>
+                <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+                    <pre class="text-sm whitespace-pre-wrap">${escapeHtml(result.stdout)}</pre>
+                </div>
+            </div>
+        `;
+    } else if (result.success) {
+        html += `
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-terminal text-green-600 mr-2"></i>Standard Output (stdout)
+                </h3>
+                <div class="bg-gray-100 text-gray-500 p-4 rounded-lg italic">
+                    (No output)
+                </div>
+            </div>
+        `;
+    }
+    
+    // Standard error
+    if (result.stderr && result.stderr.trim()) {
+        html += `
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Standard Error (stderr)
+                </h3>
+                <div class="bg-gray-900 text-yellow-400 p-4 rounded-lg overflow-x-auto">
+                    <pre class="text-sm whitespace-pre-wrap">${escapeHtml(result.stderr)}</pre>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Exit code
+    if (result.exit_code !== null && result.exit_code !== undefined) {
+        const exitColor = result.exit_code === 0 ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100';
+        html += `
+            <div class="text-sm text-gray-600">
+                <span class="font-semibold">Exit Code:</span> 
+                <span class="${exitColor} px-2 py-1 rounded">${result.exit_code}</span>
+            </div>
+        `;
+    }
+    
+    outputContent.innerHTML = html;
+    
+    // Scroll to output
+    outputPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function displayExecutionError(errorMessage) {
+    const outputPanel = document.getElementById('executionOutput');
+    const outputContent = document.getElementById('outputContent');
+    
+    if (!outputPanel || !outputContent) return;
+    
+    outputPanel.classList.remove('hidden');
+    outputContent.innerHTML = `
+        <div class="bg-red-50 border-l-4 border-red-500 p-4">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+                <div>
+                    <p class="font-bold text-red-800">Execution Error</p>
+                    <p class="text-sm text-red-700">${escapeHtml(errorMessage)}</p>
+                    <p class="text-xs text-red-600 mt-2">This may be a network error or server issue. Please try again.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    outputPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeExecutionOutput() {
+    const outputPanel = document.getElementById('executionOutput');
+    if (outputPanel) {
+        outputPanel.classList.add('hidden');
+    }
 }
 
 // ===== ERROR HANDLING =====
