@@ -210,15 +210,20 @@ function startVisualization() {
 }
 
 function setLoadingState(isLoading) {
-    DOM.visualizeBtn.disabled = isLoading;
-    DOM.codeEditor.disabled = isLoading;
+    if (DOM.visualizeBtn) {
+        DOM.visualizeBtn.disabled = isLoading;
+        
+        if (isLoading) {
+            DOM.visualizeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            DOM.visualizeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            DOM.visualizeBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Visualize Algorithm';
+            DOM.visualizeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
     
-    if (isLoading) {
-        DOM.visualizeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-        DOM.visualizeBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-        DOM.visualizeBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Visualize Algorithm';
-        DOM.visualizeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    if (DOM.codeEditor) {
+        DOM.codeEditor.disabled = isLoading;
     }
 }
 
@@ -255,6 +260,10 @@ function displayVisualization(visualization) {
 
 function displayStep(step) {
     if (!step) return;
+    if (!DOM.visualizationCanvas) {
+        console.log('[Visualizer] Visualization canvas not available');
+        return;
+    }
     
     // Update step description (XSS-safe)
     setStepDescription(step.title || 'Processing...', step.description || '');
@@ -509,6 +518,11 @@ function createDefaultVisualization(step) {
 
 // ===== STEP CONTROL FUNCTIONS =====
 function generateStepIndicators() {
+    if (!DOM.stepList) {
+        console.log('[Visualizer] Step indicators not available (element missing)');
+        return; // Skip if element doesn't exist
+    }
+    
     DOM.stepList.innerHTML = '';
     
     for (let i = 0; i < totalSteps; i++) {
@@ -526,7 +540,9 @@ function startAnimation() {
     }
     
     isPlaying = true;
-    DOM.pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    if (DOM.pauseBtn) {
+        DOM.pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }
     
     animationInterval = setInterval(() => {
         if (currentStep < totalSteps - 1) {
@@ -539,7 +555,9 @@ function startAnimation() {
 
 function stopAnimation() {
     isPlaying = false;
-    DOM.pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    if (DOM.pauseBtn) {
+        DOM.pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    }
     if (animationInterval) {
         clearInterval(animationInterval);
         animationInterval = null;
@@ -864,7 +882,9 @@ int main() {
     };
     
     if (examples[type]) {
-        DOM.codeEditor.value = examples[type];
+        if (DOM.codeEditor) {
+            DOM.codeEditor.value = examples[type];
+        }
         hideExampleModal();
         showNotification(`Loaded ${type.replace(/_/g, ' ')} example`, 'success');
     } else {
@@ -874,15 +894,21 @@ int main() {
 
 // ===== UTILITY FUNCTIONS =====
 function clearCode() {
-    DOM.codeEditor.value = '';
-    DOM.visualizationCanvas.innerHTML = `
-        <div class="text-center text-gray-500">
-            <i class="fas fa-play-circle text-4xl mb-4"></i>
-            <p class="text-lg font-medium">Click "Visualize Algorithm" to start</p>
-            <p class="text-sm">Your algorithm animation will appear here</p>
-        </div>
-    `;
-    DOM.controlPanel.classList.add('hidden');
+    if (DOM.codeEditor) {
+        DOM.codeEditor.value = '';
+    }
+    if (DOM.visualizationCanvas) {
+        DOM.visualizationCanvas.innerHTML = `
+            <div class="text-center text-gray-500">
+                <i class="fas fa-play-circle text-4xl mb-4"></i>
+                <p class="text-lg font-medium">Click "Visualize Algorithm" to start</p>
+                <p class="text-sm">Your algorithm animation will appear here</p>
+            </div>
+        `;
+    }
+    if (DOM.controlPanel) {
+        DOM.controlPanel.classList.add('hidden');
+    }
     if (DOM.stepIndicators) {
         DOM.stepIndicators.classList.add('hidden');
     }
