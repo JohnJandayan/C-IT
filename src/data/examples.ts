@@ -2,14 +2,22 @@ import { CodeExample } from '@/types';
 
 export const codeExamples: CodeExample[] = [
   {
-    id: 'hello-world',
-    title: 'Hello World',
-    category: 'Basic',
-    description: 'A simple hello world program',
+    id: 'array-demo',
+    title: 'Array Visualization',
+    category: 'Data Structures',
+    description: 'Visualize an array with multiple elements',
     code: `#include <stdio.h>
 
 int main() {
-    printf("Hello, World!\\n");
+    int numbers[] = {10, 20, 30, 40, 50};
+    int sum = 0;
+    
+    for (int i = 0; i < 5; i++) {
+        sum += numbers[i];
+        printf("numbers[%d] = %d\\n", i, numbers[i]);
+    }
+    
+    printf("Sum: %d\\n", sum);
     return 0;
 }`,
   },
@@ -21,14 +29,29 @@ int main() {
     code: `#include <stdio.h>
 
 int main() {
-    int a = 5;
-    int b = 10;
-    int sum = a + b;
-    int product = a * b;
+    int x = 10;
+    int y = 20;
+    int sum = x + y;
+    int product = x * y;
+    float average = (x + y) / 2.0;
     
+    printf("x = %d, y = %d\\n", x, y);
     printf("Sum: %d\\n", sum);
     printf("Product: %d\\n", product);
+    printf("Average: %.1f\\n", average);
     
+    return 0;
+}`,
+  },
+  {
+    id: 'hello-world',
+    title: 'Hello World',
+    category: 'Basic',
+    description: 'A simple hello world program',
+    code: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
     return 0;
 }`,
   },

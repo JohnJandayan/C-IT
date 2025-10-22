@@ -75,9 +75,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ className = '' }) => {
 
   return (
     <div className={`relative h-full ${className}`}>
-      <div className="absolute top-2 left-2 z-10 bg-gray-800 px-3 py-1 rounded text-xs font-semibold text-gray-300">
-        C Code Editor
-      </div>
       <Editor
         height="100%"
         defaultLanguage="c"

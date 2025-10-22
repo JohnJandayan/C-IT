@@ -11,15 +11,10 @@
 
 ### Core Functionality
 - **Professional Code Editor**: Monaco Editor with C syntax highlighting, line numbers, and automatic indentation
-- **Step-by-Step Visualization**: Animated execution trace with play/pause controls
-- **Data Structure Rendering**: Visual representations of:
-  - Arrays with indices and values
-  - Linked Lists with pointer arrows
-  - Binary Trees with node relationships
-  - Stacks and Queues
-  - Hash Maps
-- **Real-Time State Display**: Track variables, pointers, call stack, and memory allocations
-- **Console Output**: View `printf` output in real-time
+- **Direct Piston API Integration**: No API keys or secrets needed! Calls Piston API directly from the browser
+- **Real-Time Execution**: Compile and run C code instantly with results displayed in real-time
+- **Console Output**: View `printf` output immediately
+- **Error Handling**: Clear display of compilation and runtime errors
 - **Example Library**: Pre-loaded examples including sorting algorithms, searching, data structures, and more
 
 ### User Experience
@@ -33,8 +28,8 @@
 - **Pure React**: Built without Next.js for maximum flexibility
 - **Type-Safe**: 100% TypeScript for robust, maintainable code
 - **State Management**: Zustand for efficient, scalable state
-- **Remote Execution**: Piston API for secure C code compilation and execution
-- **Serverless Architecture**: Vercel Functions for code instrumentation
+- **Direct API Integration**: Piston API called directly from frontend - no backend needed!
+- **No Secrets Required**: Public Piston API works without API keys
 - **Production Ready**: Error boundaries, loading states, and comprehensive error handling
 
 ## 📋 Table of Contents
@@ -61,9 +56,8 @@
 - **Code Editor**: Monaco Editor (VS Code's editor)
 - **State Management**: Zustand 4.4
 - **Panel Management**: react-resizable-panels
-- **HTTP Client**: Axios
-- **Code Execution**: Piston API
-- **Hosting**: Vercel (Serverless Functions)
+- **Code Execution**: Piston API (direct integration, no backend needed)
+- **Hosting**: Vercel
 
 ## 📁 Project Structure
 
@@ -132,23 +126,7 @@ npm install
 
 This will install all required packages including React, TypeScript, Vite, Tailwind CSS, Monaco Editor, Zustand, and Axios.
 
-### 3. Set Up Environment Variables
-
-Create a `.env` file in the root directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add the Piston API URL:
-
-```env
-PISTON_API_URL=https://emkc.org/api/v2/piston
-```
-
-> **Note**: The public Piston API is free but rate-limited. For production, consider hosting your own Piston instance or using a paid service.
-
-### 4. Start the Development Server
+### 3. Start the Development Server
 
 ```bash
 npm run dev
@@ -160,15 +138,7 @@ This will start the Vite development server. Open your browser to:
 http://localhost:3000
 ```
 
-### 5. Test the Serverless Function Locally (Optional)
-
-To test the Vercel serverless function locally, you'll need the Vercel CLI:
-
-```bash
-vercel dev
-```
-
-This starts a local Vercel environment that mimics production.
+**That's it!** No environment variables needed. The app calls Piston API directly.
 
 ## 🏗 Building for Production
 
@@ -203,20 +173,14 @@ This serves the production build locally for testing before deployment.
 2. **Import Your Repository**
    - Click "Add New..." → "Project"
    - Select your Git repository
-   - Vercel will auto-detect the configuration from `vercel.json`
+   - Vercel will auto-detect the configuration
 
-3. **Configure Environment Variables**
-   - In the import screen, expand "Environment Variables"
-   - Add the following variable:
-     ```
-     PISTON_API_URL = https://emkc.org/api/v2/piston
-     ```
-   - Apply to: **Production**, **Preview**, and **Development**
-
-4. **Deploy**
+3. **Deploy**
    - Click "Deploy"
    - Vercel will build and deploy your application
    - You'll receive a production URL (e.g., `your-app.vercel.app`)
+
+**No environment variables needed!** The app works immediately.
 
 ### Method 2: Deploy via Vercel CLI
 
@@ -235,11 +199,7 @@ This serves the production build locally for testing before deployment.
    vercel --prod
    ```
 
-4. **Set Environment Variables**
-   ```bash
-   vercel env add PISTON_API_URL production
-   ```
-   When prompted, enter: `https://emkc.org/api/v2/piston`
+That's it! No environment variables to configure.
 
 ### Method 3: Deploy via GitHub Actions (CI/CD)
 
@@ -285,30 +245,16 @@ Add these secrets to your GitHub repository:
 
 ## 🔐 Environment Variables
 
-### Required Variables
+**None required!** 🎉
 
-| Variable | Description | Example Value | Where to Set |
-|----------|-------------|---------------|--------------|
-| `PISTON_API_URL` | URL of the Piston API for C code execution | `https://emkc.org/api/v2/piston` | Vercel Dashboard → Settings → Environment Variables |
+The application calls the Piston API directly from the browser. No backend, no secrets, no environment variables needed.
 
-### Setting Environment Variables in Vercel
+### Why No Environment Variables?
 
-1. Go to your project in the Vercel Dashboard
-2. Navigate to **Settings** → **Environment Variables**
-3. Add the variable:
-   - **Name**: `PISTON_API_URL`
-   - **Value**: `https://emkc.org/api/v2/piston`
-   - **Environments**: Select all (Production, Preview, Development)
-4. Click "Save"
-5. Redeploy your application for changes to take effect
-
-### Using a Private Piston Instance
-
-If you're hosting your own Piston instance:
-
-```env
-PISTON_API_URL=https://your-piston-instance.com/api/v2/piston
-```
+- **Piston API is public**: It doesn't require authentication
+- **Direct frontend integration**: Browser makes API calls directly
+- **Simpler deployment**: Just build and deploy
+- **Works everywhere**: Local development and production use the same setup
 
 ## 🏛 Architecture Overview
 
@@ -326,105 +272,65 @@ Component Layer
     ├── OutputConsole
     └── Controls
     ↓
-API Layer (Axios)
-    ↓
-Vercel Serverless Function (/api/execute)
+Direct API Call (fetch)
     ↓
 Piston API (C Code Execution)
+    ↓
+Results back to Frontend
 ```
 
 ### Code Execution Flow
 
 1. **User writes C code** in Monaco Editor
 2. **User clicks "Execute"**
-3. Frontend sends code to `/api/execute` endpoint
-4. **Vercel Serverless Function**:
+3. Frontend calls Piston API directly: `https://emkc.org/api/v2/piston/execute`
+4. **Piston API**:
    - Receives the C code
-   - Instruments the code (injects trace statements)
-   - Sends instrumented code to Piston API
-   - Piston compiles and executes the code
-   - Parses execution output into structured JSON
-   - Returns execution trace to frontend
-5. **Frontend receives trace** and stores in Zustand
-6. **User interacts** with playback controls
-7. **Visualization renders** current step's data structures
-
-### Instrumentation Process
-
-The serverless function injects `printf` statements into the C code to capture:
-- Variable declarations and assignments
-- Loop iterations
-- Function calls
-- Array operations
-- Pointer operations
-
-This creates a "trace" of the program's execution that can be played back step-by-step.
+   - Compiles the code using GCC
+   - Executes the compiled program
+   - Returns stdout, stderr, and exit code
+5. **Frontend receives results** and stores in Zustand
+6. **Visualization displays** output and any errors
 
 ## 📡 API Reference
 
-### POST /api/execute
+### Piston API
 
-Executes C code and returns an execution trace.
+The application uses the public Piston API directly:
 
-**Request Body:**
+**Endpoint**: `https://emkc.org/api/v2/piston/execute`
+
+**Request:**
 ```json
 {
-  "code": "string // C source code"
+  "language": "c",
+  "version": "*",
+  "files": [{
+    "name": "main.c",
+    "content": "// Your C code here"
+  }]
 }
 ```
 
-**Response (Success):**
+**Response:**
 ```json
 {
-  "steps": [
-    {
-      "stepNumber": 0,
-      "lineNumber": 4,
-      "code": "int x = 10;",
-      "variables": [
-        {
-          "name": "x",
-          "value": 10,
-          "type": "int",
-          "scope": "local"
-        }
-      ],
-      "pointers": [],
-      "arrays": [],
-      "linkedLists": {},
-      "trees": {},
-      "stacks": {},
-      "queues": {},
-      "hashmaps": {},
-      "callStack": [
-        {
-          "functionName": "main",
-          "lineNumber": 4,
-          "variables": []
-        }
-      ],
-      "output": ["Hello, World!"],
-      "memoryAllocations": []
-    }
-  ]
+  "language": "c",
+  "version": "10.2.0",
+  "run": {
+    "stdout": "Hello, World!\n",
+    "stderr": "",
+    "code": 0,
+    "signal": null,
+    "output": "Hello, World!\n"
+  }
 }
 ```
 
-**Response (Compilation Error):**
-```json
-{
-  "steps": [],
-  "compilationError": "main.c:4:5: error: expected ';' before '}' token"
-}
-```
-
-**Response (Runtime Error):**
-```json
-{
-  "steps": [...],
-  "error": "Segmentation fault"
-}
-```
+**Rate Limits**: The public Piston API is rate-limited. For production apps with heavy usage, consider:
+- Hosting your own Piston instance
+- Using a rate limiter on the frontend
+- Implementing request queuing
 
 ## 🐛 Troubleshooting
 
