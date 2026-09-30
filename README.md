@@ -1,475 +1,128 @@
 # C-It: An Animated C Code Visualizer
 
-![C-It Logo](https://img.shields.io/badge/C--It-Visualizer-blue?style=for-the-badge)
-![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat-square&logo=typescript)
-![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)
+C-It compiles and runs C **entirely in your browser** and animates what the program does to memory: stack frames, heap blocks, pointers, arrays, linked lists, trees, stacks and queues, step by step. The UI keeps a MARIE-style layout: editor on the left, visualization on the top right, program state and console on the bottom right, and a control bar along the bottom.
 
-**C-It** is a production-grade, animated C code visualizer built with React, TypeScript, and deployed on Vercel. It allows users to write, edit, and visualize the step-by-step execution of C code in an intuitive, animated fashion — perfect for learning algorithms, debugging, and understanding data structures.
+No server, no API keys and no cost: your code never leaves the browser.
 
-## 🚀 Features
+## Features
 
-### Core Functionality
-- **Professional Code Editor**: Monaco Editor with C syntax highlighting, line numbers, and automatic indentation
-- **Direct Piston API Integration**: No API keys or secrets needed! Calls Piston API directly from the browser
-- **Real-Time Execution**: Compile and run C code instantly with results displayed in real-time
-- **Console Output**: View `printf` output immediately
-- **Error Handling**: Clear display of compilation and runtime errors
-- **Example Library**: Pre-loaded examples including sorting algorithms, searching, data structures, and more
+- **A C interpreter in the browser.** A preprocessor, parser, type checker and bytecode VM written in TypeScript, running in a Web Worker.
+- **gcc-style diagnostics as you type.** For example `main.c:5:12: error: expected ';' before 'return'`, plus `-Wformat`-style printf/scanf checks and missing-`#include` hints.
+- **Memory-error detection, like AddressSanitizer.** It catches heap, stack and global buffer overflows, use-after-free, double free, invalid free, NULL dereference, writes to string literals, stack overflow and division by zero. It also warns about uninitialized reads and signed overflow, and reports leaks when the program exits.
+- **Two views:**
+  - **Structures:** detected arrays (cells or bars, with `i`/`j` index markers), strings, matrices, linked lists, binary trees, array-based stacks and queues, and a Stack & Heap diagram with animated pointer arrows.
+  - **Memory:** a MARIE-style hex grid of the stack, heap, globals and read-only data. Bytes are colored by the variable that owns them and flash when read or written.
+- **Stepping granularity:** **Line** (one statement per step) or **Expr** (each sub-expression, e.g. `a[j] > a[j+1] ⇒ 1`).
+- **Animations:** values that change flash and slide in, copied values fly from their source to their destination (swaps are visible), pointer arrows re-route, and frames and heap blocks pop in and out. There's a *Less motion* toggle, and the OS reduced-motion setting is respected.
+- **Interactive input:** `scanf`, `getchar` and `fgets` pause the program and show an input line in the console. **EOF** or Ctrl+D sends end-of-file.
+- **Debugger controls:** breakpoints (click the gutter or press F9), Continue (F5), Run to cursor (right-click in the editor), a timeline scrubber, and stepping backward.
+- **Auto-save and share links:** code and settings persist in `localStorage`. **Share** copies a link with the program compressed into the URL fragment, which browsers never send to a server.
+- **36 examples:** basics, sorting (bubble, selection, insertion, merge, quick), searching, pointers, structs, recursion, linked lists, BST, stack, circular queue, `realloc`, `scanf`, and intentional memory bugs.
 
-### User Experience
-- **Resizable Panels**: Customize your workspace with draggable panel dividers
-- **Playback Controls**: Play, pause, step forward/backward, reset, and adjustable animation speed
-- **Error Handling**: Graceful display of compilation and runtime errors
-- **Responsive Design**: Works on desktop and tablet devices
-- **Dark Theme**: Modern, eye-friendly interface
+## Run it locally
 
-### Technical Highlights
-- **Pure React**: Built without Next.js for maximum flexibility
-- **Type-Safe**: 100% TypeScript for robust, maintainable code
-- **State Management**: Zustand for efficient, scalable state
-- **Direct API Integration**: Piston API called directly from frontend - no backend needed!
-- **No Secrets Required**: Public Piston API works without API keys
-- **Production Ready**: Error boundaries, loading states, and comprehensive error handling
-
-## 📋 Table of Contents
-
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Prerequisites](#-prerequisites)
-- [Local Development Setup](#-local-development-setup)
-- [Building for Production](#-building-for-production)
-- [Vercel Deployment Guide](#-vercel-deployment-guide)
-- [Environment Variables](#-environment-variables)
-- [Architecture Overview](#-architecture-overview)
-- [API Reference](#-api-reference)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
-- [License](#-license)
-
-## 🛠 Technology Stack
-
-- **Frontend Framework**: React 18.2
-- **Language**: TypeScript 5.3
-- **Build Tool**: Vite 5.0
-- **UI Framework**: Tailwind CSS 3.4
-- **Code Editor**: Monaco Editor (VS Code's editor)
-- **State Management**: Zustand 4.4
-- **Panel Management**: react-resizable-panels
-- **Code Execution**: Piston API (direct integration, no backend needed)
-- **Hosting**: Vercel
-
-## 📁 Project Structure
-
-```
-C-IT/
-├── api/
-│   └── execute.ts              # Vercel Serverless Function for C code execution
-├── src/
-│   ├── components/
-│   │   ├── visualizers/
-│   │   │   ├── ArrayRenderer.tsx
-│   │   │   ├── LinkedListRenderer.tsx
-│   │   │   ├── TreeRenderer.tsx
-│   │   │   └── StackRenderer.tsx
-│   │   ├── CodeEditor.tsx      # Monaco Editor integration
-│   │   ├── VisualizationCanvas.tsx
-│   │   ├── StateDisplay.tsx
-│   │   ├── OutputConsole.tsx
-│   │   ├── Controls.tsx        # Playback controls
-│   │   ├── ExampleSelector.tsx
-│   │   ├── ErrorBoundary.tsx
-│   │   └── ErrorDisplay.tsx
-│   ├── data/
-│   │   └── examples.ts         # Pre-loaded code examples
-│   ├── store/
-│   │   └── visualizationStore.ts  # Zustand state management
-│   ├── types/
-│   │   └── index.ts            # TypeScript type definitions
-│   ├── App.tsx                 # Main application component
-│   ├── main.tsx                # Application entry point
-│   └── index.css               # Global styles
-├── public/
-├── index.html
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
-├── vercel.json                 # Vercel deployment configuration
-└── README.md
-```
-
-## ✅ Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Node.js**: Version 18.x or higher ([Download](https://nodejs.org/))
-- **npm**: Version 9.x or higher (comes with Node.js)
-- **Git**: For version control ([Download](https://git-scm.com/))
-- **Vercel CLI** (optional, for local serverless testing): `npm install -g vercel`
-
-## 🔧 Local Development Setup
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/C-IT.git
-cd C-IT
-```
-
-### 2. Install Dependencies
+Requirements: **Node.js 20.19+** (22 LTS recommended) and npm.
 
 ```bash
 npm install
+npm run dev          # http://localhost:3000 (opens automatically)
 ```
 
-This will install all required packages including React, TypeScript, Vite, Tailwind CSS, Monaco Editor, Zustand, and Axios.
-
-### 3. Start the Development Server
+Other scripts:
 
 ```bash
-npm run dev
+npm test             # engine + UI test suite (Vitest)
+npm run build        # type-check and production build into dist/
+npm run preview      # serve dist/ on http://localhost:4173 with production security headers
 ```
 
-This will start the Vite development server. Open your browser to:
+`npm run preview` is the closest to production: it sends the same Content-Security-Policy as the deployed site, so run it once before deploying.
+
+## Deploying
+
+The app is a static site (`dist/`), so any static host works. Both configurations are included:
+
+| | Cloudflare Pages (recommended) | Vercel |
+|---|---|---|
+| Free plan bandwidth | Unlimited | Monthly quota on Hobby |
+| Commercial use on free plan | Allowed | Hobby is non-commercial only |
+| Config in this repo | `public/_headers` | `vercel.json` |
+
+**Cloudflare Pages:** Workers & Pages → Create → Pages → connect the Git repo.
+- Build command `npm run build`, output directory `dist`.
+- The Node version comes from `.node-version` (22).
+- Unknown paths fall back to `index.html` automatically.
+
+**Vercel:** import the repo. `vercel.json` sets the build, the SPA rewrite and the headers. In *Project Settings → General*, set the Node.js version to 22.x. No environment variables are needed.
+
+## How it works
 
 ```
-http://localhost:3000
+Monaco editor ── check / run / input / stop ──▶ Web Worker (sandbox)
+                                                 preprocessor → parser + type checker
+                                                 → bytecode compiler → VM with checked memory
+    ◀── diagnostics, trace chunks, "need input", done ──
+Timeline (main thread): applies/undoes per-step memory deltas
+    → view model (frames, heap, detected shapes) → React renderers
 ```
 
-**That's it!** No environment variables needed. The app calls Piston API directly.
-
-## 🏗 Building for Production
-
-### Build the Application
-
-```bash
-npm run build
-```
-
-This command:
-1. Compiles TypeScript files
-2. Bundles the application with Vite
-3. Optimizes assets (minification, tree-shaking)
-4. Outputs production files to the `dist/` directory
-
-### Preview the Production Build
-
-```bash
-npm run preview
-```
-
-This serves the production build locally for testing before deployment.
-
-## 🚀 Vercel Deployment Guide
-
-### Method 1: Deploy via Vercel Dashboard (Recommended for First-Time Setup)
-
-1. **Create a Vercel Account**
-   - Go to [vercel.com](https://vercel.com)
-   - Sign up using GitHub, GitLab, or Bitbucket
-
-2. **Import Your Repository**
-   - Click "Add New..." → "Project"
-   - Select your Git repository
-   - Vercel will auto-detect the configuration
-
-3. **Deploy**
-   - Click "Deploy"
-   - Vercel will build and deploy your application
-   - You'll receive a production URL (e.g., `your-app.vercel.app`)
-
-**No environment variables needed!** The app works immediately.
-
-### Method 2: Deploy via Vercel CLI
-
-1. **Install Vercel CLI**
-   ```bash
-   npm install -g vercel
-   ```
-
-2. **Login to Vercel**
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy to Production**
-   ```bash
-   vercel --prod
-   ```
-
-That's it! No environment variables to configure.
-
-### Method 3: Deploy via GitHub Actions (CI/CD)
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to Vercel
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build
-        run: npm run build
-      
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.ORG_ID }}
-          vercel-project-id: ${{ secrets.PROJECT_ID }}
-          vercel-args: '--prod'
-```
-
-Add these secrets to your GitHub repository:
-- `VERCEL_TOKEN`: From Vercel Account Settings → Tokens
-- `ORG_ID`: From `.vercel/project.json` after first deployment
-- `PROJECT_ID`: From `.vercel/project.json` after first deployment
-
-## 🔐 Environment Variables
-
-**None required!** 🎉
-
-The application calls the Piston API directly from the browser. No backend, no secrets, no environment variables needed.
-
-### Why No Environment Variables?
-
-- **Piston API is public**: It doesn't require authentication
-- **Direct frontend integration**: Browser makes API calls directly
-- **Simpler deployment**: Just build and deploy
-- **Works everywhere**: Local development and production use the same setup
-
-## 🏛 Architecture Overview
-
-### Frontend Architecture
-
-```
-User Interface (React + TypeScript)
-    ↓
-State Management (Zustand)
-    ↓
-Component Layer
-    ├── CodeEditor (Monaco)
-    ├── VisualizationCanvas
-    ├── StateDisplay
-    ├── OutputConsole
-    └── Controls
-    ↓
-Direct API Call (fetch)
-    ↓
-Piston API (C Code Execution)
-    ↓
-Results back to Frontend
-```
-
-### Code Execution Flow
-
-1. **User writes C code** in Monaco Editor
-2. **User clicks "Execute"**
-3. Frontend calls Piston API directly: `https://emkc.org/api/v2/piston/execute`
-4. **Piston API**:
-   - Receives the C code
-   - Compiles the code using GCC
-   - Executes the compiled program
-   - Returns stdout, stderr, and exit code
-5. **Frontend receives results** and stores in Zustand
-6. **Visualization displays** output and any errors
-
-## 📡 API Reference
-
-### Piston API
-
-The application uses the public Piston API directly:
-
-**Endpoint**: `https://emkc.org/api/v2/piston/execute`
-
-**Request:**
-```json
-{
-  "language": "c",
-  "version": "*",
-  "files": [{
-    "name": "main.c",
-    "content": "// Your C code here"
-  }]
-}
-```
-
-**Response:**
-```json
-{
-  "language": "c",
-  "version": "10.2.0",
-  "run": {
-    "stdout": "Hello, World!\n",
-    "stderr": "",
-    "code": 0,
-    "signal": null,
-    "output": "Hello, World!\n"
-  }
-}
-```
-
-**Rate Limits**: The public Piston API is rate-limited. For production apps with heavy usage, consider:
-- Hosting your own Piston instance
-- Using a rate limiter on the frontend
-- Implementing request queuing
-
-## 🐛 Troubleshooting
-
-### Issue: Monaco Editor not loading
-
-**Solution**: Clear your browser cache and ensure the `@monaco-editor/react` package is installed:
-```bash
-npm install @monaco-editor/react
-```
-
-### Issue: "Cannot find module 'zustand'" error
-
-**Solution**: Install missing dependencies:
-```bash
-npm install zustand
-```
-
-### Issue: Execution timeout
-
-**Cause**: Code takes too long to execute (>10 seconds)
-
-**Solutions**:
-- Simplify your C code
-- Remove infinite loops
-- Reduce computation intensity
-- Increase timeout in `api/execute.ts` (line 189)
-
-### Issue: Compilation errors not displaying
-
-**Solution**: Check that the Piston API is accessible:
-```bash
-curl https://emkc.org/api/v2/piston/runtimes
-```
-
-### Issue: Vercel deployment fails
-
-**Common causes**:
-1. Missing environment variables
-2. Build errors (check Vercel logs)
-3. Incorrect `vercel.json` configuration
-
-**Solution**: Check the Vercel deployment logs and ensure all environment variables are set.
-
-### Issue: Serverless function errors in production
-
-**Solution**: Check Vercel Function Logs:
-1. Go to your Vercel project
-2. Navigate to "Deployments"
-3. Click on the latest deployment
-4. Select "Functions" tab
-5. View logs for `/api/execute`
-
-## 🎨 Customization
-
-### Adding New Examples
-
-Edit `src/data/examples.ts`:
-
-```typescript
-{
-  id: 'your-example',
-  title: 'Your Example Title',
-  category: 'Category',
-  description: 'Description',
-  code: `#include <stdio.h>
-
-int main() {
-    // Your code here
-    return 0;
-}`,
-}
-```
-
-### Changing Animation Speed Range
-
-Edit `src/components/Controls.tsx`:
-
-```typescript
-<input
-  type="range"
-  min="50"      // Faster
-  max="5000"    // Slower
-  step="50"
-  value={animationSpeed}
-  onChange={handleSpeedChange}
-/>
-```
-
-### Customizing Colors
-
-Edit `tailwind.config.js`:
-
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        // Your custom colors
-      },
-    },
-  },
-}
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/YourFeature`
-3. Commit your changes: `git commit -m 'Add YourFeature'`
-4. Push to the branch: `git push origin feature/YourFeature`
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Monaco Editor**: Microsoft's VS Code editor
-- **Piston API**: Engineer Man's code execution engine
-- **Tailwind CSS**: Utility-first CSS framework
-- **Vercel**: Deployment and serverless hosting
-
-## 📞 Contact
-
-**Developer**: John Jandayan  
-**Portfolio**: [https://portfolio-john-jandayan.vercel.app/](https://portfolio-john-jandayan.vercel.app/)
-
-## 🎯 Roadmap
-
-- [ ] Enhanced instrumentation for complex data structures
-- [ ] Support for more data structures (graphs, heaps)
-- [ ] Export execution trace as video
-- [ ] Collaborative code editing
-- [ ] User accounts and saved projects
-- [ ] Mobile app version
-
----
-
-**Built with ❤️ by John Jandayan**
+- **Source layout:**
+  - `src/engine/`: the compiler and VM (`lexer`, `preprocessor`, `parser`, `compiler`, `vm`, `memory`, `stdlib`, `format`, `worker`, `client`).
+  - `src/viewmodel/`: the trace mirror (`timeline.ts`), view building (`view.ts`) and data-structure detection (`shapes.ts`).
+  - `src/components/`: the UI. Visualizers live in `components/visualizers` and `components/viz`.
+- **Memory model:** x86-64 LP64 sizes (`int` 4, `long`/pointers 8), little-endian bytes, and realistic addresses (stack near `0x7ffe…`, heap from `0x5555555592a0`, globals near `0x404000`). Every byte has an "initialized" flag, and red zones between objects catch overflows.
+- **Trace:** each step records only its memory writes (old and new bytes), reads, frame/scope/heap events and new output, streamed to the UI every ~16 ms. Stepping backward undoes the deltas, so any step is reachable without storing snapshots.
+- **Data-structure detection uses real types:**
+  - A struct with one pointer to its own type is a list; `prev`/`next` makes it doubly linked; `left`/`right` makes it a tree.
+  - A struct with an array plus `top` is a stack; with `front`/`rear` it's a queue.
+  - `T[n][m]` is a matrix and a `char[]` is a string.
+
+## Supported C
+
+C99/C11 core language:
+- All operators, integer promotions and conversions (with exact 32/64-bit wraparound), `float`/`double`.
+- Pointers and pointer arithmetic, multi-dimensional arrays and VLAs.
+- `struct`/`union`/`enum`/`typedef`, designated initializers, compound literals.
+- Function pointers, recursion, variadic functions (`<stdarg.h>`), `switch`, `goto`.
+- The preprocessor (`#define` with `#`/`##`/`__VA_ARGS__`, `#if`/`#ifdef`, `#include` of standard headers).
+
+Library functions:
+- `stdio.h`: `printf` family, `scanf` family, `getchar`, `fgets`, `puts`, …
+- `stdlib.h`: `malloc`, `calloc`, `realloc`, `free`, `atoi`, `strtol`, `rand` (glibc-compatible sequence), `qsort`, `bsearch`, `exit`, …
+- `string.h`, `math.h`, `ctype.h`, `stdbool.h`, `stdint.h`, `inttypes.h`, `limits.h`, `float.h`, `assert.h`, `time.h`, `errno.h`.
+
+Not supported (you get a clear error instead):
+- Bit-fields, `_Generic`, complex numbers, `setjmp`/`longjmp`, threads, signals.
+- File I/O: `fopen` returns `NULL`, and only stdin/stdout/stderr exist.
+- Multi-file programs and non-standard headers such as `conio.h`/`windows.h`.
+
+## Limits and security
+
+- **Limits:**
+  - 64 KB of source and 64 KB of output.
+  - 200,000 recorded steps. The program keeps running after that to finish its output.
+  - 30 million instructions, which stops infinite loops.
+  - 1 MB stack and 16 MB heap.
+- **No native code runs.** The interpreter only touches its own typed arrays.
+- **Isolated worker.** The worker has no DOM access, and a watchdog restarts it if it ever stops responding.
+- **Plain-text output.** Program output is always rendered as text, never HTML.
+- **Validated share links.** They are size-capped and validated before decoding.
+- **Security headers:** a strict Content-Security-Policy (self plus `cdn.jsdelivr.net` for Monaco), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy` and `Permissions-Policy`.
+
+## Keyboard shortcuts
+
+| Keys | Action |
+|---|---|
+| Ctrl+Enter | Run / visualize |
+| Space | Play / pause |
+| → / ← | Next / previous step |
+| Shift+→ / Shift+← | Next / previous expression step |
+| Home / End | First / last step |
+| F5 | Continue to next breakpoint |
+| F9 (in editor) | Toggle breakpoint |
+
+## License
+
+MIT, see [LICENSE](LICENSE).
+
+**Built by John Jandayan** · [Portfolio](https://portfolio-john-jandayan.vercel.app/)

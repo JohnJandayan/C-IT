@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
-import { codeExamples, getExamplesByCategory } from '@/data/examples';
+import { getExamplesByCategory } from '@/data/examples';
 
 const ExampleSelector: React.FC = () => {
-  const { setCode } = useVisualizationStore();
+  const setCode = useVisualizationStore((s) => s.setCode);
+  const setBreakpoints = useVisualizationStore((s) => s.setBreakpoints);
   const [isOpen, setIsOpen] = useState(false);
   const categories = getExamplesByCategory();
 
-  const handleExampleSelect = (code: string) => {
+  const handleExampleSelect = (code: string, input?: string[]) => {
     setCode(code);
+    setBreakpoints([]);
+    useVisualizationStore.setState({ inputHint: input?.join(' ⏎ ') ?? null });
     setIsOpen(false);
   };
 
@@ -52,7 +55,7 @@ const ExampleSelector: React.FC = () => {
                 {examples.map((example) => (
                   <button
                     key={example.id}
-                    onClick={() => handleExampleSelect(example.code)}
+                    onClick={() => handleExampleSelect(example.code, example.input)}
                     className="w-full text-left px-3 py-2 rounded hover:bg-gray-700 transition-colors group"
                   >
                     <div className="font-semibold text-white group-hover:text-blue-400">
