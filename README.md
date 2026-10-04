@@ -125,4 +125,4 @@ Not supported (you get a clear error instead):
 
 MIT, see [LICENSE](LICENSE).
 
-**Built by John Jandayan** · [Portfolio](https://portfolio-john-jandayan.vercel.app/)
+**Built by John Jandayan** · [Portfolio](https://www.johnjandayan.dev/)
